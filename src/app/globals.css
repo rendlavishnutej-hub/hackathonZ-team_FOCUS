@@ -116,6 +116,15 @@ body {
   animation: spin-slow 4s linear infinite;
 }
 
+@keyframes spin-reverse-slow {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+.animate-spin-reverse-slow {
+  animation: spin-reverse-slow 4s linear infinite;
+}
+
 /* ── Custom Scrollbar (cream theme) ──────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 6px;

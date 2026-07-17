@@ -378,19 +378,19 @@ export default function LoginPage() {
 
         {/* Dynamic floating network animation mapping to AI agents */}
         <div className="relative w-full flex justify-center items-center h-[280px] z-10">
-          <div className="absolute w-[240px] h-[240px] rounded-full border border-dashed border-zinc-800 animate-spin-slow" />
+          <div className="absolute w-[240px] h-[240px] rounded-full border border-dashed border-zinc-800 animate-spin-slow flex items-center justify-center">
+            {/* Floating Orbiting Agents */}
+            <div className="absolute -translate-x-[120px] w-9 h-9 rounded-full bg-[#13131A] border border-[#7C5CFF]/30 flex items-center justify-center text-xs font-bold text-[#7C5CFF] shadow-md shadow-[#7C5CFF]/5 animate-spin-reverse-slow">P</div>
+            <div className="absolute translate-x-[120px] w-9 h-9 rounded-full bg-[#13131A] border border-[#22D3D0]/30 flex items-center justify-center text-xs font-bold text-[#22D3D0] shadow-md shadow-[#22D3D0]/5 animate-spin-reverse-slow">R</div>
+            <div className="absolute -translate-y-[120px] w-9 h-9 rounded-full bg-[#13131A] border border-[#3DD68C]/30 flex items-center justify-center text-xs font-bold text-[#3DD68C] shadow-md shadow-[#3DD68C]/5 animate-spin-reverse-slow">C</div>
+            <div className="absolute translate-y-[120px] w-9 h-9 rounded-full bg-[#13131A] border border-[#F5B942]/30 flex items-center justify-center text-xs font-bold text-[#F5B942] shadow-md shadow-[#F5B942]/5 animate-spin-reverse-slow">K</div>
+          </div>
           <div className="absolute w-[160px] h-[160px] rounded-full border border-zinc-900" />
 
           {/* Central Orchestrator Core */}
           <div className="absolute w-12 h-12 rounded-xl bg-gradient-to-tr from-[#7C5CFF] to-[#22D3D0] flex items-center justify-center shadow-lg shadow-[#7C5CFF]/25 animate-pulse">
             <Terminal className="h-5 w-5 text-zinc-950" />
           </div>
-
-          {/* Floating Orbiting Agents */}
-          <div className="absolute -translate-x-[120px] w-9 h-9 rounded-full bg-[#13131A] border border-[#7C5CFF]/30 flex items-center justify-center text-xs font-bold text-[#7C5CFF] shadow-md shadow-[#7C5CFF]/5">P</div>
-          <div className="absolute translate-x-[120px] w-9 h-9 rounded-full bg-[#13131A] border border-[#22D3D0]/30 flex items-center justify-center text-xs font-bold text-[#22D3D0] shadow-md shadow-[#22D3D0]/5">R</div>
-          <div className="absolute -translate-y-[120px] w-9 h-9 rounded-full bg-[#13131A] border border-[#3DD68C]/30 flex items-center justify-center text-xs font-bold text-[#3DD68C] shadow-md shadow-[#3DD68C]/5">C</div>
-          <div className="absolute translate-y-[120px] w-9 h-9 rounded-full bg-[#13131A] border border-[#F5B942]/30 flex items-center justify-center text-xs font-bold text-[#F5B942] shadow-md shadow-[#F5B942]/5">K</div>
         </div>
 
         <div className="space-y-6 max-w-md z-10">

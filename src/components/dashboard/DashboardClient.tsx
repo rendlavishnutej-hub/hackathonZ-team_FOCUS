@@ -46,8 +46,10 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [courses, setCourses] = useState<CourseItem[]>([]);
+  const [isMounted, setIsMounted] = useState(false);
 
   React.useEffect(() => {
+    setIsMounted(true);
     try {
       const stored = localStorage.getItem('focus_courses');
       if (stored) {
@@ -195,10 +197,10 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
           className="text-2xl font-extrabold tracking-tight"
           style={{ color: C.primary, fontFamily: 'var(--font-jakarta), sans-serif' }}
         >
-          Active Syllabus History ({courses.length})
+          Active Syllabus History ({isMounted ? courses.length : 0})
         </h2>
 
-        {courses.length === 0 ? (
+        {(!isMounted || courses.length === 0) ? (
           /* Designed empty state */
           <div
             className="border border-dashed p-12 rounded-3xl text-center space-y-4"

@@ -34,12 +34,8 @@ function Nav() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
         {/* Logo + Links */}
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-sm"
-              style={{ background: 'linear-gradient(135deg, #bec6e0 0%, #7c839b 100%)', fontFamily: 'var(--font-fredoka), sans-serif' }}>
-              F
-            </div>
-            <span className="text-xl font-bold tracking-tight" style={{ color: C.primary, fontFamily: 'var(--font-fredoka), sans-serif' }}>Focus</span>
+          <Link href="/" className="flex items-center">
+            <span className="text-3xl font-bold tracking-tight animate-pulse-subtle" style={{ color: C.primary, fontFamily: 'var(--font-fredoka), sans-serif' }}>Focus</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-6 text-sm font-medium" style={{ color: C.onSurfaceVariant }}>

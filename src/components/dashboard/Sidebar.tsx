@@ -61,15 +61,9 @@ export default function Sidebar({ userEmail }: SidebarProps) {
     >
       {/* Top Header */}
       <div className="p-6">
-        <Link href="/dashboard" className="flex items-center gap-3 group">
-          <div
-            className="h-10 w-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-md"
-            style={{ background: 'linear-gradient(135deg, #bec6e0 0%, #7c839b 100%)', fontFamily: 'var(--font-fredoka), sans-serif' }}
-          >
-            F
-          </div>
+        <Link href="/dashboard" className="flex items-center group">
           <div>
-            <span className="text-xl font-bold tracking-tight block" style={{ color: C.primary, fontFamily: 'var(--font-fredoka), sans-serif' }}>
+            <span className="text-3xl font-bold tracking-tight block" style={{ color: C.primary, fontFamily: 'var(--font-fredoka), sans-serif' }}>
               Focus
             </span>
             <span

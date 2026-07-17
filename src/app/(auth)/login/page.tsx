@@ -94,6 +94,10 @@ function LoginForm() {
     setPasskeyLoading(true);
 
     try {
+      if (typeof window !== 'undefined' && !window.isSecureContext) {
+        throw new Error('Passkeys require a secure connection (HTTPS or localhost).');
+      }
+
       const optionsRes = await fetch('/api/auth/webauthn/login/options', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -125,7 +129,11 @@ function LoginForm() {
       }
     } catch (err: any) {
       console.error('Passkey authentication error:', err);
-      setError(err.message || 'Passkey authentication failed. Ensure you have registered a passkey first.');
+      if (err.name === 'NotAllowedError') {
+        setError('Passkey login was cancelled or is not allowed on this device.');
+      } else {
+        setError(err.message || 'Passkey authentication failed. Ensure you have registered a passkey first.');
+      }
     } finally {
       setPasskeyLoading(false);
     }

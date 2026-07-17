@@ -1,0 +1,262 @@
+'use server';
+
+import { createClient, createAdminClient } from '@/utils/supabase/server';
+import { headers } from 'next/headers';
+import { checkRateLimit } from '@/utils/rateLimit';
+import { checkLockout, incrementFailedAttempts, resetFailedAttempts } from '@/utils/lockout';
+import { evaluatePassword } from '@/utils/passwordStrength';
+import { redirect } from 'next/navigation';
+
+// Helper to extract session_id from Supabase JWT access token
+function getSessionIdFromToken(token: string): string | undefined {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return undefined;
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
+    return payload.session_id;
+  } catch {
+    return undefined;
+  }
+}
+
+// Helper to parse client IP and User Agent from request headers
+async function getClientMetadata() {
+  const headersList = await headers();
+  const rawIp = headersList.get('x-forwarded-for') || headersList.get('x-real-ip') || '127.0.0.1';
+  let ipAddress = rawIp.split(',')[0].trim();
+  if (ipAddress === '::1') {
+    ipAddress = '127.0.0.1';
+  }
+  const userAgent = headersList.get('user-agent') || 'Unknown Device';
+  
+  // Local IP check for location formatting
+  const isLocal = ipAddress === '127.0.0.1' || ipAddress.startsWith('192.168.') || ipAddress.startsWith('10.');
+  const location = isLocal ? 'Localhost Development' : 'Remote Client';
+
+  return { ipAddress, userAgent, location };
+}
+
+/**
+ * Server Action: Sign Up User
+ */
+export async function signUpAction(formData: FormData) {
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+  const displayName = formData.get('displayName') as string;
+
+  if (!email || !password) {
+    return { error: 'Email and password are required' };
+  }
+
+  const { ipAddress } = await getClientMetadata();
+
+  // 1. Rate Limiting Check on Route level
+  const rateLimitResult = await checkRateLimit(ipAddress);
+  if (!rateLimitResult.success) {
+    return { error: 'Too many requests. Please wait a minute and try again.' };
+  }
+
+  // 2. Client & Server Password Strength Check (zxcvbn score >= 3 required)
+  const strength = evaluatePassword(password, [email, displayName]);
+  if (strength.score < 3) {
+    return { error: 'Password is too weak. Ensure it is not easily guessable.' };
+  }
+
+  // 2. HaveIBeenPwned API check to reject compromised passwords
+  try {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const pwnedRes = await fetch(`${appUrl}/api/auth/pwned`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
+    });
+    if (pwnedRes.ok) {
+      const pwnedData = await pwnedRes.json();
+      if (pwnedData.pwned) {
+        return { error: `This password was found in a database breach (${pwnedData.count} times). Please choose a different password.` };
+      }
+    }
+  } catch (err) {
+    console.error('Password breach API check failed:', err);
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/callback`,
+      data: {
+        display_name: displayName || email.split('@')[0],
+      },
+    },
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  // Check if email confirmation is required (Supabase returns a user but session is null if unverified)
+  if (data.user && !data.session) {
+    return { success: true, message: 'Signup successful! Please check your email for the confirmation link.' };
+  }
+
+  return { success: true, redirect: '/dashboard' };
+}
+
+/**
+ * Server Action: Sign In User
+ */
+export async function signInAction(formData: FormData) {
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+
+  if (!email || !password) {
+    return { error: 'Email and password are required' };
+  }
+
+  const { ipAddress, userAgent, location } = await getClientMetadata();
+
+  // 1. Rate Limiting Check on Route level
+  const rateLimitResult = await checkRateLimit(ipAddress);
+  if (!rateLimitResult.success) {
+    return { error: 'Too many requests. Please wait a minute and try again.' };
+  }
+
+  // 2. Account Lockout Check
+  const lockout = await checkLockout(email);
+  if (lockout.locked) {
+    return { error: `Account is temporarily locked due to too many failed attempts. Try again in ${Math.ceil(lockout.remaining / 60)} minutes.` };
+  }
+
+  const supabase = await createClient();
+  const adminClient = createAdminClient();
+
+  // Resolve user_id if possible (even for failed attempts)
+  let userId: string | undefined;
+  try {
+    const { data: profile } = await adminClient
+      .from('profiles')
+      .select('id')
+      .eq('email', email.toLowerCase())
+      .maybeSingle();
+    if (profile) {
+      userId = profile.id;
+    }
+  } catch (err) {
+    // Silently continue if we cannot fetch user by email
+  }
+
+  // 3. Authenticate with Supabase Auth
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error) {
+    // Increments failed attempts and logs audit trail
+    await incrementFailedAttempts(email);
+    
+    // Log failed attempt in sessions_log
+    await adminClient.from('sessions_log').insert({
+      user_id: userId || null,
+      ip_address: ipAddress,
+      user_agent: userAgent,
+      location,
+      login_status: 'failed',
+      is_active: false,
+    });
+
+    return { error: error.message };
+  }
+
+  // Successful login: reset failed attempts
+  await resetFailedAttempts(email);
+
+  const session = data.session;
+  const sessionId = session ? getSessionIdFromToken(session.access_token) : undefined;
+
+  // Log successful login session
+  if (session && session.user) {
+    await adminClient.from('sessions_log').insert({
+      user_id: session.user.id,
+      session_id: sessionId || null,
+      ip_address: ipAddress,
+      user_agent: userAgent,
+      location,
+      login_status: 'success',
+      is_active: true,
+    });
+  }
+
+  // Check MFA (AAL status)
+  const { data: aalData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (aalData && aalData.nextLevel === 'aal2' && aalData.currentLevel === 'aal1') {
+    // User has MFA enrolled but needs to complete verification
+    return { success: true, mfaRequired: true, redirect: '/mfa/verify' };
+  }
+
+  return { success: true, redirect: '/dashboard' };
+}
+
+/**
+ * Server Action: Sign Out User
+ */
+export async function signOutAction() {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  redirect('/login');
+}
+
+/**
+ * Server Action: Request Password Reset
+ */
+export async function resetPasswordRequestAction(formData: FormData) {
+  const email = formData.get('email') as string;
+  if (!email) {
+    return { error: 'Email is required' };
+  }
+
+  const { ipAddress } = await getClientMetadata();
+  const rateLimitResult = await checkRateLimit(ipAddress);
+  if (!rateLimitResult.success) {
+    return { error: 'Too many requests. Please wait a minute and try again.' };
+  }
+
+  const supabase = await createClient();
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${appUrl}/auth/callback?next=/dashboard/reset-password`,
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return { success: true, message: 'Password reset link sent! Check your inbox.' };
+}
+
+/**
+ * Server Action: Update/Reset Password (Authenticated session)
+ */
+export async function updatePasswordAction(formData: FormData) {
+  const password = formData.get('password') as string;
+  if (!password) {
+    return { error: 'New password is required' };
+  }
+
+  // 1. Password strength checks
+  const strength = evaluatePassword(password);
+  if (strength.score < 3) {
+    return { error: 'New password is too weak. Choose a stronger password.' };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return { success: true, message: 'Password updated successfully!' };
+}

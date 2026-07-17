@@ -1,86 +1,300 @@
-# Aegis Auth: Production-Grade Next.js Authentication Template
+# 🚀 FOCUS
+## AI Career Learning Operating System
 
-A highly secure, multi-factor, passkey-first authentication platform built for modern SaaS applications. Aegis Auth combines Postgres level security policies, biometric hardware trust, k-anonymity breach audits, and sliding-window rate limiting to provide a bulletproof auth system.
+> **Learn • Practice • Interview • Improve • Get Hired**
 
----
-
-## 🛡️ Security Architecture & Threat Model
-
-Aegis Auth is built around a **Zero-Trust Client** security model. Here is how each implemented feature maps to real-world threats:
-
-### 1. HTTP-Only, SameSite Session Cookies
-*   **Threat**: Cross-Site Scripting (XSS) token theft. Standard SPAs storing tokens in `localStorage` or `sessionStorage` are vulnerable to having their tokens read by malicious scripts.
-*   **Defense**: Sessions are managed entirely using `httpOnly` secure cookies via `@supabase/ssr`. JavaScript running in the browser cannot read these cookies, preventing session hijacking via XSS. `SameSite=Lax` prevents Cross-Site Request Forgery (CSRF).
-
-### 2. Biometric Passkeys (WebAuthn / FIDO2)
-*   **Threat**: Phishing, Credential Stuffing, and Sim Swapping. Passwords and SMS codes can be intercepted by phishing sites or spoofed cell towers.
-*   **Defense**: Passkeys use cryptographic public-key cryptography tied to the specific domain (origin validation). Even if a user is tricked by a phishing site, the browser will refuse to sign the challenge for the spoofed domain. It is completely phishing-resistant.
-
-### 3. Native TOTP Multi-Factor Authentication
-*   **Threat**: Compromised passwords due to stuffing/reuse.
-*   **Defense**: Integrates Supabase's native MFA API. Logging in with a password only awards Authenticator Assurance Level 1 (`aal1`). The user is forced to authenticate using a TOTP app to achieve `aal2`. RLS database policies reject any read/write requests if the JWT claims show only `aal1` for MFA-enrolled accounts.
-
-### 4. Custom Backup Recovery Codes
-*   **Threat**: Permanent account lockout if the authenticator device is lost.
-*   **Defense**: Generates 8 single-use recovery codes upon MFA enrollment. Plaintext codes are displayed only *once* to the user. The database stores salted SHA-256 hashes of these codes. If used, the server deletes all MFA factors for the account (disabling MFA) and allows the user to re-establish access, logging the recovery event in the audit trail.
-
-### 5. k-Anonymity Password Breach Auditing
-*   **Threat**: Weak or compromised passwords.
-*   **Defense**: Live client-side `zxcvbn` estimates crack-times and rejects guessable passwords. During signup and password updates, the server checks the k-anonymity HaveIBeenPwned API (sending only the first 5 characters of the SHA-1 password hash) to check if the password has been leaked in any known data breach, rejecting it if found.
-
-### 6. IP-Based Sliding-Window Rate Limiting
-*   **Threat**: Brute-Force and Denial of Service (DoS) attacks on login/signup endpoints.
-*   **Defense**: Rate limiting powered by Upstash Redis and `@upstash/ratelimit`. Rejects clients exceeding 5 auth-related requests per minute per IP address with `429 Too Many Requests`.
-
-### 7. Account Lockout & Backoff
-*   **Threat**: Brute-force attacks targeting a single account email across different IPs.
-*   **Defense**: Tracks failed attempts per email in Upstash Redis. After 5 consecutive failed logins, the account email is locked out for 15 minutes. Successful login resets the counter.
-
-### 8. Database-Level Row Level Security (RLS)
-*   **Threat**: Broken Object Level Authorization (BOLA/IDOR) where a client manipulates API requests to read/write another user's records.
-*   **Defense**: Every database table (profiles, sessions_log, webauthn_credentials, backup_codes) is locked down with strict PostgreSQL RLS policies. The database itself validates `auth.uid() = user_id`, guaranteeing a user can never access or modify data belonging to other accounts.
-
-### 9. Session Revocation & Audit Logs
-*   **Threat**: Unmonitored active sessions on old/stolen devices.
-*   **Defense**: Keeps a live `sessions_log` detailing IP, User Agent, approximate location, and status. Users can view active logins on `/dashboard/security`. Clicking "Revoke" deletes the session from `auth.sessions`, causing the Supabase Auth server to reject the JWT on the next API request. An active PostgreSQL trigger catches this deletion and marks the log row as inactive.
+![Next.js](https://img.shields.io/badge/Next.js-15-black)
+![React](https://img.shields.io/badge/React-19-61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4-38BDF8)
+![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E)
+![AI](https://img.shields.io/badge/AI-Multi--Agent-purple)
 
 ---
 
-## 🚀 Setup & Installation
+## 🌟 Overview
 
-### 1. Clone & Install Dependencies
+**FOCUS** is an AI-powered Career Learning Operating System that combines personalized learning with intelligent mock interviews. Unlike traditional learning platforms, FOCUS creates a continuous improvement loop where specialized AI agents collaborate to teach, evaluate, and guide learners toward career readiness.
+
+---
+
+# ❗ Problem Statement
+
+Students today use separate tools for:
+- Learning concepts
+- Finding resources
+- Practicing quizzes
+- Preparing projects
+- Taking mock interviews
+- Tracking progress
+
+This fragmented workflow leads to poor personalization and inefficient learning.
+
+---
+
+# 💡 Our Solution
+
+FOCUS unifies the complete learning journey into one AI-powered platform.
+
+A dynamic Multi-Agent Orchestrator creates specialist AI agents on demand. These agents collaborate to deliver personalized learning, adaptive assessments, mock interviews, and career guidance.
+
+---
+
+# 🎯 Core Features
+
+## 📚 Learning Hub
+- Personalized learning roadmap
+- AI Tutor
+- Adaptive quizzes
+- Project recommendations
+- RAG-powered document Q&A
+- Resource finder
+- Learning analytics
+
+## 🎤 Mock Interview Hub
+- HR interviews
+- Technical interviews
+- Voice interaction
+- AI evaluation
+- Strength & weakness analysis
+- Personalized improvement plan
+
+## 📊 Career Dashboard
+- Skill tracking
+- Learning history
+- Interview readiness
+- Placement readiness
+- Mission progress
+
+---
+
+# 🧠 Multi-Agent Architecture
+
+```mermaid
+flowchart TD
+
+User --> IntentAnalyzer
+IntentAnalyzer --> AgentGenerator
+
+AgentGenerator --> Research
+AgentGenerator --> Teacher
+AgentGenerator --> Roadmap
+AgentGenerator --> Quiz
+AgentGenerator --> Project
+AgentGenerator --> Interview
+AgentGenerator --> Memory
+AgentGenerator --> Career
+
+Research --> Builder
+Teacher --> Builder
+Roadmap --> Builder
+Quiz --> Builder
+Project --> Builder
+Interview --> Builder
+Memory --> Builder
+Career --> Builder
+
+Builder --> Dashboard
+```
+
+---
+
+# 🛣️ End-to-End Workflow
+
+```text
+Login
+  ↓
+Dashboard
+  ↓
+Choose Career Goal
+  ↓
+Intent Analyzer
+  ↓
+Dynamic Agent Generator
+  ↓
+Research Agent
+Teacher Agent
+Roadmap Agent
+Quiz Agent
+Project Agent
+Interview Agent
+Memory Agent
+Career Agent
+  ↓
+Learning Experience Builder
+  ↓
+Learning Dashboard
+  ↓
+Mock Interview
+  ↓
+AI Evaluation
+  ↓
+Weakness Detection
+  ↓
+Updated Learning Roadmap
+```
+
+---
+
+# 🎓 Learning Workflow
+
+```mermaid
+flowchart LR
+
+Goal --> Analyze
+Analyze --> Research
+Research --> Roadmap
+Roadmap --> Learn
+Learn --> Quiz
+Quiz --> Project
+Project --> Progress
+```
+
+---
+
+# 🎤 Mock Interview Workflow
+
+```mermaid
+flowchart LR
+
+Resume --> Interview
+Interview --> Evaluation
+Evaluation --> SkillGap
+SkillGap --> LearningPlan
+LearningPlan --> Retry
+```
+
+---
+
+# 📈 Dashboard Modules
+
+- 🏠 Dashboard
+- 📚 Learning Missions
+- 🎤 Mock Interviews
+- 📄 Resume Analyzer
+- 📂 Documents (RAG)
+- 📊 Analytics
+- 🏆 Achievements
+- ⚙ Settings
+
+---
+
+# ⚙️ Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | Next.js, React, TypeScript |
+| Styling | Tailwind CSS |
+| Backend | Supabase |
+| Database | PostgreSQL |
+| Authentication | Supabase Auth |
+| AI | Gemini / OpenAI |
+| Vector Search | RAG |
+| Version Control | GitHub |
+
+---
+
+# 📂 Project Structure
+
+```text
+src/
+ ├── app/
+ ├── components/
+ ├── features/
+ │    ├── learning/
+ │    ├── interview/
+ │    ├── dashboard/
+ │    └── agents/
+ ├── lib/
+ ├── hooks/
+ └── utils/
+
+public/
+supabase/
+README.md
+```
+
+---
+
+# 🚀 Installation
+
 ```bash
+git clone <repository-url>
+
+cd FOCUS
+
 npm install
+
+npm run dev
 ```
 
-### 2. Configure Environment Variables
-Create a `.env.local` file with the following variables:
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
+Open:
 
-UPSTASH_REDIS_REST_URL=https://your-db-name.upstash.io
-UPSTASH_REDIS_REST_TOKEN=your-upstash-token
-
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+```text
+http://localhost:3000
 ```
-
-### 3. Database Schema Setup
-Execute the SQL migration script located in `supabase/migrations/20260713000000_schema_and_rls.sql` in the **Supabase SQL Editor** to create the tables, RPCs, triggers, and RLS policies.
-
-### 4. Supabase Dashboard Settings
-*   Go to **Authentication -> Provider Settings -> Email** and ensure **Confirm Email** is enabled.
-*   Go to **Authentication -> URL Configuration** and set the **Site URL** to `http://localhost:3000` (or your production URL), and add `http://localhost:3000/auth/callback` to the redirect URLs list.
-*   If using OAuth, configure Google/GitHub under **Authentication -> Providers** with your provider credentials.
 
 ---
 
-## 🛠️ Tech Stack
-*   **Framework**: Next.js 14+ App Router (TypeScript)
-*   **Database & Auth**: Supabase (PostgreSQL, RLS)
-*   **SDK**: `@supabase/ssr`
-*   **Rate Limiting**: `@upstash/ratelimit` + `@upstash/redis`
-*   **Biometrics (Passkeys)**: `@simplewebauthn/server` & `@simplewebauthn/browser`
-*   **Password Quality**: `@zxcvbn-ts/core`
-*   **Styling**: Tailwind CSS
+# 📸 Screenshots
+
+Replace these placeholders before final submission.
+
+- Landing Page
+- Dashboard
+- Learning Mission
+- AI Agent View
+- Mock Interview
+- Analytics
+- Career Report
+
+---
+
+# 🔮 Future Scope
+
+- Live coding interviews
+- AI Resume Builder
+- ATS Resume Scoring
+- Company-specific interview preparation
+- Team learning
+- Faculty dashboard
+- Placement analytics
+- AI voice avatar
+
+---
+
+# 👥 Team
+
+| Member | Responsibility |
+|---------|----------------|
+| Team Member 1 | Frontend |
+| Team Member 2 | Backend |
+| Team Member 3 | AI Workflow |
+| Team Member 4 | Mock Interview |
+| Team Member 5 | Integration |
+
+---
+
+# 🏆 Why FOCUS?
+
+✅ Personalized Learning
+
+✅ Multi-Agent Collaboration
+
+✅ AI Mock Interviews
+
+✅ Continuous Skill Improvement
+
+✅ Career Readiness Dashboard
+
+✅ Modern SaaS User Experience
+
+---
+
+## ⭐ Vision
+
+> **FOCUS isn't just another learning platform. It's an AI-powered Career Learning Operating System that helps learners acquire skills, validate knowledge through intelligent interviews, and continuously improve through collaborative AI agents.**
+
+---
+
+Made with ❤️ for Hack2Hire 24-Hour Hackathon.

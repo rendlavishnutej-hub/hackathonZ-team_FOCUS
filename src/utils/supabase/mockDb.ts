@@ -165,9 +165,11 @@ export async function runMockQuery(builder: {
       // Strict RLS: can only access row belonging to user_id
       filtered = filtered.filter(row => row.user_id === builder.currentUserId);
     } else if (builder.table === 'quiz_files') {
-      filtered = filtered.filter(row => row.userId === builder.currentUserId);
+      // Support both user_id (snake_case) and userId (camelCase)
+      filtered = filtered.filter(row => (row.user_id || row.userId) === builder.currentUserId);
     } else if (builder.table === 'quiz_attempts') {
-      filtered = filtered.filter(row => row.studentId === builder.currentUserId);
+      // Support both student_id (snake_case) and studentId (camelCase)
+      filtered = filtered.filter(row => (row.student_id || row.studentId) === builder.currentUserId);
     }
   }
 

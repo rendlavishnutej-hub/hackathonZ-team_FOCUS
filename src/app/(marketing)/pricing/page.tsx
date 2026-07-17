@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { Terminal, Check, ArrowRight } from 'lucide-react';
+import { Check, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Pricing — FOCUS AI',
@@ -15,7 +15,25 @@ export const metadata: Metadata = {
   alternates: { canonical: '/pricing' },
 };
 
-
+const C = {
+  cream: '#fef9f2',
+  primary: '#000000',
+  onPrimary: '#ffffff',
+  surfaceContainerLowest: '#ffffff',
+  surfaceContainerLow: '#f8f3ec',
+  surfaceContainer: '#f2ede6',
+  surfaceContainerHigh: '#ece7e1',
+  surfaceVariant: '#e6e2db',
+  onSurface: '#1d1c18',
+  onSurfaceVariant: '#45464d',
+  outline: '#76777d',
+  outlineVariant: '#c6c6cd',
+  accentYellow: '#ffe24c',
+  accentBlue: '#bec6e0',
+  accentPink: '#ffafd3',
+  accentGreen: '#86efac',
+  accentPurple: '#d3579a',
+};
 
 export default function PricingPage() {
   const plans = [
@@ -68,27 +86,37 @@ export default function PricingPage() {
   ];
 
   return (
-    <div className="flex-1 bg-[#0A0A0F] text-[#F5F5F7] flex flex-col min-h-screen relative dots-bg">
-      <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-[#7C5CFF]/5 rounded-full blur-[100px] pointer-events-none" />
+    <div 
+      className="flex-1 flex flex-col min-h-screen relative dots-bg"
+      style={{ backgroundColor: C.cream, color: C.onSurface, fontFamily: 'var(--font-jakarta), sans-serif' }}
+    >
+      <div className="absolute top-0 left-1/4 w-[400px] h-[400px] rounded-full blur-[100px] pointer-events-none" style={{ backgroundColor: 'rgba(124,92,255,0.05)' }} />
 
       {/* Header */}
-      <header className="w-full border-b border-white/5 py-4 px-6 sm:px-12 flex justify-between items-center max-w-7xl mx-auto z-10">
+      <header 
+        className="w-full border-b py-4 px-6 sm:px-12 flex justify-between items-center max-w-7xl mx-auto z-10"
+        style={{ borderColor: C.surfaceVariant }}
+      >
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-[#7C5CFF] to-[#22D3D0] p-[1px]">
-            <div className="h-full w-full bg-zinc-950 rounded-[11px] flex items-center justify-center">
-              <Terminal className="h-4.5 w-4.5 text-[#22D3D0]" />
-            </div>
+          <div
+            className="h-9 w-9 rounded-xl flex items-center justify-center text-white font-bold text-sm"
+            style={{ background: 'linear-gradient(135deg, #bec6e0 0%, #7c839b 100%)' }}
+          >
+            F
           </div>
-          <span className="font-display text-2xl tracking-wide text-white">FOCUS</span>
+          <span className="text-2xl font-extrabold tracking-tight" style={{ color: C.primary }}>
+            Focus
+          </span>
         </Link>
 
         <div className="flex items-center gap-4">
-          <Link href="/login" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">
+          <Link href="/login" className="text-sm font-semibold transition-colors" style={{ color: C.onSurfaceVariant }}>
             Sign In
           </Link>
           <Link 
             href="/signup" 
-            className="px-4 py-2 bg-gradient-to-r from-[#7C5CFF] to-[#22D3D0] text-zinc-950 text-xs font-bold rounded-lg transition-all"
+            className="px-4 py-2 text-xs font-bold rounded-lg transition-all hover:scale-[1.01]"
+            style={{ backgroundColor: C.primary, color: C.onPrimary }}
           >
             Get Started
           </Link>
@@ -98,14 +126,14 @@ export default function PricingPage() {
       {/* Main Content */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-6 sm:px-12 py-16 flex flex-col items-center justify-center text-center space-y-12 z-10">
         <div className="space-y-4 max-w-3xl">
-          <span className="font-display text-sm tracking-widest text-[#7C5CFF] uppercase">
+          <span className="text-xs font-bold tracking-widest uppercase" style={{ color: C.accentPurple }}>
             PRICING SCHEME
           </span>
-          <h1 className="font-display text-4xl sm:text-6xl tracking-wide text-white uppercase leading-none">
-            INVEST IN YOUR <br />
-            <span className="text-gradient">AI ROADMAP</span>
+          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight leading-none" style={{ color: C.primary }}>
+            Invest in your <br />
+            <span className="text-gradient">AI Roadmap</span>
           </h1>
-          <p className="text-sm text-zinc-400 max-w-md mx-auto">
+          <p className="text-sm max-w-md mx-auto leading-relaxed" style={{ color: C.onSurfaceVariant }}>
             Choose the depth of your agent critiques. Upgrading grants unlimited syllabus generation.
           </p>
         </div>
@@ -115,33 +143,41 @@ export default function PricingPage() {
           {plans.map((plan) => (
             <div 
               key={plan.name}
-              className={`glass-panel p-8 rounded-3xl border flex flex-col justify-between text-left transition-all ${
+              className={`p-8 rounded-3xl border flex flex-col justify-between text-left transition-all ${
                 plan.highlighted 
-                  ? 'border-[#7C5CFF] bg-[#7C5CFF]/5 shadow-xl relative' 
-                  : 'border-white/5 bg-zinc-950/40 hover:border-white/10'
+                  ? 'shadow-xl relative' 
+                  : 'hover:shadow-md'
               }`}
+              style={{
+                backgroundColor: C.surfaceContainerLowest,
+                borderColor: plan.highlighted ? C.accentPurple : C.surfaceVariant,
+                boxShadow: plan.highlighted ? '0 12px 40px rgba(211,87,154,0.12)' : '0 4px 20px rgba(0,0,0,0.03)',
+              }}
             >
               {plan.highlighted && (
-                <span className="absolute -top-3.5 left-8 px-3 py-1 bg-gradient-to-r from-[#7C5CFF] to-[#22D3D0] text-zinc-950 text-[10px] font-bold tracking-widest uppercase rounded-full">
+                <span 
+                  className="absolute -top-3 left-8 px-3 py-0.5 text-white text-[9px] font-bold tracking-widest uppercase rounded-full"
+                  style={{ backgroundColor: C.accentPurple }}
+                >
                   RECOMMENDED
                 </span>
               )}
               
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-bold text-white">{plan.name}</h3>
-                  <p className="text-xs text-zinc-400 mt-2 leading-relaxed">{plan.description}</p>
+                  <h3 className="text-lg font-bold" style={{ color: C.primary }}>{plan.name}</h3>
+                  <p className="text-xs mt-2 leading-relaxed" style={{ color: C.onSurfaceVariant }}>{plan.description}</p>
                 </div>
                 
-                <div className="flex items-baseline text-white">
-                  <span className="text-4xl font-display tracking-tight">{plan.price}</span>
-                  {plan.period && <span className="text-sm text-zinc-500 font-semibold ml-1">{plan.period}</span>}
+                <div className="flex items-baseline" style={{ color: C.primary }}>
+                  <span className="text-4xl font-extrabold tracking-tight">{plan.price}</span>
+                  {plan.period && <span className="text-sm font-semibold ml-1" style={{ color: C.outline }}>{plan.period}</span>}
                 </div>
 
-                <ul className="space-y-3.5 border-t border-white/5 pt-6">
+                <ul className="space-y-3.5 border-t pt-6" style={{ borderColor: C.surfaceVariant }}>
                   {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2.5 text-xs text-zinc-300">
-                      <Check className="h-4 w-4 text-[#22D3D0] shrink-0 mt-0.5" />
+                    <li key={feature} className="flex items-start gap-2.5 text-xs" style={{ color: C.onSurfaceVariant }}>
+                      <Check className="h-4 w-4 shrink-0 mt-0.5" style={{ color: C.accentPurple }} />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -152,7 +188,8 @@ export default function PricingPage() {
                 {plan.highlighted ? (
                   <Link
                     href={plan.href}
-                    className="w-full flex items-center justify-center gap-1.5 py-3 px-4 rounded-xl font-semibold text-sm text-zinc-950 bg-gradient-to-r from-[#7C5CFF] to-[#22D3D0] hover:opacity-90 transition-all shadow-md"
+                    className="w-full flex items-center justify-center gap-1.5 py-3 px-4 rounded-xl font-semibold text-sm transition-all shadow-md hover:scale-[1.01]"
+                    style={{ backgroundColor: C.primary, color: C.onPrimary }}
                   >
                     {plan.cta}
                     <ArrowRight className="h-4 w-4" />
@@ -160,7 +197,12 @@ export default function PricingPage() {
                 ) : (
                   <Link
                     href={plan.href}
-                    className="w-full flex items-center justify-center gap-1.5 py-3 px-4 rounded-xl font-semibold text-xs border border-zinc-800 bg-zinc-900/40 hover:bg-zinc-900 text-zinc-300 hover:text-white transition-all"
+                    className="w-full flex items-center justify-center gap-1.5 py-3 px-4 rounded-xl font-semibold text-xs border transition-all hover:bg-zinc-50"
+                    style={{
+                      borderColor: C.outlineVariant,
+                      backgroundColor: C.surfaceContainerLow,
+                      color: C.onSurface,
+                    }}
                   >
                     {plan.cta}
                   </Link>

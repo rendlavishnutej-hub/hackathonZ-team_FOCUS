@@ -1,5 +1,7 @@
-import { createClient, createAdminClient, createClientForResponse } from '@/utils/supabase/server';
+import { createAdminClient, createClientForResponse } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
+
+export const dynamic = 'force-dynamic';
 
 function getSessionIdFromToken(token: string): string | undefined {
   try {

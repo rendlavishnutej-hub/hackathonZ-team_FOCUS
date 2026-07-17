@@ -361,6 +361,35 @@ export function createAdminClient() {
             const user = db.users.find(u => u.id === id);
             return { data: { user: user || { id, email: 'mock-user@focus.ai' } }, error: null };
           },
+          async createUser(options: any) {
+            const { getMockDb, writeMockDb, generateUUID } = await import('./mockDb');
+            const email = options.email;
+            const displayName = options.user_metadata?.display_name || email.split('@')[0];
+            const db = getMockDb();
+
+            if (db.users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+              return { data: { user: null }, error: { message: 'A user with this email has already been registered.' } };
+            }
+
+            const userId = generateUUID();
+            const user = {
+              id: userId,
+              email,
+              user_metadata: { display_name: displayName }
+            };
+            db.users.push(user);
+
+            const profile = {
+              id: userId,
+              email,
+              display_name: displayName,
+              created_at: new Date().toISOString()
+            };
+            db.profiles.push(profile);
+            writeMockDb(db);
+
+            return { data: { user }, error: null };
+          },
           async generateLink(params: any) {
             return {
               data: {

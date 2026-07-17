@@ -92,7 +92,7 @@ export default function CareerGuidanceClient({ userEmail }: CareerGuidanceClient
     setIsLoading(true);
 
     try {
-      const response = await getCareerSuggestions(message, getCourses());
+      const response = await getCareerSuggestions(message, getCourses(), messages);
       setMessages((prev) => [...prev, response]);
     } catch {
       setMessages((prev) => [

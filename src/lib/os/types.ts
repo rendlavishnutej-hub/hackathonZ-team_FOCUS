@@ -32,12 +32,15 @@ export type AgentId =
   | 'code'
   | 'project'
   | 'memory'
+  | 'profile'
+  | 'interview'
   | 'career'
   | 'evaluation'
   | 'motivation'
   | 'resource'
   | 'flashcard'
   | 'roadmap'
+  | 'report'
   | 'resume'
   | 'summary';
 
@@ -62,6 +65,11 @@ export interface AgentCard {
   status: AgentStatus;
   startedAt?: number;
   completedAt?: number;
+  thinking?: string;
+  confidence?: number; // e.g. 0.98
+  executionTimeMs?: number;
+  dependencies?: AgentId[];
+  input?: any;
   output?: any;
   error?: string;
 }
@@ -80,6 +88,14 @@ export interface UserMemory {
   totalHours: number;
   currentStreak: number;
   lastActive?: string;
+
+  // New graph representations
+  skillGraph: Record<string, number>;         // e.g. { "React Hooks": 85 }
+  learningGraph: string[];                    // chronological node path
+  weaknessGraph: string[];                    // topics needing reinforcement
+  interviewGraph: Record<string, number>;     // e.g. { "Google": 72 }
+  careerGraph: string[];                      // target jobs
+  knowledgeGraph: Record<string, string[]>;   // concept parent-to-children relations
 }
 
 // ── Workspace Result ─────────────────────────────────────────────────────────

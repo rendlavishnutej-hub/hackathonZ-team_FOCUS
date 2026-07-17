@@ -134,6 +134,12 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
         totalHours: 0,
         currentStreak: 0,
         lastActive: new Date().toISOString(),
+        skillGraph: {},
+        learningGraph: [],
+        weaknessGraph: [],
+        interviewGraph: {},
+        careerGraph: [],
+        knowledgeGraph: {},
       };
       saveMemory(defaultMem);
       setMemory(defaultMem);

@@ -14,6 +14,12 @@ function defaultMemory(): UserMemory {
     totalHours: 0,
     currentStreak: 0,
     lastActive: new Date().toISOString(),
+    skillGraph: {},
+    learningGraph: [],
+    weaknessGraph: [],
+    interviewGraph: {},
+    careerGraph: [],
+    knowledgeGraph: {},
   };
 }
 
@@ -26,7 +32,17 @@ export function loadMemory(): UserMemory {
   try {
     const raw = localStorage.getItem(MEMORY_KEY);
     if (!raw) return defaultMemory();
-    return { ...defaultMemory(), ...JSON.parse(raw) };
+    const parsed = JSON.parse(raw);
+    return {
+      ...defaultMemory(),
+      ...parsed,
+      skillGraph: parsed.skillGraph || {},
+      learningGraph: parsed.learningGraph || [],
+      weaknessGraph: parsed.weaknessGraph || [],
+      interviewGraph: parsed.interviewGraph || {},
+      careerGraph: parsed.careerGraph || [],
+      knowledgeGraph: parsed.knowledgeGraph || {},
+    };
   } catch {
     return defaultMemory();
   }
@@ -48,6 +64,21 @@ export function recordMission(prompt: string, topic: string, quizScore?: number)
   memory.previousPrompts = [prompt, ...memory.previousPrompts].slice(0, 50);
   if (!memory.learningHistory.includes(topic)) {
     memory.learningHistory = [topic, ...memory.learningHistory].slice(0, 100);
+    memory.learningGraph = [...memory.learningGraph, topic].slice(0, 50);
+  }
+
+  // Initialize skill score if not present
+  if (memory.skillGraph[topic] === undefined) {
+    memory.skillGraph[topic] = 50;
+  }
+
+  // Populate dynamic knowledge graph relationships
+  if (!memory.knowledgeGraph[topic]) {
+    memory.knowledgeGraph[topic] = [
+      'Core Mechanics',
+      'Advanced Architecture',
+      'Production Testing'
+    ];
   }
 
   // Update hours (rough estimate: 30min per mission)
@@ -64,8 +95,41 @@ export function recordMission(prompt: string, topic: string, quizScore?: number)
 
   memory.lastActive = new Date().toISOString();
 
+  // Handle quiz scores and skill upgrades
   if (quizScore !== undefined) {
     memory.completedQuizzes = [topic, ...memory.completedQuizzes].slice(0, 50);
+    const scorePercentage = Math.round(quizScore * 20); // assuming score is 0-5 scaled to 0-100
+    memory.skillGraph[topic] = scorePercentage;
+
+    if (scorePercentage >= 80) {
+      if (!memory.strongConcepts.includes(topic)) {
+        memory.strongConcepts = [...memory.strongConcepts, topic];
+      }
+      memory.weakConcepts = memory.weakConcepts.filter(t => t !== topic);
+      memory.weaknessGraph = memory.weaknessGraph.filter(t => t !== topic);
+    } else {
+      if (!memory.weakConcepts.includes(topic)) {
+        memory.weakConcepts = [...memory.weakConcepts, topic];
+      }
+      if (!memory.weaknessGraph.includes(topic)) {
+        memory.weaknessGraph = [...memory.weaknessGraph, topic];
+      }
+      memory.strongConcepts = memory.strongConcepts.filter(t => t !== topic);
+    }
+
+    // Career matching heuristics
+    const lowerTopic = topic.toLowerCase();
+    if (lowerTopic.includes('google') || lowerTopic.includes('interview') || lowerTopic.includes('sde')) {
+      memory.interviewGraph[topic] = scorePercentage;
+      if (!memory.careerGraph.includes('Software Engineer')) {
+        memory.careerGraph.push('Software Engineer');
+      }
+    }
+    if (lowerTopic.includes('react') || lowerTopic.includes('frontend') || lowerTopic.includes('next.js')) {
+      if (!memory.careerGraph.includes('Frontend Developer')) {
+        memory.careerGraph.push('Frontend Developer');
+      }
+    }
   }
 
   saveMemory(memory);

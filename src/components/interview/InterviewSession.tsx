@@ -148,6 +148,7 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
   const synthRef         = useRef<SpeechSynthesisUtterance | null>(null);
   const isListeningRef   = useRef(false);
   const isSpeakingRef    = useRef(false);
+  const transcriptRef    = useRef('');
   const logEndRef        = useRef<HTMLDivElement>(null);
   const transcriptRef    = useRef('');
   const silenceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -334,7 +335,6 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
         if (res.isFinal) final   += res[0].transcript;
         else              interim += res[0].transcript;
       }
-      
       if (final || interim) {
         console.log(`[${new Date().toISOString()}] SpeechRecognition: onresult - Final: "${final}", Interim: "${interim}"`);
       }
@@ -395,7 +395,6 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
     };
 
     recognitionRef.current = recog;
-    
     // HACK: Edge/Chrome often silently block SpeechRecognition on localhost without showing a prompt.
     // By calling standard getUserMedia first, we force the browser to show the permissions dialog.
     // Once granted, SpeechRecognition will automatically work.

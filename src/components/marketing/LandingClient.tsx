@@ -105,12 +105,12 @@ function HeroSection() {
 
           <h1 className="text-5xl sm:text-6xl font-extrabold leading-tight tracking-tight mb-6"
             style={{ color: C.primary, fontFamily: 'var(--font-jakarta), sans-serif' }}>
-            Orchestrate the Future of Learning from a{' '}
-            <span style={{ color: C.accentBlue.replace('#bec6e0', '#5a6ba8') }}>Single Prompt</span>
+            Go From One Prompt to a Complete{' '}
+            <span style={{ color: C.accentBlue.replace('#bec6e0', '#5a6ba8') }}>Course—Instantly.</span>
           </h1>
 
           <p className="text-lg mb-8 leading-relaxed" style={{ color: C.onSurfaceVariant }}>
-            Stop the daily hassle of disconnected tools. FOCUS dynamically coordinates specialist AI agents to research, design, and generate complete personalised learning experiences — instantly.
+            Stop the daily jhanjhat of disconnected tools. Focus dynamically coordinates specialist AI agents to research, design, and generate complete personalized learning experiences.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
@@ -119,7 +119,7 @@ function HeroSection() {
               className="text-center px-8 py-4 rounded-full font-semibold transition-all shadow-lg hover:scale-[1.02]"
               style={{ backgroundColor: C.primary, color: C.onPrimary, boxShadow: '0 8px 24px rgba(0,0,0,0.18)' }}
             >
-              Get Started Free
+              Shuru Karein (Get Started)
             </Link>
             <a
               href="#how-it-works"
@@ -314,10 +314,10 @@ function ProblemSection() {
 
         <h2 className="text-3xl sm:text-4xl font-extrabold mb-6" style={{ color: C.primary }}>
           The Content Creation{' '}
-          <span style={{ color: C.accentPurple }}>Maze</span>
+          <span style={{ color: C.accentPurple }}>Chakravyuh</span>
         </h2>
         <p className="max-w-2xl mx-auto mb-12 text-lg leading-relaxed" style={{ color: C.onSurfaceVariant }}>
-          Educators are trapped in a maze of disconnected tools. Writing docs, designing slides, building quizzes — the immense manual effort drains creativity. It&apos;s time to break free.
+          Educational content creation requires curriculum design, research, assessment creation, and storytelling. Today, these tasks rely on disconnected tools and immense manual effort. Even specialized AI models operate in silos, failing to deliver unified educational lakshya (objectives).
         </p>
 
         {/* Pain-point cards */}
@@ -351,10 +351,10 @@ function FeaturesSection() {
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-extrabold mb-4" style={{ color: C.primary }}>
             Dynamic Multi-Agent{' '}
-            <span style={{ color: '#5a6ba8' }}>Collaboration</span>
+            <span style={{ color: '#5a6ba8' }}>Sangam</span>
           </h2>
           <p className="max-w-2xl mx-auto" style={{ color: C.onSurfaceVariant }}>
-            Our platform brings together specialised AI models working in harmony to deliver complete educational solutions — powered by Gemini 2.0 Flash.
+            Give us an educational challenge. We&apos;ll assemble the ultimate AI mandali (team).
           </p>
         </div>
 
@@ -362,14 +362,14 @@ function FeaturesSection() {
           {[
             {
               icon: (
-                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                </svg>
+                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+                 </svg>
               ),
               iconBg: C.accentYellow,
               iconColor: '#6b4f00',
-              title: 'The AI Orchestrator',
-              desc: 'The master planner that understands your core prompt and coordinates the entire workflow across specialised sub-agents.',
+              title: 'The AI Sutradhar',
+              desc: 'No fixed workflows. Focus dynamically identifies and deploys the exact AI specialists needed for your specific learning objective.',
             },
             {
               icon: (
@@ -379,8 +379,8 @@ function FeaturesSection() {
               ),
               iconBg: C.accentBlue,
               iconColor: '#1e3a6e',
-              title: 'Specialised Agent Team',
-              desc: 'Planner, Researcher, Coder, Critic, and Quizzer agents each dedicated to specific tasks — working simultaneously.',
+              title: 'Specialized Agent Mandali',
+              desc: 'Instructional planners, researchers, and visual communicators seamlessly exchange information and review each other\'s outputs.',
             },
             {
               icon: (
@@ -391,8 +391,8 @@ function FeaturesSection() {
               ),
               iconBg: C.accentPink,
               iconColor: '#831843',
-              title: 'Personalised Guidance',
-              desc: 'Content adapts dynamically to different learning styles and levels, providing a truly targeted educational experience.',
+              title: 'Personalized Margdarshan',
+              desc: 'Agents adapt the curriculum in real-time based on learner needs, ensuring an optimized and focused educational journey.',
             },
           ].map(({ icon, iconBg, iconColor, title, desc }) => (
             <div
@@ -419,10 +419,10 @@ function FeaturesSection() {
 // ─── How it Works / Process Section ──────────────────────────────────────────
 function ProcessSection() {
   const steps = [
-    { n: '1', title: 'Define the Objective', desc: 'Provide a topic or learning goal in plain English.' },
-    { n: '2', title: 'AI Council Assembles', desc: 'Gemini-powered agents analyse and plan the structure.' },
-    { n: '3', title: 'Collaborative Execution', desc: 'Drafting, coding, and fact-checking simultaneously.' },
-    { n: '4', title: 'Ready for Review', desc: 'Export a complete, personalised learning module.', accent: true },
+    { n: '1', title: 'Define the Lakshya (Objective)', desc: 'Enter a single prompt detailing your topic, audience, and educational challenge.' },
+    { n: '2', title: 'The AI Panchayat Assembles', desc: 'The Orchestrator Agent breaks down the task and spins up specialized agents for research, writing, and assessment.' },
+    { n: '3', title: 'Collaborative Execution', desc: 'Agents share context and build the course collaboratively, ensuring pedagogical alignment.' },
+    { n: '4', title: 'Ready for Pariksha', desc: 'Export a complete, personalized learning module ready for your LMS or application.', accent: true },
   ];
 
   return (
@@ -431,7 +431,7 @@ function ProcessSection() {
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-extrabold mb-4" style={{ color: C.primary }}>
             From Prompt to Complete{' '}
-            <span style={{ color: C.accentPurple }}>Syllabus</span>
+            <span style={{ color: C.accentPurple }}>Curriculum</span>
           </h2>
           <p className="max-w-2xl mx-auto" style={{ color: C.onSurfaceVariant }}>
             See how FOCUS transforms a simple idea into a rich, structured learning journey.
@@ -486,17 +486,17 @@ function Footer() {
       {/* CTA */}
       <div className="max-w-4xl mx-auto px-4 text-center mb-16">
         <h2 className="text-3xl font-extrabold mb-4" style={{ color: C.primary }}>
-          Ready to build the ultimate digital Academy?
+          Ready to build the ultimate digital Gurukul?
         </h2>
         <p className="mb-8 text-lg" style={{ color: C.onSurfaceVariant }}>
-          Join educators and developers who are using FOCUS to create 10x better learning experiences.
+          Join the waitlist to access the Focus multi-agent content creation API.
         </p>
         <Link
           href="/signup"
           className="inline-block px-10 py-4 rounded-full font-bold text-lg hover:opacity-90 transition-all shadow-lg"
           style={{ backgroundColor: C.primary, color: C.onPrimary }}
         >
-          Get Early Access — It&apos;s Free
+          Get Early Access
         </Link>
       </div>
 

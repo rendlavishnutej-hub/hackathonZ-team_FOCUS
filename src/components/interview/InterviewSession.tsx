@@ -6,7 +6,7 @@ import {
   Mic, MicOff, Volume2, VolumeX, Brain, Loader2,
   ChevronRight, LogOut, Type, Send, Sparkles, AlertCircle
 } from 'lucide-react';
-import { InterviewState } from '@/lib/agents/interview/orchestrator';
+import type { InterviewState } from '@/lib/interview/types';
 import InterviewReport from './InterviewReport';
 
 const C = {
@@ -165,7 +165,10 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
       resumeText,
       history: [],
       currentQuestionIndex: 0,
-      maxQuestions: 5,
+      maxQuestions: 8,
+      followUpCount: 0,
+      hintsGiven: 0,
+      questionHashes: [],
       activeAgentId: null,
       status: 'idle',
       logs: [],

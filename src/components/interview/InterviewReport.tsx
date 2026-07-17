@@ -7,7 +7,7 @@ import {
   Star, Zap, Users, Target, Brain, CheckCircle, XCircle,
   BarChart3, RotateCcw
 } from 'lucide-react';
-import type { FinalReport, InterviewHistoryItem } from '@/lib/agents/interview/orchestrator';
+import type { FinalReport, InterviewHistoryItem } from '@/lib/interview/types';
 
 const C = {
   cream: '#fef9f2',
@@ -271,6 +271,78 @@ export default function InterviewReport({ report, history, role, company, diffic
         </div>
       </div>
 
+      {/* ── ENHANCED ANALYTICS ─────────────────────────────────────────────── */}
+      {(report.probabilityOfSelection !== undefined || report.companyReadiness !== undefined) && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {report.probabilityOfSelection !== undefined && (
+            <div
+              className="p-4 rounded-2xl border bg-white text-center"
+              style={{ borderColor: C.surfaceVariant }}
+            >
+              <p className="text-2xl font-extrabold" style={{ color: report.probabilityOfSelection >= 70 ? '#047857' : report.probabilityOfSelection >= 50 ? '#d97706' : '#ea580c' }}>
+                {report.probabilityOfSelection}%
+              </p>
+              <p className="text-[9px] uppercase tracking-widest text-[#76777d] mt-1 font-bold">Selection Probability</p>
+            </div>
+          )}
+          {report.companyReadiness !== undefined && (
+            <div
+              className="p-4 rounded-2xl border bg-white text-center"
+              style={{ borderColor: C.surfaceVariant }}
+            >
+              <p className="text-2xl font-extrabold" style={{ color: report.companyReadiness >= 7 ? '#047857' : report.companyReadiness >= 5 ? '#d97706' : '#ea580c' }}>
+                {report.companyReadiness}/10
+              </p>
+              <p className="text-[9px] uppercase tracking-widest text-[#76777d] mt-1 font-bold">Company Readiness</p>
+            </div>
+          )}
+          {report.estimatedLevel && (
+            <div
+              className="p-4 rounded-2xl border bg-white text-center"
+              style={{ borderColor: C.surfaceVariant }}
+            >
+              <p className="text-lg font-extrabold" style={{ color: '#5a6ba8' }}>
+                {report.estimatedLevel}
+              </p>
+              <p className="text-[9px] uppercase tracking-widest text-[#76777d] mt-1 font-bold">Estimated Level</p>
+            </div>
+          )}
+          {report.leadershipScore !== undefined && (
+            <div
+              className="p-4 rounded-2xl border bg-white text-center"
+              style={{ borderColor: C.surfaceVariant }}
+            >
+              <p className="text-2xl font-extrabold" style={{ color: report.leadershipScore >= 70 ? '#047857' : '#d97706' }}>
+                {report.leadershipScore}
+              </p>
+              <p className="text-[9px] uppercase tracking-widest text-[#76777d] mt-1 font-bold">Leadership Score</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── CONFIDENCE TREND ───────────────────────────────────────────────── */}
+      {report.confidenceTrend && report.confidenceTrend.length > 1 && (
+        <Card title="Confidence Trend" icon={<TrendingUp className="h-4 w-4" style={{ color: '#5a6ba8' }} />}>
+          <div className="h-16 flex items-end gap-1">
+            {report.confidenceTrend.map((val: number, i: number) => {
+              const height = Math.max(4, (val / 100) * 60);
+              const color = val >= 75 ? '#047857' : val >= 55 ? '#d97706' : '#ea580c';
+              return (
+                <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                  <span className="text-[8px] font-bold" style={{ color }}>{val}</span>
+                  <div
+                    className="w-full rounded-t-md transition-all duration-500"
+                    style={{ height, backgroundColor: color, opacity: 0.75, minWidth: 8 }}
+                  />
+                  <span className="text-[7px] text-zinc-400">Q{i + 1}</span>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      )}
+
       {/* ── METRIC BREAKDOWN ───────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card title="Performance Metrics" icon={<BarChart3 className="h-4 w-4" style={{ color: '#d3579a' }} />}>
@@ -395,6 +467,58 @@ export default function InterviewReport({ report, history, role, company, diffic
           </div>
         </Card>
       </div>
+
+      {/* ── LEARNING RESOURCES ─────────────────────────────────────────────── */}
+      {report.learningResources && report.learningResources.length > 0 && (
+        <Card title="Learning Resources" icon={<Star className="h-4 w-4" style={{ color: '#d97706' }} />}>
+          <div className="space-y-2">
+            {report.learningResources.map((res, i) => (
+              <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-[#fcfaf5] border border-zinc-200">
+                <div
+                  className="shrink-0 h-7 w-7 rounded-lg flex items-center justify-center text-[9px] font-bold uppercase"
+                  style={{
+                    backgroundColor: res.priority === 'High' ? 'rgba(234,88,12,0.1)' : res.priority === 'Medium' ? 'rgba(217,119,6,0.1)' : 'rgba(4,120,87,0.1)',
+                    color: res.priority === 'High' ? '#ea580c' : res.priority === 'Medium' ? '#d97706' : '#047857',
+                  }}
+                >
+                  {res.type === 'Book' ? '📖' : res.type === 'Course' ? '🎓' : res.type === 'Practice' ? '💪' : '📄'}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-black">{res.resourceName}</p>
+                  <p className="text-[10px] text-zinc-500 uppercase tracking-wider">{res.topic} · {res.type} · {res.priority} priority</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* ── PRACTICE QUESTIONS ─────────────────────────────────────────────── */}
+      {report.practiceQuestions && report.practiceQuestions.length > 0 && (
+        <Card title="Practice Questions" icon={<Users className="h-4 w-4" style={{ color: '#5a6ba8' }} />}>
+          <ol className="space-y-2 list-decimal list-inside">
+            {report.practiceQuestions.map((q, i) => (
+              <li key={i} className="text-sm text-zinc-800 leading-relaxed">
+                {q}
+              </li>
+            ))}
+          </ol>
+        </Card>
+      )}
+
+      {/* ── LEARNING TIMELINE ──────────────────────────────────────────────── */}
+      {report.learningTimeline && (
+        <div
+          className="p-4 rounded-2xl border bg-gradient-to-r from-[#fef9f2] to-white flex items-center gap-3"
+          style={{ borderColor: C.surfaceVariant }}
+        >
+          <Zap className="h-5 w-5 shrink-0" style={{ color: '#ffe24c' }} />
+          <div>
+            <p className="text-[10px] uppercase font-bold tracking-widest text-[#76777d]">Estimated Timeline</p>
+            <p className="text-sm font-semibold text-black mt-0.5">{report.learningTimeline}</p>
+          </div>
+        </div>
+      )}
 
       {/* ── RE-INTERVIEW RECOMMENDATION ──────────────────────────────────────── */}
       <div

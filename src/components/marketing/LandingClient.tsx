@@ -308,6 +308,8 @@ function HeroSection() {
 // ─── Problem Section ──────────────────────────────────────────────────────────
 function ProblemSection() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isJumping, setIsJumping] = useState(false);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -338,13 +340,43 @@ function ProblemSection() {
   return (
     <section style={{ backgroundColor: C.surfaceContainerLowest }} className="py-24 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        {/* Character with eye-tracking */}
-        <div className="flex justify-center mb-10">
+        {/* Character with eye-tracking, active hovers, and jump action */}
+        <div className="flex justify-center mb-10 select-none">
           <motion.div 
             ref={containerRef} 
-            className="w-32 h-32 relative group"
-            animate={{ y: [0, -4, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            className="w-32 h-32 relative group cursor-pointer"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            onClick={() => {
+              if (isJumping) return;
+              setIsJumping(true);
+              setTimeout(() => setIsJumping(false), 900);
+            }}
+            animate={
+              isJumping
+                ? { 
+                    y: [0, -70, 8, -3, 0],
+                    rotate: [0, 360, 360, 360, 360],
+                    scale: [1, 1.15, 0.92, 1.04, 1] 
+                  }
+                : isHovered
+                  ? { 
+                      y: [0, -10, 0],
+                      scale: 1.08,
+                      rotate: [0, -2, 2, 0]
+                    }
+                  : { 
+                      y: [0, -4, 0],
+                      scale: 1
+                    }
+            }
+            transition={
+              isJumping
+                ? { duration: 0.9, ease: "easeInOut" }
+                : isHovered
+                  ? { duration: 0.6, repeat: Infinity, ease: "easeInOut" }
+                  : { duration: 4, repeat: Infinity, ease: "easeInOut" }
+            }
           >
             {/* Owl character SVG */}
             <svg viewBox="0 0 120 120" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -361,16 +393,69 @@ function ProblemSection() {
               <circle cx="75" cy="44" r="13" fill="white" />
               {/* Beak */}
               <polygon points="60,52 53,62 67,62" fill="#e2a800" />
-              {/* Wings */}
-              <ellipse cx="28" cy="80" rx="12" ry="22" fill="#e2a800" transform="rotate(-15 28 80)" />
-              <ellipse cx="92" cy="80" rx="12" ry="22" fill="#e2a800" transform="rotate(15 92 80)" />
+              
+              {/* Left Wing with flight/flap animation */}
+              <motion.g
+                style={{ transformOrigin: '28px 80px' }}
+                animate={
+                  isJumping
+                    ? { rotate: [-15, -95, -15], scaleX: [1, 1.1, 1] }
+                    : isHovered
+                      ? { rotate: [-15, -80, 20, -15] }
+                      : { rotate: [-15, -22, -15] }
+                }
+                transition={
+                  isJumping
+                    ? { duration: 0.9, ease: "easeInOut" }
+                    : isHovered
+                      ? { duration: 0.22, repeat: Infinity, ease: "easeInOut" }
+                      : { duration: 3.5, repeat: Infinity, ease: "easeInOut" }
+                }
+              >
+                <ellipse cx="28" cy="80" rx="12" ry="22" fill="#e2a800" />
+              </motion.g>
+
+              {/* Right Wing with flight/flap animation */}
+              <motion.g
+                style={{ transformOrigin: '92px 80px' }}
+                animate={
+                  isJumping
+                    ? { rotate: [15, 95, 15], scaleX: [1, 1.1, 1] }
+                    : isHovered
+                      ? { rotate: [15, 80, -20, 15] }
+                      : { rotate: [15, 22, 15] }
+                }
+                transition={
+                  isJumping
+                    ? { duration: 0.9, ease: "easeInOut" }
+                    : isHovered
+                      ? { duration: 0.22, repeat: Infinity, ease: "easeInOut" }
+                      : { duration: 3.5, repeat: Infinity, ease: "easeInOut" }
+                }
+              >
+                <ellipse cx="92" cy="80" rx="12" ry="22" fill="#e2a800" />
+              </motion.g>
+
               {/* Feet */}
-              <ellipse cx="48" cy="112" rx="10" ry="5" fill="#e2a800" />
-              <ellipse cx="72" cy="112" rx="10" ry="5" fill="#e2a800" />
+              <motion.g
+                style={{ transformOrigin: '60px 112px' }}
+                animate={
+                  isJumping
+                    ? { y: [0, 4, -4, 0], scaleY: [1, 0.7, 1.1, 1] }
+                    : isHovered
+                      ? { y: [0, -2, 0] }
+                      : { y: 0 }
+                }
+                transition={{ duration: 0.6 }}
+              >
+                <ellipse cx="48" cy="112" rx="10" ry="5" fill="#e2a800" />
+                <ellipse cx="72" cy="112" rx="10" ry="5" fill="#e2a800" />
+              </motion.g>
             </svg>
-            {/* Left pupil overlay */}
-            <div
-              className="absolute pupil"
+
+            {/* Left pupil overlay - squints on hover/jump */}
+            <motion.div
+              className="absolute pupil transition-all duration-75"
               style={{
                 width: 20, height: 20,
                 borderRadius: '50%',
@@ -380,12 +465,20 @@ function ProblemSection() {
                 padding: 3, zIndex: 20,
                 transform: 'translate(var(--eye-x, 0px), var(--eye-y, 0px))',
               }}
+              animate={
+                isJumping
+                  ? { scaleY: 0.15, scaleX: 1.1 }
+                  : isHovered
+                    ? { scale: 1.15 }
+                    : { scale: 1 }
+              }
             >
-              <div style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: 'white' }} />
-            </div>
-            {/* Right pupil overlay */}
-            <div
-              className="absolute pupil"
+              {!isJumping && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+            </motion.div>
+
+            {/* Right pupil overlay - winks/squints on hover/jump */}
+            <motion.div
+              className="absolute pupil transition-all duration-75"
               style={{
                 width: 24, height: 24,
                 borderRadius: '50%',
@@ -395,9 +488,16 @@ function ProblemSection() {
                 padding: 4, zIndex: 20,
                 transform: 'translate(var(--eye-x, 0px), var(--eye-y, 0px))',
               }}
+              animate={
+                isJumping
+                  ? { scaleY: 0.15, scaleX: 1.1 }
+                  : isHovered
+                    ? { scale: 1.15 }
+                    : { scale: 1 }
+              }
             >
-              <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'white' }} />
-            </div>
+              {!isJumping && <div className="w-2 h-2 rounded-full bg-white" />}
+            </motion.div>
           </motion.div>
         </div>
 

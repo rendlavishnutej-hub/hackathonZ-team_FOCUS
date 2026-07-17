@@ -23,7 +23,7 @@ async function executeAgent(
       case 'research':   result = await runResearchAgent(intent); break;
       case 'curriculum': result = await runCurriculumAgent(intent); break;
       case 'diagram':    result = await runDiagramAgent(intent); break;
-      case 'quiz':       result = await runQuizAgent(intent, outputs['research']?.notes); break;
+      case 'quiz':       result = await runQuizAgent(intent, outputs['research']?.notes, Date.now()); break;
       case 'code':       result = await runCodeAgent(intent); break;
       case 'flashcard':  result = await runFlashcardAgent(intent); break;
       case 'project':    result = await runProjectAgent(intent); break;

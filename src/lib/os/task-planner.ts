@@ -7,24 +7,23 @@ import type { IntentAnalysis, IntentType, AgentId, AgentExecutionGroup, AgentPla
 const INTENT_PLANS: Record<IntentType, AgentExecutionGroup[]> = {
   learn: [
     { parallel: false, agents: ['memory'] },
-    { parallel: true,  agents: ['curriculum', 'research', 'diagram'] },
-    { parallel: true,  agents: ['code', 'quiz', 'flashcard'] },
-    { parallel: true,  agents: ['project', 'resource'] },
+    { parallel: true,  agents: ['curriculum', 'research', 'diagram', 'roadmap'] },
+    { parallel: true,  agents: ['quiz', 'flashcard'] },
+    { parallel: true,  agents: ['resource'] },
     { parallel: false, agents: ['motivation'] },
     { parallel: false, agents: ['summary'] },
   ],
   interview_prep: [
     { parallel: false, agents: ['memory'] },
     { parallel: true,  agents: ['roadmap', 'evaluation', 'career'] },
-    { parallel: true,  agents: ['quiz', 'code'] },
+    { parallel: true,  agents: ['quiz'] },
     { parallel: true,  agents: ['resume', 'resource'] },
     { parallel: false, agents: ['motivation'] },
     { parallel: false, agents: ['summary'] },
   ],
   project: [
     { parallel: false, agents: ['memory'] },
-    { parallel: true,  agents: ['research', 'code'] },
-    { parallel: false, agents: ['project'] },
+    { parallel: true,  agents: ['research'] },
     { parallel: true,  agents: ['resource', 'motivation'] },
     { parallel: false, agents: ['summary'] },
   ],
@@ -44,7 +43,6 @@ const INTENT_PLANS: Record<IntentType, AgentExecutionGroup[]> = {
   code: [
     { parallel: false, agents: ['memory'] },
     { parallel: false, agents: ['research'] },
-    { parallel: false, agents: ['code'] },
     { parallel: true,  agents: ['quiz', 'resource'] },
     { parallel: false, agents: ['summary'] },
   ],

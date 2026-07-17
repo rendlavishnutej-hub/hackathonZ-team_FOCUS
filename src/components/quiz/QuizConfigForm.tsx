@@ -417,7 +417,9 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
         </div>
 
         {/* Start Button */}
-        <button
+        <motion.button
+          whileHover={{ scale: 1.02, y: -2 }}
+          whileTap={{ scale: 0.98 }}
           onClick={handleStart}
           disabled={!selectedFile || generating || uploading}
           className="w-full py-3.5 bg-gradient-to-r from-[#7C5CFF] to-[#22D3D0] text-zinc-950 font-bold text-sm rounded-2xl hover:opacity-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#7C5CFF]/15 disabled:opacity-40 disabled:cursor-not-allowed"
@@ -433,7 +435,7 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
               {selectedFile ? 'Generate & Start Quiz' : 'Select or upload a document first'}
             </>
           )}
-        </button>
+        </motion.button>
       </motion.div>
     </div>
   );

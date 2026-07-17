@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Send, Sparkles, Loader2, MessageCircle, Briefcase, GraduationCap, ArrowDown } from 'lucide-react';
 import { getCareerSuggestions, type CareerMessage } from '@/lib/careerGuidanceService';
 
@@ -127,33 +128,47 @@ export default function CareerGuidanceClient({ userEmail }: CareerGuidanceClient
   // ─── Render helpers ─────────────────────────────────────────────────────────
 
   const renderEmptyState = () => (
-    <div className="flex-1 flex flex-col items-center justify-center px-4 py-16">
+    <motion.div 
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, margin: "-50px" }}
+      variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
+      className="flex-1 flex flex-col items-center justify-center px-4 py-16"
+    >
       {/* Hero icon */}
-      <div
+      <motion.div
+        variants={{ hidden: { opacity: 0, scale: 0.8 }, show: { opacity: 1, scale: 1, transition: { type: 'spring' } } }}
         className="h-20 w-20 rounded-3xl flex items-center justify-center mb-6 shadow-lg"
         style={{
           background: 'linear-gradient(135deg, #bec6e0 0%, #7c839b 50%, #d3579a 100%)',
         }}
       >
         <GraduationCap className="h-10 w-10 text-white" />
-      </div>
+      </motion.div>
 
-      <h2
+      <motion.h2
+        variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
         className="text-2xl sm:text-3xl font-extrabold tracking-tight text-center mb-2"
         style={{ color: C.primary, fontFamily: 'var(--font-jakarta), sans-serif' }}
       >
         Career Guidance
-      </h2>
-      <p className="text-sm text-center max-w-md mb-10" style={{ color: C.onSurfaceVariant }}>
+      </motion.h2>
+      <motion.p 
+        variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
+        className="text-sm text-center max-w-md mb-10" style={{ color: C.onSurfaceVariant }}
+      >
         Ask me anything about career paths, skills, and opportunities. I&apos;ll give you personalised suggestions
         {getCourses().length > 0 ? ' based on your current courses.' : '.'}
-      </p>
+      </motion.p>
 
       {/* Starter question cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
         {STARTER_QUESTIONS.map((sq, i) => (
-          <button
+          <motion.button
             key={i}
+            variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => handleSend(sq.question)}
             className="group text-left p-4 rounded-2xl border transition-all duration-200 hover:shadow-md"
             style={{
@@ -185,20 +200,23 @@ export default function CareerGuidanceClient({ userEmail }: CareerGuidanceClient
                 </span>
               </div>
             </div>
-          </button>
+          </motion.button>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 
   const renderMessage = (msg: CareerMessage) => {
     const isUser = msg.role === 'user';
 
     return (
-      <div
+      <motion.div
         key={msg.id}
-        className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4 animate-in`}
-        style={{ animation: 'fadeSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}
+        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+        className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}
       >
         {/* Assistant avatar */}
         {!isUser && (
@@ -257,7 +275,7 @@ export default function CareerGuidanceClient({ userEmail }: CareerGuidanceClient
             {displayName[0]?.toUpperCase() || 'U'}
           </div>
         )}
-      </div>
+      </motion.div>
     );
   };
 

@@ -24,9 +24,15 @@ export default function QuizHubClient({ userEmail, userId }: QuizHubClientProps)
   const [activeTab, setActiveTab] = useState<TabId>('start');
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
+    <motion.div 
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, margin: "-50px" }}
+      variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
+      className="max-w-6xl mx-auto space-y-8"
+    >
       {/* Header */}
-      <div className="space-y-2">
+      <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="space-y-2">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[#7C5CFF] text-[10px] font-semibold uppercase tracking-wider">
           <Sparkles className="h-3 w-3 animate-spin-slow" />
           Assessment Module
@@ -37,10 +43,10 @@ export default function QuizHubClient({ userEmail, userId }: QuizHubClientProps)
         <p className="text-sm text-zinc-400 font-body">
           Upload your study materials and let AI generate a personalised quiz. Track progress and discover weak areas with intelligent analytics.
         </p>
-      </div>
+      </motion.div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 p-1 bg-zinc-950/60 border border-zinc-800 rounded-2xl w-fit">
+      <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="flex gap-1 p-1 bg-zinc-950/60 border border-zinc-800 rounded-2xl w-fit">
         {tabs.map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -68,7 +74,7 @@ export default function QuizHubClient({ userEmail, userId }: QuizHubClientProps)
             </button>
           );
         })}
-      </div>
+      </motion.div>
 
       {/* Tab Content */}
       <AnimatePresence mode="wait">
@@ -84,6 +90,6 @@ export default function QuizHubClient({ userEmail, userId }: QuizHubClientProps)
           {activeTab === 'analytics' && <QuizAnalytics userId={userId} />}
         </motion.div>
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }

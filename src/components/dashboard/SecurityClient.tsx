@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { startRegistration } from '@simplewebauthn/browser';
 import { createClient } from '@/utils/supabase/client';
+import { motion } from 'framer-motion';
 
 const C = {
   cream: '#fef9f2',
@@ -186,35 +187,51 @@ export default function SecurityClient({
   const activeSessions = logs.filter(log => log.is_active && log.session_id);
   const auditLogs = logs.filter(log => !log.is_active || log.login_status === 'failed');
 
+  const containerVars = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+  };
+  
+  const itemVars = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 24 } }
+  };
+
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
+    <motion.div 
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, margin: "-50px" }}
+      variants={containerVars}
+      className="max-w-5xl mx-auto space-y-8 pb-20"
+    >
       {/* Title */}
-      <div className="space-y-1.5 pb-6" style={{ borderBottom: `1px solid ${C.surfaceVariant}` }}>
+      <motion.div variants={itemVars} className="space-y-1.5 pb-6" style={{ borderBottom: `1px solid ${C.surfaceVariant}` }}>
         <h1 className="font-display text-3xl sm:text-5xl tracking-wide uppercase leading-none" style={{ color: C.primary }}>
           Grid Settings
         </h1>
         <p className="text-sm font-body" style={{ color: C.onSurfaceVariant }}>
           Manage your credentials, active login keys, and audit logs.
         </p>
-      </div>
+      </motion.div>
 
       {error && (
-        <div className="text-xs p-3.5 rounded-xl flex items-start gap-2.5" style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626' }}>
+        <motion.div variants={itemVars} className="text-xs p-3.5 rounded-xl flex items-start gap-2.5" style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626' }}>
           <AlertCircle className="h-5 w-5 shrink-0" style={{ color: '#dc2626' }} />
           <span>{error}</span>
-        </div>
+        </motion.div>
       )}
 
       {success && (
-        <div className="text-xs p-3.5 rounded-xl flex items-start gap-2.5" style={{ backgroundColor: '#ecfdf5', border: '1px solid #a7f3d0', color: '#059669' }}>
+        <motion.div variants={itemVars} className="text-xs p-3.5 rounded-xl flex items-start gap-2.5" style={{ backgroundColor: '#ecfdf5', border: '1px solid #a7f3d0', color: '#059669' }}>
           <CheckCircle2 className="h-5 w-5 shrink-0" style={{ color: '#059669' }} />
           <span>{success}</span>
-        </div>
+        </motion.div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Passkeys Panel */}
-        <div className="p-6 rounded-2xl space-y-5" style={{ backgroundColor: C.surfaceContainerLowest, border: `1px solid ${C.surfaceVariant}` }}>
+        <motion.div variants={itemVars} whileHover={{ y: -2 }} className="p-6 rounded-2xl space-y-5 transition-shadow hover:shadow-lg" style={{ backgroundColor: C.surfaceContainerLowest, border: `1px solid ${C.surfaceVariant}` }}>
           <div className="flex items-center justify-between">
             <h3 className="font-display text-lg uppercase tracking-wider" style={{ color: C.primary }}>
               Biometric Passkeys
@@ -266,10 +283,10 @@ export default function SecurityClient({
               <p className="text-xs text-center py-6" style={{ color: C.outline }}>No passkeys registered yet.</p>
             )}
           </div>
-        </div>
+        </motion.div>
 
         {/* Multi-Factor Authentication Panel */}
-        <div className="p-6 rounded-2xl space-y-5 flex flex-col justify-between" style={{ backgroundColor: C.surfaceContainerLowest, border: `1px solid ${C.surfaceVariant}` }}>
+        <motion.div variants={itemVars} whileHover={{ y: -2 }} className="p-6 rounded-2xl space-y-5 flex flex-col justify-between transition-shadow hover:shadow-lg" style={{ backgroundColor: C.surfaceContainerLowest, border: `1px solid ${C.surfaceVariant}` }}>
           <div className="space-y-4">
             <h3 className="font-display text-lg uppercase tracking-wider" style={{ color: C.primary }}>
               Multi-Factor Auth (MFA)
@@ -309,11 +326,11 @@ export default function SecurityClient({
               {mfaEnabled ? 'Manage MFA Factors' : 'Set Up Two-Factor Auth'}
             </button>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Active Sessions List */}
-      <div className="p-6 sm:p-8 rounded-2xl space-y-5" style={{ backgroundColor: C.surfaceContainerLowest, border: `1px solid ${C.surfaceVariant}` }}>
+      <motion.div variants={itemVars} className="p-6 sm:p-8 rounded-2xl space-y-5 transition-shadow hover:shadow-lg" style={{ backgroundColor: C.surfaceContainerLowest, border: `1px solid ${C.surfaceVariant}` }}>
         <h3 className="font-display text-lg uppercase tracking-wider" style={{ color: C.primary }}>
           Active Sessions ({activeSessions.length})
         </h3>
@@ -362,10 +379,10 @@ export default function SecurityClient({
             </div>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* Audit Logs Table */}
-      <div className="p-6 sm:p-8 rounded-2xl space-y-5" style={{ backgroundColor: C.surfaceContainerLowest, border: `1px solid ${C.surfaceVariant}` }}>
+      <motion.div variants={itemVars} className="p-6 sm:p-8 rounded-2xl space-y-5 transition-shadow hover:shadow-lg" style={{ backgroundColor: C.surfaceContainerLowest, border: `1px solid ${C.surfaceVariant}` }}>
         <h3 className="font-display text-lg uppercase tracking-wider" style={{ color: C.primary }}>
           Security Audit Trail
         </h3>
@@ -415,7 +432,7 @@ export default function SecurityClient({
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

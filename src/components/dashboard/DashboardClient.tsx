@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { 
   Play, BookOpen, Clock, ChevronRight, Award, 
   HelpCircle, Terminal, Sparkles, Loader2 
@@ -82,10 +83,25 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
     'PostgreSQL Query Optimization',
   ];
 
+  const containerVars = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+  };
+  
+  const itemVars = {
+    hidden: { opacity: 0, y: 30 },
+    show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 24 } }
+  };
+
   return (
-    <div className="max-w-5xl mx-auto space-y-12">
+    <div className="max-w-5xl mx-auto space-y-12 pb-20 overflow-x-hidden">
       {/* Greeting Banner */}
-      <div className="space-y-2">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="space-y-2"
+      >
         <div
           className="inline-flex items-center gap-1.5 px-3 py-1 border rounded-full text-[10px] font-semibold uppercase tracking-wider"
           style={{
@@ -106,22 +122,31 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
         <p className="text-sm" style={{ color: C.onSurfaceVariant }}>
           Deploy structured multi-agent loops to research topics and build interactive quizzes.
         </p>
-      </div>
+      </motion.div>
 
       {/* Main Orchestrator Prompt Panel */}
-      <div
-        className="p-8 sm:p-10 rounded-3xl border shadow-lg space-y-6"
+      <motion.div
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-50px" }}
+        variants={itemVars}
+        className="p-8 sm:p-10 rounded-3xl border shadow-lg space-y-6 relative overflow-hidden group"
         style={{
           backgroundColor: C.surfaceContainerLowest,
           borderColor: C.surfaceVariant,
           boxShadow: '0 8px 32px rgba(0,0,0,0.06)',
         }}
       >
-        <form onSubmit={handleStartSession} className="space-y-4">
+        <motion.div 
+          className="absolute -top-32 -right-32 w-64 h-64 rounded-full blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-700 pointer-events-none"
+          style={{ backgroundColor: C.accentBlue }}
+        />
+        
+        <form onSubmit={handleStartSession} className="space-y-4 relative z-10">
           <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
+            <div className="relative flex-1 group/input">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Terminal className="h-5 w-5" style={{ color: C.outline }} />
+                <Terminal className="h-5 w-5 transition-colors group-focus-within/input:text-[#5a6ba8]" style={{ color: C.outline }} />
               </div>
               <input
                 type="text"
@@ -135,18 +160,20 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
                   backgroundColor: C.surfaceContainerLow,
                   borderColor: C.outlineVariant,
                   color: C.onSurface,
-                  '--tw-ring-color': C.primary,
+                  '--tw-ring-color': '#5a6ba8',
                 } as React.CSSProperties}
               />
             </div>
-            <button
+            <motion.button
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading || !prompt.trim()}
-              className="px-6 py-3 font-bold text-sm rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 shrink-0 hover:opacity-90 hover:scale-[1.01]"
+              className="px-6 py-3 font-bold text-sm rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 shrink-0"
               style={{
                 backgroundColor: C.primary,
                 color: C.onPrimary,
-                boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
               }}
             >
               {loading ? (
@@ -157,12 +184,12 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
                   <Play className="h-4 w-4" style={{ fill: C.onPrimary }} />
                 </>
               )}
-            </button>
+            </motion.button>
           </div>
         </form>
 
         {/* Quick suggestions */}
-        <div className="space-y-3">
+        <div className="space-y-3 relative z-10">
           <span
             className="text-[10px] uppercase font-bold tracking-widest block"
             style={{ color: C.outline }}
@@ -170,12 +197,17 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
             Popular Learning Grids:
           </span>
           <div className="flex flex-wrap gap-2">
-            {suggestions.map((topic) => (
-              <button
+            {suggestions.map((topic, i) => (
+              <motion.button
                 key={topic}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.4 + i * 0.1 }}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => handleSuggestionClick(topic)}
                 disabled={loading}
-                className="px-3.5 py-1.5 border rounded-xl text-xs font-semibold transition-all hover:scale-[1.01] hover:shadow-md"
+                className="px-3.5 py-1.5 border rounded-xl text-xs font-semibold"
                 style={{
                   borderColor: C.outlineVariant,
                   backgroundColor: C.surfaceContainerLow,
@@ -183,24 +215,32 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
                 }}
               >
                 {topic}
-              </button>
+              </motion.button>
             ))}
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Courses / History Section */}
-      <div className="space-y-6">
-        <h2
+      <motion.div 
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={containerVars}
+        className="space-y-6"
+      >
+        <motion.h2
+          variants={itemVars}
           className="text-2xl font-extrabold tracking-tight"
           style={{ color: C.primary, fontFamily: 'var(--font-jakarta), sans-serif' }}
         >
           Active Syllabus History ({courses.length})
-        </h2>
+        </motion.h2>
 
         {courses.length === 0 ? (
           /* Designed empty state */
-          <div
+          <motion.div
+            variants={itemVars}
             className="border border-dashed p-12 rounded-3xl text-center space-y-4"
             style={{
               borderColor: C.outlineVariant,
@@ -225,9 +265,11 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
                 Type a topic above and deploy the FOCUS orchestration loop to generate your first 3-lesson curriculum.
               </p>
             </div>
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => handleSuggestionClick('TypeScript Conditional Types')}
-              className="px-4 py-2 border text-xs font-semibold rounded-xl transition-all hover:shadow-md"
+              className="px-4 py-2 border text-xs font-semibold rounded-xl"
               style={{
                 borderColor: C.outlineVariant,
                 backgroundColor: C.surfaceContainerLowest,
@@ -235,22 +277,27 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
               }}
             >
               Try Demo Suggestion
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
         ) : (
           /* Staged Course Cards */
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {courses.map((course) => (
-              <div 
+              <motion.div 
                 key={course.id}
+                variants={itemVars}
+                whileHover={{ y: -5, scale: 1.01 }}
                 onClick={() => router.push(`/course/${course.id}`)}
-                className="p-6 rounded-2xl border hover:shadow-lg transition-all cursor-pointer group flex flex-col justify-between h-44"
+                className="p-6 rounded-2xl border cursor-pointer group flex flex-col justify-between h-44 relative overflow-hidden"
                 style={{
                   backgroundColor: C.surfaceContainerLowest,
                   borderColor: C.surfaceVariant,
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
                 }}
               >
-                <div className="space-y-2">
+                <div className="absolute top-0 left-0 w-1 h-full opacity-0 group-hover:opacity-100 transition-opacity" style={{ backgroundColor: '#5a6ba8' }} />
+                
+                <div className="space-y-2 relative z-10">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5" style={{ color: C.outline }}>
                       <Clock className="h-3.5 w-3.5" />
@@ -281,7 +328,7 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
                     )}
                   </div>
                   <h3
-                    className="text-base font-bold transition-colors line-clamp-1"
+                    className="text-base font-bold transition-colors line-clamp-1 group-hover:text-[#5a6ba8]"
                     style={{ color: C.primary }}
                   >
                     {course.title}
@@ -292,23 +339,23 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
                 </div>
                 
                 <div
-                  className="flex items-center justify-between border-t pt-4 text-xs font-semibold"
+                  className="flex items-center justify-between border-t pt-4 text-xs font-semibold relative z-10"
                   style={{ borderColor: C.surfaceVariant, color: '#5a6ba8' }}
                 >
                   <span className="flex items-center gap-1.5">
                     <Award className="h-4 w-4" />
                     Interactive Syllabus
                   </span>
-                  <span className="flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
+                  <span className="flex items-center gap-0.5 group-hover:translate-x-1 transition-transform">
                     Enter Workspace
                     <ChevronRight className="h-4 w-4" />
                   </span>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }

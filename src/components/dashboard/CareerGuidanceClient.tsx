@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Send, Sparkles, Loader2, MessageCircle, Briefcase, GraduationCap, ArrowDown } from 'lucide-react';
 import { getCareerSuggestions, type CareerMessage } from '@/lib/careerGuidanceService';
-import { motion } from 'framer-motion';
+
 
 // ─── Colour constants matching the design system ────────────────────────────
 const C = {

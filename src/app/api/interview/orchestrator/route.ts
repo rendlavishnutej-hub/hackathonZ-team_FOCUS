@@ -3,9 +3,10 @@ import { runInterviewTurn } from '@/lib/interview/orchestrator';
 import type { InterviewState } from '@/lib/interview/types';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 120;
 
 // Timeout wrapper — prevents runaway LLM calls from blocking indefinitely
-const TIMEOUT_MS = 55_000; // 55 seconds (Vercel limit is 60s)
+const TIMEOUT_MS = 120_000; // 120 seconds
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   return Promise.race([

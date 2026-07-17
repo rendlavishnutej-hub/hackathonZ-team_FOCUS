@@ -149,6 +149,9 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
   const isListeningRef   = useRef(false);
   const isSpeakingRef    = useRef(false);
   const logEndRef        = useRef<HTMLDivElement>(null);
+  const transcriptRef    = useRef('');
+  const silenceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const shouldBeListeningRef = useRef(false);
 
   // ── Scroll agent log to bottom
   useEffect(() => { logEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [agentLog]);
@@ -177,13 +180,24 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // ── Cleanup on unmount (Failure Mode 5)
+  useEffect(() => {
+    return () => {
+      shouldBeListeningRef.current = false;
+      if (recognitionRef.current) {
+        try { recognitionRef.current.abort(); } catch (e) {}
+      }
+      if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
+    };
+  }, []);
+
   // ── Sync agent log display when state changes
   useEffect(() => {
     if (state?.logs) setAgentLog([...state.logs]);
     if (state?.status === 'completed') {
       setMode('completed');
-      stopListening();
       window.speechSynthesis?.cancel();
+      // stopListening is handled below or skipped here to avoid circular dep on mount
     }
   }, [state]);
 
@@ -208,6 +222,26 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
       setMode('error');
     }
   }, []);
+
+  const stopListening = useCallback(() => {
+    shouldBeListeningRef.current = false;
+    if (recognitionRef.current) {
+      try { recognitionRef.current.abort(); } catch (e) {}
+    }
+    isListeningRef.current = false;
+  }, []);
+
+  // ── Submit answer (voice or typed)
+  const submitAnswer = useCallback((answer: string, currentState?: InterviewState) => {
+    const cs = currentState || state;
+    if (!cs) return;
+    stopListening();
+    window.speechSynthesis?.cancel();
+    setLiveText('');
+    setTextInput('');
+    setTranscript('');
+    runTurn(cs, answer);
+  }, [state, runTurn, stopListening]);
 
   // ── Text-to-Speech
   const speakText = useCallback((text: string, currentState: InterviewState) => {
@@ -247,11 +281,15 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
 
   // ── Speech-to-Text — start
   const startListening = useCallback((currentState: InterviewState) => {
-    if (isListeningRef.current) return;
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       setShowTextBox(true);
       return;
+    }
+
+    // 4. MULTIPLE OVERLAPPING INSTANCES
+    if (recognitionRef.current) {
+      try { recognitionRef.current.abort(); } catch (e) {}
     }
 
     const recog = new SpeechRecognition();
@@ -259,9 +297,35 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
     recog.interimResults = true;
     recog.lang         = 'en-US';
 
-    recog.onstart = () => { isListeningRef.current = true; setMode('listening'); };
+    transcriptRef.current = '';
+    shouldBeListeningRef.current = true;
+
+    const resetSilenceTimeout = () => {
+      if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
+      
+      const hasSpoken = transcriptRef.current.trim().length > 3;
+      const timeoutMs = hasSpoken ? 4000 : 30000; // 4s pause to submit, or 30s silence to cancel
+      
+      silenceTimeoutRef.current = setTimeout(() => {
+        stopListening();
+        const collected = transcriptRef.current.trim();
+        if (collected.length > 3) {
+          submitAnswer(collected, currentState);
+        } else {
+          submitAnswer('The candidate provided no answer (timeout).', currentState);
+        }
+      }, timeoutMs);
+    };
+
+    recog.onstart = () => { 
+      console.log(`[${new Date().toISOString()}] SpeechRecognition: onstart`);
+      isListeningRef.current = true; 
+      setMode('listening'); 
+      resetSilenceTimeout(); 
+    };
 
     recog.onresult = (event: Event) => {
+      resetSilenceTimeout();
       const ev = event as SpeechRecognitionEvent;
       let interim = '';
       let final   = '';
@@ -270,53 +334,83 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
         if (res.isFinal) final   += res[0].transcript;
         else              interim += res[0].transcript;
       }
-      setLiveText(interim || final);
-      if (final) setTranscript(prev => prev + ' ' + final);
-    };
+      
+      if (final || interim) {
+        console.log(`[${new Date().toISOString()}] SpeechRecognition: onresult - Final: "${final}", Interim: "${interim}"`);
+      }
 
-    recog.onspeechend = () => {
-      recog.stop();
+      setLiveText(interim || final);
+      if (final) {
+        transcriptRef.current += (transcriptRef.current ? ' ' : '') + final;
+        setTranscript(transcriptRef.current);
+        resetSilenceTimeout();
+      }
     };
 
     recog.onend = () => {
-      isListeningRef.current = false;
-      // Submit collected transcript
-      const collected = transcript.trim();
-      if (collected.length > 3) {
-        setLiveText('');
-        setTranscript('');
-        submitAnswer(collected, currentState);
+      console.log(`[${new Date().toISOString()}] SpeechRecognition: onend`);
+      // Only the currently active instance should update global state
+      if (recognitionRef.current === recog) {
+        isListeningRef.current = false;
+      }
+      
+      // 1. NO AUTO-RESTART ON end
+      if (shouldBeListeningRef.current && recognitionRef.current === recog) {
+        console.log(`[${new Date().toISOString()}] SpeechRecognition: Restarting because shouldBeListeningRef is true`);
+        // Add a tiny delay to prevent tight infinite loops if the browser is instantly rejecting
+        setTimeout(() => {
+          if (shouldBeListeningRef.current && recognitionRef.current === recog) {
+            try {
+              // 2. RACE CONDITION ON start()
+              recog.start();
+            } catch (e: any) {
+              console.log(`[${new Date().toISOString()}] SpeechRecognition: Error restarting in onend:`, e?.message);
+            }
+          }
+        }, 200);
+      } else {
+        if (silenceTimeoutRef.current && recognitionRef.current === recog) {
+          clearTimeout(silenceTimeoutRef.current);
+        }
       }
     };
 
     recog.onerror = (e: Event) => {
       const err = e as SpeechRecognitionErrorEvent;
-      isListeningRef.current = false;
-      if (err.error !== 'no-speech') {
+      console.log(`[${new Date().toISOString()}] SpeechRecognition: onerror - ${err.error}`);
+      
+      // 3. no-speech ERROR TREATED AS FATAL
+      if (err.error === 'no-speech') {
+        // Let normal end -> restart flow handle it
+        return;
+      }
+
+      // 6. RESTART LOOPS ON PERMISSION ERRORS
+      if (err.error === 'not-allowed' || err.error === 'service-not-allowed' || err.error === 'audio-capture') {
+        shouldBeListeningRef.current = false;
+        isListeningRef.current = false;
         setShowTextBox(true);
+        if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
       }
     };
 
     recognitionRef.current = recog;
-    recog.start();
-  }, [transcript]);
+    
+    // HACK: Edge/Chrome often silently block SpeechRecognition on localhost without showing a prompt.
+    // By calling standard getUserMedia first, we force the browser to show the permissions dialog.
+    // Once granted, SpeechRecognition will automatically work.
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then((stream) => {
+        stream.getTracks().forEach(track => track.stop()); // Clean up immediately
+        try { recog.start(); } catch (e) {}
+      })
+      .catch((err) => {
+        console.log(`[${new Date().toISOString()}] getUserMedia denied:`, err);
+        // Fallback: try starting anyway, which will naturally hit the onerror handler
+        try { recog.start(); } catch (e) {}
+      });
 
-  const stopListening = () => {
-    recognitionRef.current?.stop();
-    isListeningRef.current = false;
-  };
-
-  // ── Submit answer (voice or typed)
-  const submitAnswer = useCallback((answer: string, currentState?: InterviewState) => {
-    const cs = currentState || state;
-    if (!cs) return;
-    stopListening();
-    window.speechSynthesis?.cancel();
-    setLiveText('');
-    setTextInput('');
-    setTranscript('');
-    runTurn(cs, answer);
-  }, [state, runTurn]);
+  }, [submitAnswer, stopListening]);
 
   // ── Text fallback submit
   const handleTextSubmit = (e: React.FormEvent) => {

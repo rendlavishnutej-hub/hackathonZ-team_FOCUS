@@ -86,7 +86,8 @@ export async function formatForVoice(
   isFollowUp: boolean,
   lastScore?: number,
   hintText?: string,
-  companyStyle?: string
+  companyStyle?: string,
+  feedback?: string
 ): Promise<string> {
   // Clean the question of any markdown artifacts
   const cleanQuestion = stripMarkdown(question);
@@ -104,20 +105,20 @@ export async function formatForVoice(
 Convert this interview question into a natural, spoken sentence that sounds like a real person talking. 
 
 Rules:
-- Maximum 40 words
+- Maximum 40 words total (including feedback if provided)
 - No markdown, no bullets, no special characters
 - No "Question:" prefix
-- Sound conversational, not scripted
-- Do NOT add transitions or greetings — I handle those separately
+- Sound conversational, supportive, and natural
+${feedback ? `- BEFORE asking the question, provide ONE very brief, conversational sentence acknowledging their previous answer based on this feedback: "${feedback}"` : '- Do NOT add random transitions or greetings.'}
 - Preserve the core question's intent exactly
 
-Original: "${cleanQuestion}"
+Original Question: "${cleanQuestion}"
 
-Return ONLY the reformulated spoken question, nothing else.`;
+Return ONLY the reformulated spoken response, nothing else.`;
 
       const result = await generateText(prompt, cleanQuestion);
       const formatted = stripMarkdown(result || cleanQuestion);
-      return buildSpokenPrompt(formatted, questionIndex, isFollowUp, lastScore, hintText);
+      return feedback ? formatted : buildSpokenPrompt(formatted, questionIndex, isFollowUp, lastScore, hintText);
     } catch {
       // Fallback to rule-based formatting
     }

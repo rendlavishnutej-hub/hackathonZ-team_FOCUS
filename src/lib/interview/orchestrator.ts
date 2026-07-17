@@ -323,7 +323,8 @@ export async function processAnswer(
       nextQ.isFollowUp,
       evaluation.score,
       hintText,
-      s.companyProfile?.name
+      s.companyProfile?.name,
+      evaluation.feedback
     );
     s.logs = log(s.logs, 'voice-agent', 'Speech prompt ready.', 'success');
 

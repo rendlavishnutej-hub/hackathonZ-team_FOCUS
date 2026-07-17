@@ -83,7 +83,7 @@ export async function POST(request: Request) {
   }
 
   // 3. AI Generation
-  const model = getModel('gemini-1.5-flash');
+  const model = getModel('gemini-3.1-flash-lite');
   let questions: Question[];
 
   if (!model) {
@@ -109,23 +109,29 @@ Respond with ONLY a raw JSON array (no markdown, no code fences):
 [{"type":"...","question":"...","payload":{...},"correctAnswer":{...},"explanation":"...","marks":N,"negativeMarks":N}]
 
 Document title: ${file.name}
-Document content:
-${fileContent.substring(0, 14000)}`;
+${fileContent.startsWith('[Binary document:') ? 'Please analyze the attached PDF file.' : `Document content:\n${fileContent.substring(0, 14000)}`}`;
 
     try {
       let result;
       if (file.raw_content && file.type === 'application/pdf') {
-        result = await model.generateContent([prompt, { inlineData: { data: file.raw_content, mimeType: 'application/pdf' } }]);
+        result = await model.generateContent({
+          contents: [{ role: 'user', parts: [{ text: prompt }, { inlineData: { data: file.raw_content, mimeType: 'application/pdf' } }] }],
+          generationConfig: { responseMimeType: 'application/json' }
+        });
       } else {
-        result = await model.generateContent(prompt);
+        result = await model.generateContent({
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: { responseMimeType: 'application/json' }
+        });
       }
 
       const text = result.response.text().trim();
       const cleaned = text.replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/i, '').trim();
       const parsed = JSON.parse(cleaned);
       questions = parseGeminiQuestions(parsed, fileId, difficulty);
-    } catch (err) {
+    } catch (err: any) {
       console.error('[FOCUS Quiz] Gemini generation failed, falling back to mock:', err);
+      require('fs').writeFileSync('quiz_error.log', err?.message || String(err));
       questions = generateMockQuestions(file.name, difficulty, questionCount, fileId);
     }
   }

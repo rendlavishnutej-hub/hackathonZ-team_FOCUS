@@ -64,27 +64,41 @@ Formatting Guidelines:
     parts: [{ text: currentPrompt }],
   });
 
-  try {
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
-      systemInstruction,
-    });
+  const models = [
+    'gemini-2.0-flash',
+    'gemini-1.5-flash',
+    'gemini-2.5-flash',
+    'gemini-1.5-flash-latest'
+  ];
 
-    const response = await model.generateContent({
-      contents,
-      generationConfig: {
-        temperature: 0.7,
-      },
-    });
+  let lastError: any = null;
 
-    const reply = response.response.text();
-    if (!reply) {
-      throw new Error('Received empty response from Gemini.');
+  for (const modelName of models) {
+    try {
+      console.log(`[FOCUS Gemini Service] Trying model ${modelName} for career guidance...`);
+      const model = genAI.getGenerativeModel({
+        model: modelName,
+        systemInstruction,
+      });
+
+      const response = await model.generateContent({
+        contents,
+        generationConfig: {
+          temperature: 0.7,
+        },
+      });
+
+      const reply = response.response.text();
+      if (reply) {
+        return reply;
+      }
+    } catch (error) {
+      console.warn(`[FOCUS Gemini Service] Failed with model ${modelName}:`, error);
+      lastError = error;
     }
-    return reply;
-  } catch (error) {
-    console.error('[FOCUS Gemini Service] Error generating content:', error);
-    throw error;
   }
+
+  console.error('[FOCUS Gemini Service] All models failed. Last error:', lastError);
+  throw lastError || new Error('All model attempts failed');
 }
 

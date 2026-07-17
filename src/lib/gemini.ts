@@ -28,39 +28,59 @@ async function retryWithBackoff<T>(fn: () => Promise<T>, retries = 3, delayMs = 
   }
 }
 
-export async function generateJSON<T>(prompt: string, fallback: T): Promise<T> {
-  const model = getModel();
-  if (!model) return fallback;
+const MODELS_TO_TRY = [
+  'gemini-2.0-flash',
+  'gemini-1.5-flash',
+  'gemini-2.5-flash',
+  'gemini-1.5-flash-latest'
+];
 
-  try {
-    const fn = async () => {
-      const result = await model.generateContent(
-        `You are a JSON-only response agent. Return ONLY valid JSON, no markdown, no code fences, no commentary.\n\n${prompt}`
-      );
-      const text = result.response.text().trim();
-      // Strip markdown code fences if model adds them despite instruction
-      const cleaned = text.replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/i, '').trim();
-      return JSON.parse(cleaned) as T;
-    };
-    return await retryWithBackoff(fn);
-  } catch (err) {
-    console.error('[FOCUS Gemini] JSON parse failed, using fallback:', err);
-    return fallback;
+export async function generateJSON<T>(prompt: string, fallback: T): Promise<T> {
+  if (!genAI) return fallback;
+
+  let lastError: any = null;
+  for (const modelName of MODELS_TO_TRY) {
+    try {
+      const model = genAI.getGenerativeModel({ model: modelName });
+      const fn = async () => {
+        const result = await model.generateContent(
+          `You are a JSON-only response agent. Return ONLY valid JSON, no markdown, no code fences, no commentary.\n\n${prompt}`
+        );
+        const text = result.response.text().trim();
+        // Strip markdown code fences if model adds them despite instruction
+        const cleaned = text.replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/i, '').trim();
+        return JSON.parse(cleaned) as T;
+      };
+      return await retryWithBackoff(fn);
+    } catch (err) {
+      console.warn(`[FOCUS Gemini] generateJSON failed with model ${modelName}, trying next...`, err);
+      lastError = err;
+    }
   }
+
+  console.error('[FOCUS Gemini] All model attempts in generateJSON failed:', lastError);
+  return fallback;
 }
 
 export async function generateText(prompt: string, fallback: string): Promise<string> {
-  const model = getModel();
-  if (!model) return fallback;
+  if (!genAI) return fallback;
 
-  try {
-    const fn = async () => {
-      const result = await model.generateContent(prompt);
-      return result.response.text().trim();
-    };
-    return await retryWithBackoff(fn);
-  } catch (err) {
-    console.error('[FOCUS Gemini] Text generation failed, using fallback:', err);
-    return fallback;
+  let lastError: any = null;
+  for (const modelName of MODELS_TO_TRY) {
+    try {
+      const model = genAI.getGenerativeModel({ model: modelName });
+      const fn = async () => {
+        const result = await model.generateContent(prompt);
+        return result.response.text().trim();
+      };
+      return await retryWithBackoff(fn);
+    } catch (err) {
+      console.warn(`[FOCUS Gemini] generateText failed with model ${modelName}, trying next...`, err);
+      lastError = err;
+    }
   }
+
+  console.error('[FOCUS Gemini] All model attempts in generateText failed:', lastError);
+  return fallback;
 }
+

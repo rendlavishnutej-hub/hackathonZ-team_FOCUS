@@ -7,7 +7,7 @@ import {
   BookOpen, Settings, LogOut, Shield, Award, 
   Terminal, Activity, Compass, Users 
 } from 'lucide-react';
-import { createClient as createBrowserClient } from '@/utils/supabase/client';
+import { signOutAction } from '@/app/auth/actions';
 
 // ─── Colour constants matching the landing page design system ──────────────
 const C = {
@@ -33,15 +33,13 @@ interface SidebarProps {
 
 export default function Sidebar({ userEmail }: SidebarProps) {
   const pathname = usePathname();
-  const supabase = createBrowserClient();
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      await supabase.auth.signOut();
-      window.location.href = '/login';
+      await signOutAction();
     } catch (err) {
       console.error(err);
+      // Fallback
       window.location.href = '/login';
     }
   };

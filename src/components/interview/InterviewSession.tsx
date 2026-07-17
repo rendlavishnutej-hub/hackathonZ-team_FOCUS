@@ -150,7 +150,6 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
   const isSpeakingRef    = useRef(false);
   const transcriptRef    = useRef('');
   const logEndRef        = useRef<HTMLDivElement>(null);
-  const transcriptRef    = useRef('');
   const silenceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const shouldBeListeningRef = useRef(false);
 

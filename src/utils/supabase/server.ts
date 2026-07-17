@@ -203,9 +203,7 @@ function isMockEnabled() {
     !supabaseUrl ||
     supabaseUrl.includes('placeholder') ||
     !supabaseKey ||
-    supabaseKey.includes('placeholder') ||
-    supabaseKey.startsWith('sb_') ||
-    !supabaseKey.includes('.')
+    supabaseKey.includes('placeholder')
   );
 }
 

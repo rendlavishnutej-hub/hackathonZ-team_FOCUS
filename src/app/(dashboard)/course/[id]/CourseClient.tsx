@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   BookOpen, Code, Award, CheckCircle, HelpCircle, 
-  ArrowLeft, Copy, Check, RefreshCw, Sparkles 
+  ArrowLeft, Copy, Check, RefreshCw, Sparkles, Loader2
 } from 'lucide-react';
 import { AlertTriangle } from 'lucide-react';
 
@@ -36,20 +36,24 @@ interface CourseClientProps {
 
 export default function CourseClient({ courseId }: CourseClientProps) {
   const router = useRouter();
-  const [course, setCourse] = useState<any | null>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const stored = localStorage.getItem('focus_courses');
-        if (stored) {
-          const list = JSON.parse(stored);
-          return list.find((c: any) => c.id === courseId) || null;
-        }
-      } catch (e) {
-        console.error(e);
+  const [course, setCourse] = useState<any | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  React.useEffect(() => {
+    try {
+      const stored = localStorage.getItem('focus_courses');
+      if (stored) {
+        const list = JSON.parse(stored);
+        const match = list.find((c: any) => c.id === courseId) || null;
+        setCourse(match);
       }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
     }
-    return null;
-  });
+  }, [courseId]);
+
   const [activeTab, setActiveTab] = useState<'lesson-1' | 'lesson-2' | 'lesson-3' | 'quiz'>('lesson-1');
   const [copied, setCopied] = useState<string | null>(null);
 
@@ -58,6 +62,17 @@ export default function CourseClient({ courseId }: CourseClientProps) {
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [quizScore, setQuizScore] = useState<number | null>(null);
   const [quizPassed, setQuizPassed] = useState<boolean | null>(null);
+
+  if (isLoading) {
+    return (
+      <div className="max-w-md mx-auto text-center space-y-6 pt-24 animate-pulse">
+        <div className="h-12 w-12 rounded-2xl bg-zinc-100 border animate-spin mx-auto flex items-center justify-center">
+          <Loader2 className="h-5 w-5 text-black animate-spin" />
+        </div>
+        <p className="text-xs text-zinc-500 font-mono">Loading dynamic study notes workspace...</p>
+      </div>
+    );
+  }
 
   if (!course) {
     return (

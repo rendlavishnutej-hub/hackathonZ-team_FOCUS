@@ -62,10 +62,14 @@ export async function signUpAction(formData: FormData) {
     return { error: 'Password is too weak. Ensure it is not easily guessable.' };
   }
 
+  const headersList = await headers();
+  const host = headersList.get('host') || 'localhost:3000';
+  const protocol = headersList.get('x-forwarded-proto') || (host.includes('localhost') ? 'http' : 'https');
+  const currentAppUrl = `${protocol}://${host}`;
+
   // 2. HaveIBeenPwned API check to reject compromised passwords
   try {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const pwnedRes = await fetch(`${appUrl}/api/auth/pwned`, {
+    const pwnedRes = await fetch(`${currentAppUrl}/api/auth/pwned`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password }),
@@ -85,7 +89,7 @@ export async function signUpAction(formData: FormData) {
     email,
     password,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/callback`,
+      emailRedirectTo: `${currentAppUrl}/auth/callback`,
       data: {
         display_name: displayName || email.split('@')[0],
       },

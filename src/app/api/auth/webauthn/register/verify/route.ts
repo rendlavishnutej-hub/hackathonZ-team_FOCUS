@@ -27,8 +27,8 @@ export async function POST(request: Request) {
 
     const host = request.headers.get('host') || 'localhost:3000';
     const rpID = host.split(':')[0];
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const expectedOrigin = appUrl;
+    const protocol = request.headers.get('x-forwarded-proto') || (host.includes('localhost') ? 'http' : 'https');
+    const expectedOrigin = `${protocol}://${host}`;
 
     // 3. Verify Registration Response
     const verification = await verifyRegistrationResponse({

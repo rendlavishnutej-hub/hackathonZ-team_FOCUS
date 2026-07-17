@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { AGENT_REGISTRY } from '@/lib/agents';
 
 const apiKey = process.env.GEMINI_API_KEY;
 
@@ -106,7 +107,7 @@ export async function generateCareerGuidance(
     return generateMockGuidance(message, courses);
   }
 
-  const systemInstruction = `You are a professional and friendly Career AI Advisor for a student planner application called FOCUS.
+  const systemInstruction = AGENT_REGISTRY.career?.systemPrompt || `You are a professional and friendly Career AI Advisor for a student planner application called FOCUS.
 Your goal is to provide insightful, realistic, and encouraging career suggestions, guidance, and actionable next steps based on the student's questions, skills, and current courses.
 
 Formatting Guidelines:

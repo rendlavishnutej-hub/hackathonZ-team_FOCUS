@@ -467,10 +467,17 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
         if (!list.some((r: any) => r.id === sessionId)) {
           list.unshift(record);
           localStorage.setItem('focus_interview_history', JSON.stringify(list));
+          
+          // Link this back to the global OS memory dashboard!
+          const { recordMission } = require('@/lib/os/memory-manager');
+          // Scale overall score (assuming it's a 0-100 or something, we divide by 20 to get 0-5 scale for recordMission)
+          // If it's already 0-100, wait, overallScore is out of 100 in the UI.
+          const normalizedScore = state.finalReport.overallScore / 20; 
+          recordMission(`Mock Interview: ${role} at ${company}`, role, normalizedScore);
         }
       } catch { /* ignore */ }
     }
-  }, [state?.status, state?.finalReport]);
+  }, [state?.status, state?.finalReport, sessionId, role, company, interviewType, difficulty]);
 
   // ── STATUS label helper
   const statusLabel: Record<InterviewMode, string> = {

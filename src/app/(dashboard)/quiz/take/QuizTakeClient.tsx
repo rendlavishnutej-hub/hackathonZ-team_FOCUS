@@ -239,6 +239,16 @@ export default function QuizTakeClient({ userId }: QuizTakeClientProps) {
       });
 
       const data = await res.json();
+      
+      try {
+        const topic = data.attempt?.topicName || config?.topicId || 'General Quiz';
+        const score = data.result?.percentage ? data.result.percentage / 20 : 0;
+        const { recordMission } = require('@/lib/os/memory-manager');
+        recordMission(`Quiz Complete: ${topic}`, topic, score);
+      } catch (e) {
+        console.error('Failed to record quiz mission:', e);
+      }
+
       setResultData({ ...data, questions });
       setPhase('results');
     } catch (err) {

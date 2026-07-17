@@ -38,6 +38,7 @@ export async function POST(request: Request) {
       subjectName: config.subjectName,
       topicId: config.topicId,
       topicName: config.topicName,
+      fileId: config.fileId,
       difficulty: config.difficulty,
       totalQuestions: result.totalQuestions,
       timerEnabled: config.timerEnabled || false,

@@ -34,6 +34,7 @@ interface MockDbSchema {
   quiz_questions: any[];
   quiz_attempts: any[];
   quiz_attempt_answers: any[];
+  quiz_files: any[];
 }
 
 const DEFAULT_DB: MockDbSchema = {
@@ -48,6 +49,7 @@ const DEFAULT_DB: MockDbSchema = {
   quiz_questions: [],
   quiz_attempts: [],
   quiz_attempt_answers: [],
+  quiz_files: [],
 };
 
 // Safe helper to read the mock database file
@@ -72,6 +74,7 @@ export function getMockDb(): MockDbSchema {
     if (!db.quiz_questions) db.quiz_questions = [];
     if (!db.quiz_attempts) db.quiz_attempts = [];
     if (!db.quiz_attempt_answers) db.quiz_attempt_answers = [];
+    if (!db.quiz_files) db.quiz_files = [];
 
     // Seed quiz data if tables are empty
     if (db.quiz_subjects.length === 0) {
@@ -161,6 +164,10 @@ export async function runMockQuery(builder: {
     } else if (builder.table === 'webauthn_credentials' || builder.table === 'sessions_log' || builder.table === 'backup_codes') {
       // Strict RLS: can only access row belonging to user_id
       filtered = filtered.filter(row => row.user_id === builder.currentUserId);
+    } else if (builder.table === 'quiz_files') {
+      filtered = filtered.filter(row => row.userId === builder.currentUserId);
+    } else if (builder.table === 'quiz_attempts') {
+      filtered = filtered.filter(row => row.studentId === builder.currentUserId);
     }
   }
 

@@ -48,15 +48,15 @@ export async function signUpAction(formData: FormData) {
     return { error: 'Email and password are required' };
   }
 
-  const { ipAddress } = await getClientMetadata();
+  const { ipAddress, userAgent, location } = await getClientMetadata();
 
-  // 1. Rate Limiting Check on Route level
+  // 1. Rate Limiting Check
   const rateLimitResult = await checkRateLimit(ipAddress);
   if (!rateLimitResult.success) {
     return { error: 'Too many requests. Please wait a minute and try again.' };
   }
 
-  // 2. Client & Server Password Strength Check (zxcvbn score >= 3 required)
+  // 2. Password Strength Check (zxcvbn score >= 3 required)
   const strength = evaluatePassword(password, [email, displayName]);
   if (strength.score < 3) {
     return { error: 'Password is too weak. Ensure it is not easily guessable.' };
@@ -67,7 +67,7 @@ export async function signUpAction(formData: FormData) {
   const protocol = headersList.get('x-forwarded-proto') || (host.includes('localhost') ? 'http' : 'https');
   const currentAppUrl = `${protocol}://${host}`;
 
-  // 2. HaveIBeenPwned API check to reject compromised passwords
+  // 3. HaveIBeenPwned API check to reject compromised passwords
   try {
     const pwnedRes = await fetch(`${currentAppUrl}/api/auth/pwned`, {
       method: 'POST',
@@ -84,25 +84,50 @@ export async function signUpAction(formData: FormData) {
     console.error('Password breach API check failed:', err);
   }
 
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({
+  // 4. Create user via Admin API with auto-confirm (bypasses email rate limits)
+  const adminClient = createAdminClient();
+  const { data: adminData, error: adminError } = await adminClient.auth.admin.createUser({
     email,
     password,
-    options: {
-      emailRedirectTo: `${currentAppUrl}/auth/callback`,
-      data: {
-        display_name: displayName || email.split('@')[0],
-      },
+    email_confirm: true,
+    user_metadata: {
+      display_name: displayName || email.split('@')[0],
     },
   });
 
-  if (error) {
-    return { error: error.message };
+  if (adminError) {
+    // Handle duplicate user gracefully
+    if (adminError.message?.includes('already been registered') || adminError.message?.includes('already exists')) {
+      return { error: 'An account with this email already exists. Please sign in instead.' };
+    }
+    return { error: adminError.message };
   }
 
-  // Check if email confirmation is required (Supabase returns a user but session is null if unverified)
-  if (data.user && !data.session) {
-    return { success: true, message: 'Signup successful! Please check your email for the confirmation link.' };
+  // 5. Immediately sign in the newly created user to establish a session
+  const supabase = await createClient();
+  const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (signInError) {
+    // User was created but auto-login failed — they can still sign in manually
+    return { success: true, message: 'Account created successfully! Please sign in with your credentials.' };
+  }
+
+  // 6. Log the session
+  const session = signInData.session;
+  const sessionId = session ? getSessionIdFromToken(session.access_token) : undefined;
+  if (session?.user) {
+    await adminClient.from('sessions_log').insert({
+      user_id: session.user.id,
+      session_id: sessionId || null,
+      ip_address: ipAddress,
+      user_agent: userAgent,
+      location,
+      login_status: 'success',
+      is_active: true,
+    });
   }
 
   return { success: true, redirect: '/dashboard' };
@@ -228,9 +253,12 @@ export async function resetPasswordRequestAction(formData: FormData) {
   }
 
   const supabase = await createClient();
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const headersList = await headers();
+  const host = headersList.get('host') || 'localhost:3000';
+  const protocol = headersList.get('x-forwarded-proto') || (host.includes('localhost') ? 'http' : 'https');
+  const currentAppUrl = `${protocol}://${host}`;
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${appUrl}/auth/callback?next=/dashboard/reset-password`,
+    redirectTo: `${currentAppUrl}/auth/callback?next=/dashboard/reset-password`,
   });
 
   if (error) {

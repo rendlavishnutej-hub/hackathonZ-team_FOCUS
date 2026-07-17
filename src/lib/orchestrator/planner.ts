@@ -45,7 +45,29 @@ function makeFallbackResearch(prompt: string) {
   };
 }
 
+function isCodingTopic(prompt: string): boolean {
+  const p = prompt.toLowerCase();
+  const keywords = [
+    'react', 'rust', 'typescript', 'javascript', 'python', 'sql', 'mysql', 'postgres',
+    'database', 'query', 'css', 'html', 'git', 'coding', 'programming', 'code',
+    'decorator', 'class', 'function', 'variable', 'loop', 'array', 'json', 'api',
+    'server', 'client', 'web', 'framework', 'compiler', 'interpreter', 'stack', 'queue',
+    'algorithm', 'sorting', 'tree', 'linked list', 'complexity', 'c++', 'java ', 'develop'
+  ];
+  return keywords.some(k => p.includes(k));
+}
+
 function makeFallbackCode(prompt: string) {
+  if (!isCodingTopic(prompt)) {
+    return {
+      snippets: [
+        { lessonId: 'lesson-1', language: '', code: '' },
+        { lessonId: 'lesson-2', language: '', code: '' },
+        { lessonId: 'lesson-3', language: '', code: '' },
+      ]
+    };
+  }
+
   return {
     snippets: [
       {
@@ -186,17 +208,20 @@ Each theory must be educational, technically accurate, well-structured, and writ
 
     const codeOutput = await generateJSON(
       `You are an expert software engineer called Coder Agent.
+First, determine if the topic "${prompt}" is a programming, software engineering, databases, configuration, web development, or code-related topic.
+If it is NOT a coding or technical IT topic (e.g. it is about history, literature, medicine, business, biology, general advice, etc.), you MUST set the "code" field for all snippets to empty string "".
+
 Based on the syllabus for "${prompt}":
 ${JSON.stringify(syllabus.lessons, null, 2)}
 
-Write a practical, working code snippet (TypeScript or the most appropriate language) for each lesson.
+Write a practical, working code snippet (TypeScript or the most appropriate language) for each lesson. If code is not relevant to the topic, use empty string "".
 
 Return a JSON object with EXACTLY this shape:
 {
   "snippets": [
-    { "lessonId": "lesson-1", "language": "typescript", "code": "// full working code example for lesson 1" },
-    { "lessonId": "lesson-2", "language": "typescript", "code": "// full working code example for lesson 2" },
-    { "lessonId": "lesson-3", "language": "typescript", "code": "// full working code example for lesson 3" }
+    { "lessonId": "lesson-1", "language": "language name or empty", "code": "code snippet or empty" },
+    { "lessonId": "lesson-2", "language": "language name or empty", "code": "code snippet or empty" },
+    { "lessonId": "lesson-3", "language": "language name or empty", "code": "code snippet or empty" }
   ]
 }
 

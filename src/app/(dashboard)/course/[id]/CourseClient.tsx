@@ -235,7 +235,7 @@ export default function CourseClient({ courseId }: CourseClientProps) {
         {activeTab !== 'quiz' && activeContent && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Theory half */}
-            <div className="lg:col-span-7 space-y-4">
+            <div className={activeContent.code ? "lg:col-span-7 space-y-4" : "lg:col-span-12 space-y-4"}>
               <h2 className="font-display text-xl sm:text-2xl tracking-wide uppercase" style={{ color: C.primary }}>
                 {activeContent.lesson.title}
               </h2>
@@ -251,47 +251,49 @@ export default function CourseClient({ courseId }: CourseClientProps) {
             </div>
 
             {/* Code Exercises half */}
-            <div className="lg:col-span-5 space-y-3">
-              <span className="text-[10px] uppercase font-bold tracking-widest block" style={{ color: C.outline }}>
-                Code exercise &amp; syntax
-              </span>
-              <div
-                className="rounded-2xl overflow-hidden shadow-lg"
-                style={{ backgroundColor: C.surfaceContainerHigh, border: `1px solid ${C.surfaceVariant}` }}
-              >
-                {/* Editor Header */}
+            {activeContent.code && (
+              <div className="lg:col-span-5 space-y-3">
+                <span className="text-[10px] uppercase font-bold tracking-widest block" style={{ color: C.outline }}>
+                  Code exercise &amp; syntax
+                </span>
                 <div
-                  className="px-4 py-2 flex justify-between items-center text-[10px] font-mono"
-                  style={{ backgroundColor: C.surfaceContainerHigh, borderBottom: `1px solid ${C.surfaceVariant}`, color: C.outline }}
+                  className="rounded-2xl overflow-hidden shadow-lg"
+                  style={{ backgroundColor: C.surfaceContainerHigh, border: `1px solid ${C.surfaceVariant}` }}
                 >
-                  <span>workspace.{activeContent.language}</span>
-                  <button
-                    onClick={() => handleCopyCode(activeContent.code, activeTab)}
-                    className="flex items-center gap-1 transition-colors hover:opacity-70"
-                    style={{ color: C.onSurfaceVariant }}
+                  {/* Editor Header */}
+                  <div
+                    className="px-4 py-2 flex justify-between items-center text-[10px] font-mono"
+                    style={{ backgroundColor: C.surfaceContainerHigh, borderBottom: `1px solid ${C.surfaceVariant}`, color: C.outline }}
                   >
-                    {copied === activeTab ? (
-                      <>
-                        <Check className="h-3 w-3" style={{ color: '#059669' }} />
-                        Copied
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="h-3 w-3" />
-                        Copy
-                      </>
-                    )}
-                  </button>
+                    <span>workspace.{activeContent.language}</span>
+                    <button
+                      onClick={() => handleCopyCode(activeContent.code, activeTab)}
+                      className="flex items-center gap-1 transition-colors hover:opacity-70"
+                      style={{ color: C.onSurfaceVariant }}
+                    >
+                      {copied === activeTab ? (
+                        <>
+                          <Check className="h-3 w-3" style={{ color: '#059669' }} />
+                          Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-3 w-3" />
+                          Copy
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  {/* Code Area */}
+                  <pre
+                    className="p-4 font-mono text-[11px] overflow-x-auto leading-relaxed max-h-[300px]"
+                    style={{ backgroundColor: C.inverseSurface, color: '#e8e6e1' }}
+                  >
+                    <code>{activeContent.code}</code>
+                  </pre>
                 </div>
-                {/* Code Area */}
-                <pre
-                  className="p-4 font-mono text-[11px] overflow-x-auto leading-relaxed max-h-[300px]"
-                  style={{ backgroundColor: C.inverseSurface, color: '#e8e6e1' }}
-                >
-                  <code>{activeContent.code}</code>
-                </pre>
               </div>
-            </div>
+            )}
           </div>
         )}
 

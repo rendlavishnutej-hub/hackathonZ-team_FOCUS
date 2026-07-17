@@ -94,7 +94,8 @@ export default function CareerGuidanceClient({ userEmail }: CareerGuidanceClient
     try {
       const response = await getCareerSuggestions(message, getCourses(), messages);
       setMessages((prev) => [...prev, response]);
-    } catch {
+    } catch (error) {
+      console.error('Error fetching career suggestions:', error);
       setMessages((prev) => [
         ...prev,
         {

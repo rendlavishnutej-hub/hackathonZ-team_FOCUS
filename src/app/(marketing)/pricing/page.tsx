@@ -1,6 +1,21 @@
 import React from 'react';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { Terminal, Check, ArrowRight } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Pricing — FOCUS AI',
+  description:
+    'Choose the FOCUS AI plan that suits you. Start free with 3 AI-generated curriculum sessions per month, or upgrade for unlimited agent orchestration.',
+  openGraph: {
+    title: 'Pricing — FOCUS AI',
+    description: 'Start free with 3 AI sessions/month or go unlimited. Transparent, simple pricing.',
+    url: '/pricing',
+  },
+  alternates: { canonical: '/pricing' },
+};
+
+
 
 export default function PricingPage() {
   const plans = [

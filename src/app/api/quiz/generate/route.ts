@@ -83,7 +83,7 @@ export async function POST(request: Request) {
   }
 
   // 3. AI Generation
-  const model = getModel('gemini-2.0-flash');
+  const model = getModel('gemini-1.5-flash');
   let questions: Question[];
 
   if (!model) {

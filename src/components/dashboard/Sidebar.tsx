@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
   BookOpen, Settings, LogOut, Shield, Award, 
-  Terminal, Activity, Compass, Users, HelpCircle
+  Terminal, Activity, Compass, Users, HelpCircle, GraduationCap 
 } from 'lucide-react';
 import { signOutAction } from '@/app/auth/actions';
 
@@ -47,6 +47,7 @@ export default function Sidebar({ userEmail }: SidebarProps) {
   const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: Compass },
     { name: 'Quiz', href: '/quiz', icon: HelpCircle },
+    { name: 'Career Guidance', href: '/career-guidance', icon: GraduationCap },
     { name: 'Security Settings', href: '/settings', icon: Shield },
     { name: 'Pricing Tiers', href: '/pricing', icon: Award },
   ];

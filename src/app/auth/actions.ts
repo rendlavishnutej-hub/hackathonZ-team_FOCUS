@@ -96,6 +96,7 @@ export async function signUpAction(formData: FormData) {
   });
 
   if (adminError) {
+    console.log('[DEBUG signUpAction] Admin CreateUser Error:', adminError.message);
     // Handle duplicate user gracefully
     if (adminError.message?.includes('already been registered') || adminError.message?.includes('already exists')) {
       return { error: 'An account with this email already exists. Please sign in instead.' };
@@ -204,6 +205,7 @@ export async function signInAction(formData: FormData) {
   }
 
   if (error) {
+    console.log('[DEBUG signInAction] Supabase Auth Error:', error.message);
     // Increments failed attempts and logs audit trail
     await incrementFailedAttempts(email);
     

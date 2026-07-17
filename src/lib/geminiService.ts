@@ -1,4 +1,4 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const apiKey = process.env.GEMINI_API_KEY;
 
@@ -6,7 +6,8 @@ if (!apiKey) {
   console.warn('[FOCUS] GEMINI_API_KEY is not set in environment variables.');
 }
 
-export const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
+export const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
+export const ai = genAI;
 
 export interface CareerMessageInput {
   role: 'user' | 'assistant';
@@ -26,7 +27,7 @@ export async function generateCareerGuidance(
   history: CareerMessageInput[] = [],
   courses: CourseContextInput[] = []
 ): Promise<string> {
-  if (!ai) {
+  if (!genAI) {
     throw new Error('Gemini API is not initialized. Please set GEMINI_API_KEY.');
   }
 
@@ -64,16 +65,19 @@ Formatting Guidelines:
   });
 
   try {
-    const response = await ai.models.generateContent({
+    const model = genAI.getGenerativeModel({
       model: 'gemini-1.5-flash',
+      systemInstruction,
+    });
+
+    const response = await model.generateContent({
       contents,
-      config: {
-        systemInstruction,
+      generationConfig: {
         temperature: 0.7,
       },
     });
 
-    const reply = response.text;
+    const reply = response.response.text();
     if (!reply) {
       throw new Error('Received empty response from Gemini.');
     }
@@ -83,3 +87,4 @@ Formatting Guidelines:
     throw error;
   }
 }
+

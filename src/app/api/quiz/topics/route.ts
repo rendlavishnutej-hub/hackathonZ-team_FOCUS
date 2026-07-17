@@ -11,8 +11,9 @@ export async function GET(request: Request) {
     const supabase = await createClient();
     let query = supabase.from('quiz_topics').select('*');
 
+    // DB column is subject_id (snake_case)
     if (subjectId) {
-      query = query.eq('subjectId', subjectId);
+      query = query.eq('subject_id', subjectId);
     }
 
     const { data: topics, error } = await query;
@@ -21,7 +22,14 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ topics: topics || [] });
+    // Normalize to camelCase for the client
+    const normalized = (topics || []).map((t: any) => ({
+      id: t.id,
+      subjectId: t.subject_id,
+      name: t.name,
+    }));
+
+    return NextResponse.json({ topics: normalized });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'Failed to fetch topics' }, { status: 500 });
   }

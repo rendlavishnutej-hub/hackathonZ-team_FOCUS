@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
   BookOpen, Settings, LogOut, Shield, Award, 
-  Terminal, Activity, Compass, Users, Mic 
+  Terminal, Activity, Compass, Users, Mic, HelpCircle
 } from 'lucide-react';
 import { signOutAction } from '@/app/auth/actions';
 
@@ -46,6 +46,7 @@ export default function Sidebar({ userEmail }: SidebarProps) {
 
   const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: Compass },
+    { name: 'Quiz', href: '/quiz', icon: HelpCircle },
     { name: '🎤 AI Mock Interview', href: '/interview', icon: Mic },
     { name: 'Security Settings', href: '/settings', icon: Shield },
     { name: 'Pricing Tiers', href: '/pricing', icon: Award },
@@ -63,12 +64,12 @@ export default function Sidebar({ userEmail }: SidebarProps) {
         <Link href="/dashboard" className="flex items-center gap-3 group">
           <div
             className="h-10 w-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-md"
-            style={{ background: 'linear-gradient(135deg, #bec6e0 0%, #7c839b 100%)' }}
+            style={{ background: 'linear-gradient(135deg, #bec6e0 0%, #7c839b 100%)', fontFamily: 'var(--font-fredoka), sans-serif' }}
           >
             F
           </div>
           <div>
-            <span className="text-xl font-extrabold tracking-tight block" style={{ color: C.primary }}>
+            <span className="text-xl font-bold tracking-tight block" style={{ color: C.primary, fontFamily: 'var(--font-fredoka), sans-serif' }}>
               Focus
             </span>
             <span

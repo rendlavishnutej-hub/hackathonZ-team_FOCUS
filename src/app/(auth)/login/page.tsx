@@ -366,12 +366,12 @@ export default function LoginPage() {
         
         <Link href="/" className="flex items-center gap-3 group z-10">
           <div
-            className="h-9 w-9 rounded-xl flex items-center justify-center text-white font-bold text-sm"
-            style={{ background: 'linear-gradient(135deg, #bec6e0 0%, #7c839b 100%)' }}
+            className="h-9 w-9 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-sm"
+            style={{ background: 'linear-gradient(135deg, #bec6e0 0%, #7c839b 100%)', fontFamily: 'var(--font-fredoka), sans-serif' }}
           >
             F
           </div>
-          <span className="text-2xl font-extrabold tracking-tight" style={{ color: C.primary }}>
+          <span className="text-2xl font-bold tracking-tight" style={{ color: C.primary, fontFamily: 'var(--font-fredoka), sans-serif' }}>
             Focus
           </span>
         </Link>

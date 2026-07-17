@@ -58,6 +58,7 @@ function Nav() {
             <input
               type="text"
               placeholder="Search capabilities..."
+              suppressHydrationWarning
               className="block w-full pl-9 pr-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 transition-shadow"
               style={{
                 borderColor: C.outlineVariant,

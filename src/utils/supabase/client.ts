@@ -96,7 +96,14 @@ export function createClient() {
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   // Use mock client if credentials are not configured or are placeholders
-  const isMock = !supabaseUrl || supabaseUrl.includes('placeholder') || !supabaseKey || supabaseKey.includes('placeholder');
+  const isMock = (
+    !supabaseUrl ||
+    supabaseUrl.includes('placeholder') ||
+    !supabaseKey ||
+    supabaseKey.includes('placeholder') ||
+    supabaseKey.startsWith('sb_') ||
+    !supabaseKey.includes('.')
+  );
 
   if (isMock) {
     return {

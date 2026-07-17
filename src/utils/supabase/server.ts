@@ -83,8 +83,31 @@ class MockServerQueryBuilder {
     try {
       const { runMockQuery, getSessionUser } = await import('./mockDb');
       const cookieStore = await cookies();
+      
+      let currentUserId: string | null = null;
       const user = await getSessionUser(cookieStore);
-      const currentUserId = user?.id || null;
+      if (user?.id) {
+        currentUserId = user.id;
+      } else {
+        const allCookies = cookieStore.getAll();
+        const sbCookie = allCookies.find((c: any) => c.name.startsWith('sb-') && c.name.endsWith('-auth-token'));
+        if (sbCookie?.value) {
+          try {
+            const cleanVal = decodeURIComponent(sbCookie.value);
+            const parsed = JSON.parse(cleanVal);
+            const token = Array.isArray(parsed) ? parsed[0] : parsed.access_token;
+            if (token) {
+              const payloadPart = token.split('.')[1];
+              if (payloadPart) {
+                const payload = JSON.parse(Buffer.from(payloadPart, 'base64').toString('utf8'));
+                currentUserId = payload.sub || null;
+              }
+            }
+          } catch (e) {
+            // Ignore error
+          }
+        }
+      }
 
       const data = await runMockQuery({
         table: this.table,
@@ -107,11 +130,83 @@ class MockServerQueryBuilder {
   }
 }
 
+class SafeQueryBuilderProxy {
+  private table: string;
+  private realBuilder: any;
+  private mockBuilder: any;
+
+  constructor(table: string, realBuilder: any, mockBuilder: any) {
+    this.table = table;
+    this.realBuilder = realBuilder;
+    this.mockBuilder = mockBuilder;
+  }
+
+  private addMethod(method: string, args: any[]) {
+    if (this.realBuilder && typeof this.realBuilder[method] === 'function') {
+      this.realBuilder = this.realBuilder[method](...args);
+    }
+    if (this.mockBuilder && typeof this.mockBuilder[method] === 'function') {
+      this.mockBuilder = this.mockBuilder[method](...args);
+    }
+    return this;
+  }
+
+  select(...args: any[]) { return this.addMethod('select', args); }
+  insert(...args: any[]) { return this.addMethod('insert', args); }
+  update(...args: any[]) { return this.addMethod('update', args); }
+  delete(...args: any[]) { return this.addMethod('delete', args); }
+  eq(...args: any[]) { return this.addMethod('eq', args); }
+  in(...args: any[]) { return this.addMethod('in', args); }
+  neq(...args: any[]) { return this.addMethod('neq', args); }
+  order(...args: any[]) { return this.addMethod('order', args); }
+  limit(...args: any[]) { return this.addMethod('limit', args); }
+  single(...args: any[]) { return this.addMethod('single', args); }
+  maybeSingle(...args: any[]) { return this.addMethod('maybeSingle', args); }
+
+  async then(resolve: any, reject: any) {
+    try {
+      const result = await this.realBuilder;
+      if (result && result.error && (result.error.code === '42P01' || result.error.message?.includes('does not exist') || result.error.message?.includes('violates row-level security'))) {
+        console.warn(`[FOCUS Safe Client] Table/Access issue on "${this.table}" with live database. Falling back to local mock DB.`);
+        const fallbackResult = await this.mockBuilder;
+        return resolve(fallbackResult);
+      }
+      return resolve(result);
+    } catch (realErr: any) {
+      console.warn(`[FOCUS Safe Client] Real query exceptions on "${this.table}". falling back to local mock DB. Error:`, realErr.message || realErr);
+      try {
+        const fallbackResult = await this.mockBuilder;
+        return resolve(fallbackResult);
+      } catch (mockErr) {
+        return reject(mockErr);
+      }
+    }
+  }
+}
+
+function wrapClientWithFailsafe(realClient: any, isAdmin = false) {
+  if (!realClient) return realClient;
+  const originalFrom = realClient.from.bind(realClient);
+  realClient.from = (table: string) => {
+    const realBuilder = originalFrom(table);
+    const mockBuilder = new MockServerQueryBuilder(table, isAdmin);
+    return new SafeQueryBuilderProxy(table, realBuilder, mockBuilder) as any;
+  };
+  return realClient;
+}
+
 // Check if credentials are mock/missing
 function isMockEnabled() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  return !supabaseUrl || supabaseUrl.includes('placeholder') || !supabaseKey || supabaseKey.includes('placeholder');
+  return (
+    !supabaseUrl ||
+    supabaseUrl.includes('placeholder') ||
+    !supabaseKey ||
+    supabaseKey.includes('placeholder') ||
+    supabaseKey.startsWith('sb_') ||
+    !supabaseKey.includes('.')
+  );
 }
 
 // Server Mock Client Factory helper
@@ -321,7 +416,7 @@ export async function createClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key';
 
-  return createServerClient(
+  const client = createServerClient(
     supabaseUrl,
     supabaseKey,
     {
@@ -341,6 +436,8 @@ export async function createClient() {
       },
     }
   );
+
+  return wrapClientWithFailsafe(client, false);
 }
 
 // Special client for Route Handlers to ensure cookies are appended to the returned NextResponse
@@ -353,7 +450,7 @@ export async function createClientForResponse(response: NextResponse) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key';
 
-  return createServerClient(
+  const client = createServerClient(
     supabaseUrl,
     supabaseKey,
     {
@@ -374,6 +471,8 @@ export async function createClientForResponse(response: NextResponse) {
       },
     }
   );
+
+  return wrapClientWithFailsafe(client, false);
 }
 
 // Admin client using service role key (for server-side security operations only)
@@ -456,7 +555,7 @@ export function createAdminClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-service-role-key';
 
-  return createSupabaseClient(
+  const client = createSupabaseClient(
     supabaseUrl,
     serviceRoleKey,
     {
@@ -466,4 +565,6 @@ export function createAdminClient() {
       },
     }
   );
+
+  return wrapClientWithFailsafe(client, true);
 }

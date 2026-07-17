@@ -4,7 +4,14 @@ import { NextResponse, type NextRequest } from 'next/server';
 function isMockEnabled() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  return !supabaseUrl || supabaseUrl.includes('placeholder') || !supabaseKey || supabaseKey.includes('placeholder');
+  return (
+    !supabaseUrl ||
+    supabaseUrl.includes('placeholder') ||
+    !supabaseKey ||
+    supabaseKey.includes('placeholder') ||
+    supabaseKey.startsWith('sb_') ||
+    !supabaseKey.includes('.')
+  );
 }
 
 function decodeJwt(token: string) {

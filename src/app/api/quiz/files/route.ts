@@ -36,6 +36,7 @@ export async function GET() {
 
     return NextResponse.json({ files: normalized });
   } catch (err: any) {
+    console.error('DEBUG: GET /api/quiz/files error:', err);
     return NextResponse.json({ error: err.message || 'Failed to fetch files' }, { status: 500 });
   }
 }

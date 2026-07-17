@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Anton, Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Anton, Inter, Plus_Jakarta_Sans, Fredoka } from "next/font/google";
 import "./globals.css";
 
 const anton = Anton({
@@ -20,6 +20,12 @@ const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
   variable: "--font-jakarta",
+  display: "swap",
+});
+
+const fredoka = Fredoka({
+  subsets: ["latin"],
+  variable: "--font-fredoka",
   display: "swap",
 });
 
@@ -98,7 +104,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${anton.variable} ${inter.variable} ${plusJakarta.variable} h-full antialiased`}
+      className={`${anton.variable} ${inter.variable} ${plusJakarta.variable} ${fredoka.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-bg-base text-text-primary">
         {children}

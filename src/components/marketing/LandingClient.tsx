@@ -35,11 +35,11 @@ function Nav() {
         {/* Logo + Links */}
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-lg flex items-center justify-center text-white font-bold text-sm"
-              style={{ background: 'linear-gradient(135deg, #bec6e0 0%, #7c839b 100%)' }}>
+            <div className="h-8 w-8 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-sm"
+              style={{ background: 'linear-gradient(135deg, #bec6e0 0%, #7c839b 100%)', fontFamily: 'var(--font-fredoka), sans-serif' }}>
               F
             </div>
-            <span className="text-xl font-extrabold tracking-tight" style={{ color: C.primary }}>Focus</span>
+            <span className="text-xl font-bold tracking-tight" style={{ color: C.primary, fontFamily: 'var(--font-fredoka), sans-serif' }}>Focus</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-6 text-sm font-medium" style={{ color: C.onSurfaceVariant }}>
@@ -505,7 +505,7 @@ function Footer() {
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t pt-10 flex flex-col md:flex-row justify-between items-center gap-6"
         style={{ borderColor: C.surfaceVariant }}
       >
-        <div className="text-xl font-bold tracking-tight" style={{ color: C.outline }}>Focus.AI</div>
+        <div className="text-xl font-bold tracking-tight" style={{ color: C.outline, fontFamily: 'var(--font-fredoka), sans-serif' }}>Focus.AI</div>
         <div className="flex gap-6 text-sm" style={{ color: C.onSurfaceVariant }}>
           <a href="#" className="hover:text-black transition-colors">Privacy Policy</a>
           <a href="#" className="hover:text-black transition-colors">Terms of Service</a>

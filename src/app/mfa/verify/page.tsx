@@ -29,7 +29,7 @@ export default function MfaVerifyPage() {
         if (error) throw error;
 
         // Find the first active/verified TOTP factor
-        const totpFactor = data.totp?.find(f => f.status === 'verified');
+        const totpFactor = data.totp?.find((f: any) => f.status === 'verified');
         if (totpFactor) {
           setFactorId(totpFactor.id);
         } else {

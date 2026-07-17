@@ -35,7 +35,7 @@ export default async function SettingsPage() {
 
   // 4. Fetch Multi-Factor Authentication factors status
   const { data: factors } = await supabase.auth.mfa.listFactors();
-  const mfaEnabled = factors?.all?.some(f => f.status === 'verified') || false;
+  const mfaEnabled = factors?.all?.some((f: any) => f.status === 'verified') || false;
 
   return (
     <div className="flex h-screen bg-[#0A0A0F] text-[#F5F5F7] overflow-hidden">

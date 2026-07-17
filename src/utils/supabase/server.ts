@@ -382,41 +382,53 @@ export function createAdminClient() {
     return {
       auth: {
         admin: {
-          async getUserById(id: string) {
-            const { getMockDb } = await import('./mockDb');
-            const db = getMockDb();
-            const user = db.users.find(u => u.id === id);
-            return { data: { user: user || { id, email: 'mock-user@focus.ai' } }, error: null };
-          },
-          async createUser(options: any) {
+          async createUser(params: any) {
             const { getMockDb, writeMockDb, generateUUID } = await import('./mockDb');
-            const email = options.email;
-            const displayName = options.user_metadata?.display_name || email.split('@')[0];
+            const { email, password, user_metadata, email_confirm } = params;
             const db = getMockDb();
 
-            if (db.users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
-              return { data: { user: null }, error: { message: 'A user with this email has already been registered.' } };
+            // Check for duplicate email
+            if (db.users.some((u: any) => u.email.toLowerCase() === email.toLowerCase())) {
+              return {
+                data: { user: null },
+                error: { message: 'A user with this email address has already been registered' },
+              };
             }
 
             const userId = generateUUID();
             const user = {
               id: userId,
               email,
-              user_metadata: { display_name: displayName }
+              email_confirmed_at: email_confirm ? new Date().toISOString() : null,
+              user_metadata: user_metadata || { display_name: email.split('@')[0] },
             };
             db.users.push(user);
 
-            const profile = {
+            // Auto-create matching profile row
+            db.profiles.push({
               id: userId,
               email,
-              display_name: displayName,
-              created_at: new Date().toISOString()
-            };
-            db.profiles.push(profile);
-            writeMockDb(db);
+              display_name: user_metadata?.display_name || email.split('@')[0],
+              created_at: new Date().toISOString(),
+            });
 
+            writeMockDb(db);
             return { data: { user }, error: null };
           },
+
+          async getUserById(id: string) {
+            const { getMockDb } = await import('./mockDb');
+            const db = getMockDb();
+            const user = db.users.find((u: any) => u.id === id);
+            return { data: { user: user || { id, email: 'mock-user@focus.ai' } }, error: null };
+          },
+
+          async listUsers() {
+            const { getMockDb } = await import('./mockDb');
+            const db = getMockDb();
+            return { data: { users: db.users }, error: null };
+          },
+
           async generateLink(params: any) {
             return {
               data: {
@@ -427,6 +439,7 @@ export function createAdminClient() {
               error: null
             };
           },
+
           mfa: {
             async deleteFactor(params: any) {
               return { data: {}, error: null };

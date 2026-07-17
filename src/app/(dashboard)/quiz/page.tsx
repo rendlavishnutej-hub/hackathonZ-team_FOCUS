@@ -18,10 +18,10 @@ export default async function QuizPage() {
   }
 
   return (
-    <div className="flex h-screen bg-[#0A0A0F] text-[#F5F5F7] overflow-hidden">
+    <div className="flex h-screen bg-[#fef9f2] text-black overflow-hidden font-sans">
       <Sidebar userEmail={user.email!} />
       <main className="flex-1 overflow-y-auto dots-bg p-8 md:p-12 relative">
-        <div className="absolute top-0 right-1/4 w-[300px] h-[300px] bg-[#7C5CFF]/5 rounded-full blur-[80px] pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-[300px] h-[300px] bg-[#d3579a]/0.04 rounded-full blur-[80px] pointer-events-none" />
         <QuizHubClient userEmail={user.email!} userId={user.id} />
       </main>
     </div>

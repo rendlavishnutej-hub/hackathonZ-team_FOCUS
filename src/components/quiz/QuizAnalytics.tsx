@@ -13,6 +13,29 @@ import {
 import type { AnalyticsData, AccuracyEntry } from '@/lib/quiz/types';
 import QuizRecommendations from './QuizRecommendations';
 
+const C = {
+  cream: '#fef9f2',
+  primary: '#000000',
+  onPrimary: '#ffffff',
+  surfaceContainerLowest: '#ffffff',
+  surfaceContainerLow: '#f8f3ec',
+  surfaceContainer: '#f2ede6',
+  surfaceContainerHigh: '#ece7e1',
+  surfaceVariant: '#e6e2db',
+  onSurface: '#1d1c18',
+  onSurfaceVariant: '#45464d',
+  outline: '#76777d',
+  outlineVariant: '#c6c6cd',
+  inverseOnSurface: '#f5f0e9',
+  inverseSurface: '#32302c',
+  accentYellow: '#ffe24c',
+  accentBlue: '#bec6e0',
+  accentPink: '#ffafd3',
+  accentGreen: '#86efac',
+  accentPurple: '#d3579a',
+  secondaryContainer: '#fcdf46',
+};
+
 interface QuizAnalyticsProps {
   userId: string;
 }
@@ -20,10 +43,10 @@ interface QuizAnalyticsProps {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-[#13131A] border border-zinc-700 rounded-lg px-3 py-2 text-xs shadow-xl">
-      <p className="text-zinc-400 mb-0.5">{label}</p>
+    <div className="bg-white border border-zinc-200 rounded-lg px-3 py-2 text-xs shadow-md">
+      <p className="text-zinc-550 font-bold mb-0.5">{label}</p>
       {payload.map((p: any, i: number) => (
-        <p key={i} className="font-bold" style={{ color: p.color }}>
+        <p key={i} className="font-extrabold" style={{ color: p.color }}>
           {p.name}: {p.value}{p.name === 'Accuracy' || p.name === 'Percentage' ? '%' : ''}
         </p>
       ))}
@@ -48,7 +71,7 @@ export default function QuizAnalytics({ userId }: QuizAnalyticsProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 text-[#7C5CFF] animate-spin" />
+        <Loader2 className="h-8 w-8 text-[#d3579a] animate-spin" />
       </div>
     );
   }
@@ -56,12 +79,18 @@ export default function QuizAnalytics({ userId }: QuizAnalyticsProps) {
   if (!analytics || analytics.totalAttempts === 0) {
     return (
       <div className="space-y-8">
-        <div className="border border-dashed border-zinc-800 p-12 rounded-3xl text-center space-y-4 bg-zinc-950/20">
-          <div className="h-12 w-12 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mx-auto text-[#22D3D0]">
+        <div 
+          className="border border-dashed p-12 rounded-3xl text-center space-y-4 bg-white"
+          style={{ borderColor: C.surfaceVariant }}
+        >
+          <div 
+            className="h-12 w-12 rounded-2xl flex items-center justify-center mx-auto text-[#d3579a] border"
+            style={{ backgroundColor: `${C.accentPurple}10`, borderColor: `${C.accentPurple}30` }}
+          >
             <BarChart3 className="h-6 w-6" />
           </div>
           <div className="space-y-1.5">
-            <h4 className="text-white font-bold text-sm">No Analytics Data Yet</h4>
+            <h4 className="text-black font-extrabold text-sm">No Analytics Data Yet</h4>
             <p className="text-xs text-zinc-500 max-w-sm mx-auto">
               Complete at least one quiz to see your performance analytics here.
             </p>
@@ -72,38 +101,39 @@ export default function QuizAnalytics({ userId }: QuizAnalyticsProps) {
     );
   }
 
-  const barColors = ['#7C5CFF', '#22D3D0', '#3DD68C', '#F5B942', '#F1583D', '#9C5CFF'];
+  // Soft palette color array for charts
+  const barColors = ['#d3579a', '#5a6ba8', '#047857', '#d97706', '#ea580c', '#ffe24c'];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 font-sans" style={{ color: C.onSurface }}>
       {/* Overview Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatCard
           icon={Award}
           label="Avg Score"
           value={`${analytics.averagePercentage}%`}
-          color="#7C5CFF"
+          color="#d3579a"
           delay={0}
         />
         <StatCard
           icon={Target}
           label="Total Quizzes"
           value={String(analytics.totalAttempts)}
-          color="#22D3D0"
+          color="#5a6ba8"
           delay={0.1}
         />
         <StatCard
           icon={Flame}
           label="Quiz Streak"
           value={`${analytics.quizStreak} day${analytics.quizStreak !== 1 ? 's' : ''}`}
-          color="#F5B942"
+          color="#d97706"
           delay={0.2}
         />
         <StatCard
           icon={Zap}
           label="Avg Response"
           value={`${analytics.averageResponseTime}s`}
-          color="#3DD68C"
+          color="#047857"
           delay={0.3}
         />
       </div>
@@ -115,17 +145,18 @@ export default function QuizAnalytics({ userId }: QuizAnalyticsProps) {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="glass-panel p-6 rounded-2xl border border-white/5 bg-[#13131A]/60"
+          className="p-6 rounded-2xl border bg-white shadow-sm"
+          style={{ borderColor: C.surfaceVariant }}
         >
           <h4 className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4 flex items-center gap-1.5">
-            <BarChart3 className="h-3.5 w-3.5 text-[#7C5CFF]" />
+            <BarChart3 className="h-4 w-4 text-[#d3579a]" />
             Subject-wise Accuracy
           </h4>
           {analytics.subjectAccuracy.length > 0 ? (
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={analytics.subjectAccuracy} layout="vertical" margin={{ left: 0, right: 20 }}>
                 <XAxis type="number" domain={[0, 100]} tick={{ fill: '#71717a', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis type="category" dataKey="name" tick={{ fill: '#a1a1aa', fontSize: 11 }} axisLine={false} tickLine={false} width={120} />
+                <YAxis type="category" dataKey="name" tick={{ fill: '#4b5563', fontSize: 11 }} axisLine={false} tickLine={false} width={120} />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="accuracy" name="Accuracy" radius={[0, 6, 6, 0]} barSize={20}>
                   {analytics.subjectAccuracy.map((_, idx) => (
@@ -135,7 +166,7 @@ export default function QuizAnalytics({ userId }: QuizAnalyticsProps) {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-xs text-zinc-600 text-center py-8">No data yet</p>
+            <p className="text-xs text-zinc-500 font-semibold text-center py-8">No data yet</p>
           )}
         </motion.div>
 
@@ -144,17 +175,18 @@ export default function QuizAnalytics({ userId }: QuizAnalyticsProps) {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="glass-panel p-6 rounded-2xl border border-white/5 bg-[#13131A]/60"
+          className="p-6 rounded-2xl border bg-white shadow-sm"
+          style={{ borderColor: C.surfaceVariant }}
         >
-          <h4 className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4 flex items-center gap-1.5">
-            <Target className="h-3.5 w-3.5 text-[#22D3D0]" />
+          <h4 className="text-xs font-bold uppercase tracking-widest text-[#76777d] mb-4 flex items-center gap-1.5">
+            <Target className="h-4 w-4 text-[#5a6ba8]" />
             Topic-wise Accuracy
           </h4>
           {analytics.topicAccuracy.length > 0 ? (
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={analytics.topicAccuracy} layout="vertical" margin={{ left: 0, right: 20 }}>
                 <XAxis type="number" domain={[0, 100]} tick={{ fill: '#71717a', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis type="category" dataKey="name" tick={{ fill: '#a1a1aa', fontSize: 11 }} axisLine={false} tickLine={false} width={120} />
+                <YAxis type="category" dataKey="name" tick={{ fill: '#4b5563', fontSize: 11 }} axisLine={false} tickLine={false} width={120} />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="accuracy" name="Accuracy" radius={[0, 6, 6, 0]} barSize={16}>
                   {analytics.topicAccuracy.map((_, idx) => (
@@ -164,7 +196,7 @@ export default function QuizAnalytics({ userId }: QuizAnalyticsProps) {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-xs text-zinc-600 text-center py-8">No data yet</p>
+            <p className="text-xs text-zinc-500 font-semibold text-center py-8">No data yet</p>
           )}
         </motion.div>
       </div>
@@ -175,15 +207,16 @@ export default function QuizAnalytics({ userId }: QuizAnalyticsProps) {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="glass-panel p-6 rounded-2xl border border-white/5 bg-[#13131A]/60"
+          className="p-6 rounded-2xl border bg-white shadow-sm"
+          style={{ borderColor: C.surfaceVariant }}
         >
           <h4 className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4 flex items-center gap-1.5">
-            <TrendingUp className="h-3.5 w-3.5 text-[#3DD68C]" />
+            <TrendingUp className="h-4 w-4 text-emerald-600" />
             Improvement Trend
           </h4>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={analytics.improvementTrend} margin={{ left: 0, right: 20, top: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e6e2db" />
               <XAxis dataKey="date" tick={{ fill: '#71717a', fontSize: 10 }} axisLine={false} tickLine={false} />
               <YAxis domain={[0, 100]} tick={{ fill: '#71717a', fontSize: 10 }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
@@ -191,10 +224,10 @@ export default function QuizAnalytics({ userId }: QuizAnalyticsProps) {
                 type="monotone"
                 dataKey="percentage"
                 name="Percentage"
-                stroke="#7C5CFF"
+                stroke="#d3579a"
                 strokeWidth={2.5}
-                dot={{ fill: '#7C5CFF', r: 4, strokeWidth: 0 }}
-                activeDot={{ fill: '#22D3D0', r: 6, strokeWidth: 2, stroke: '#0A0A0F' }}
+                dot={{ fill: '#d3579a', r: 4, strokeWidth: 0 }}
+                activeDot={{ fill: '#5a6ba8', r: 6, strokeWidth: 2, stroke: '#ffffff' }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -206,19 +239,19 @@ export default function QuizAnalytics({ userId }: QuizAnalyticsProps) {
         <AreaList
           title="Weak Areas"
           icon={AlertTriangle}
-          iconColor="#F1583D"
+          iconColor="#dc2626"
           areas={analytics.weakAreas}
           emptyText="No weak areas — you're doing great!"
-          badgeColor="text-[#F1583D] bg-[#F1583D]/10"
+          badgeColor="text-red-750 bg-red-50 border border-red-100"
           delay={0.5}
         />
         <AreaList
           title="Strong Areas"
           icon={Award}
-          iconColor="#3DD68C"
+          iconColor="#047857"
           areas={analytics.strongAreas}
           emptyText="Complete more quizzes to identify strong areas."
-          badgeColor="text-[#3DD68C] bg-[#3DD68C]/10"
+          badgeColor="text-emerald-750 bg-emerald-50 border border-emerald-100"
           delay={0.6}
         />
       </div>
@@ -239,10 +272,11 @@ function StatCard({ icon: Icon, label, value, color, delay }: {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="glass-panel p-5 rounded-xl border border-white/5 bg-[#13131A]/60"
+      className="p-5 rounded-xl border bg-white shadow-sm"
+      style={{ borderColor: C.surfaceVariant }}
     >
       <Icon className="h-5 w-5 mb-2" style={{ color }} />
-      <div className="text-2xl font-bold text-white">{value}</div>
+      <div className="text-2xl font-extrabold text-black">{value}</div>
       <div className="text-[10px] uppercase tracking-wider font-bold text-zinc-500 mt-0.5">{label}</div>
     </motion.div>
   );
@@ -257,20 +291,25 @@ function AreaList({ title, icon: Icon, iconColor, areas, emptyText, badgeColor, 
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="glass-panel p-6 rounded-2xl border border-white/5 bg-[#13131A]/60"
+      className="p-6 rounded-2xl border bg-white shadow-sm"
+      style={{ borderColor: C.surfaceVariant }}
     >
-      <h4 className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4 flex items-center gap-1.5">
-        <Icon className="h-3.5 w-3.5" style={{ color: iconColor }} />
+      <h4 className="text-xs font-bold uppercase tracking-widest text-[#76777d] mb-4 flex items-center gap-1.5">
+        <Icon className="h-4 w-4" style={{ color: iconColor }} />
         {title}
       </h4>
       {areas.length === 0 ? (
-        <p className="text-xs text-zinc-600 text-center py-4">{emptyText}</p>
+        <p className="text-xs text-zinc-500 font-semibold text-center py-4">{emptyText}</p>
       ) : (
         <div className="space-y-2">
           {areas.map(area => (
-            <div key={area.id} className="flex items-center justify-between py-2 border-b border-zinc-800/50 last:border-0">
-              <span className="text-sm text-zinc-300">{area.name}</span>
-              <span className={`px-2 py-0.5 rounded-lg text-xs font-bold ${badgeColor}`}>
+            <div 
+              key={area.id} 
+              className="flex items-center justify-between py-2 border-b last:border-0"
+              style={{ borderColor: C.surfaceVariant }}
+            >
+              <span className="text-sm font-semibold text-zinc-800">{area.name}</span>
+              <span className={`px-2.5 py-0.5 rounded-lg text-xs font-bold ${badgeColor}`}>
                 {area.accuracy}%
               </span>
             </div>

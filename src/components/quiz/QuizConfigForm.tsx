@@ -5,19 +5,41 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play, Loader2, Timer, Zap, FileText, Upload,
-  File, X, RefreshCw, CheckCircle2, Clock, AlertCircle,
-  FileType, ChevronRight
+  CheckCircle2, AlertCircle, ChevronRight, RefreshCw
 } from 'lucide-react';
 import type { Difficulty, QuizFile } from '@/lib/quiz/types';
+
+const C = {
+  cream: '#fef9f2',
+  primary: '#000000',
+  onPrimary: '#ffffff',
+  surfaceContainerLowest: '#ffffff',
+  surfaceContainerLow: '#f8f3ec',
+  surfaceContainer: '#f2ede6',
+  surfaceContainerHigh: '#ece7e1',
+  surfaceVariant: '#e6e2db',
+  onSurface: '#1d1c18',
+  onSurfaceVariant: '#45464d',
+  outline: '#76777d',
+  outlineVariant: '#c6c6cd',
+  inverseOnSurface: '#f5f0e9',
+  inverseSurface: '#32302c',
+  accentYellow: '#ffe24c',
+  accentBlue: '#bec6e0',
+  accentPink: '#ffafd3',
+  accentGreen: '#86efac',
+  accentPurple: '#d3579a',
+  secondaryContainer: '#fcdf46',
+};
 
 interface QuizConfigFormProps {
   userId: string;
 }
 
 const difficulties: { value: Difficulty; label: string; color: string; desc: string }[] = [
-  { value: 'easy', label: 'Easy', color: '#3DD68C', desc: '2 pts / -0.5' },
-  { value: 'medium', label: 'Medium', color: '#F5B942', desc: '3 pts / -0.75' },
-  { value: 'hard', label: 'Hard', color: '#F1583D', desc: '4 pts / -1' },
+  { value: 'easy', label: 'Easy', color: '#047857', desc: '2 pts / -0.5' },
+  { value: 'medium', label: 'Medium', color: '#d97706', desc: '3 pts / -0.75' },
+  { value: 'hard', label: 'Hard', color: '#ea580c', desc: '4 pts / -1' },
 ];
 
 const ACCEPTED_TYPES: Record<string, string> = {
@@ -36,10 +58,13 @@ function formatFileSize(bytes: number): string {
 }
 
 function FileTypeIcon({ ext }: { ext: string }) {
-  const colors: Record<string, string> = { pdf: '#F1583D', docx: '#3B82F6', doc: '#3B82F6', pptx: '#F5B942', ppt: '#F5B942', txt: '#9C9CA8' };
+  const colors: Record<string, string> = { pdf: '#ea580c', docx: '#3B82F6', doc: '#3B82F6', pptx: '#ffe24c', ppt: '#ffe24c', txt: '#76777d' };
   return (
-    <div className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: `${colors[ext] || '#9C9CA8'}20`, border: `1px solid ${colors[ext] || '#9C9CA8'}30` }}>
-      <FileText className="h-4 w-4" style={{ color: colors[ext] || '#9C9CA8' }} />
+    <div 
+      className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0 border" 
+      style={{ backgroundColor: `${colors[ext] || '#76777d'}12`, borderColor: `${colors[ext] || '#76777d'}25` }}
+    >
+      <FileText className="h-4 w-4" style={{ color: colors[ext] || '#76777d' }} />
     </div>
   );
 }
@@ -48,7 +73,6 @@ async function extractTextFromFile(file: File): Promise<string> {
   if (file.type === 'text/plain') {
     return await file.text();
   }
-  // For PDF/DOCX/PPTX — we pass rawContent (base64) to Gemini and return minimal placeholder text
   return `[Binary document: ${file.name}. Content will be analyzed by AI directly from the raw file data.]`;
 }
 
@@ -65,14 +89,12 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
   const router = useRouter();
   const dropRef = useRef<HTMLDivElement>(null);
 
-  // Upload & file state
   const [existingFiles, setExistingFiles] = useState<QuizFile[]>([]);
   const [selectedFile, setSelectedFile] = useState<QuizFile | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
 
-  // Quiz config state
   const [difficulty, setDifficulty] = useState<Difficulty>('medium');
   const [questionCount, setQuestionCount] = useState(10);
   const [timerEnabled, setTimerEnabled] = useState(false);
@@ -80,7 +102,6 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
   const [generating, setGenerating] = useState(false);
   const [forceRegenerate, setForceRegenerate] = useState(false);
 
-  // Fetch previously uploaded files
   useEffect(() => {
     fetch('/api/quiz/files')
       .then(r => r.json())
@@ -159,7 +180,6 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
     setGenerating(true);
 
     try {
-      // Generate (or use cached) questions for the selected file
       const genRes = await fetch('/api/quiz/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -186,7 +206,6 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
         timerDuration: timerEnabled ? timerMinutes * 60 : 0,
       };
 
-      // Store the pre-fetched questions + config in session storage
       sessionStorage.setItem('focus_quiz_config', JSON.stringify(config));
       sessionStorage.setItem('focus_quiz_questions', JSON.stringify(genData.questions));
 
@@ -200,21 +219,20 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
   const fileExt = (f: QuizFile) => ACCEPTED_TYPES[f.type] || f.name.split('.').pop() || 'file';
 
   return (
-    <div className="max-w-2xl space-y-5">
+    <div className="max-w-2xl space-y-5 font-sans" style={{ color: C.onSurface }}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass-panel p-8 rounded-3xl border border-white/5 bg-[#13131A]/60 shadow-xl shadow-[#7C5CFF]/5 space-y-7"
+        className="p-8 rounded-[2rem] border bg-white shadow-sm space-y-7"
+        style={{ borderColor: C.surfaceVariant }}
       >
         {/* Header */}
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-[#7C5CFF] to-[#22D3D0] p-[1px]">
-            <div className="h-full w-full bg-zinc-950 rounded-[11px] flex items-center justify-center">
-              <Zap className="h-5 w-5 text-[#22D3D0]" />
-            </div>
+          <div className="h-10 w-10 rounded-xl bg-zinc-50 border flex items-center justify-center shadow-inner">
+            <Zap className="h-5 w-5 text-[#d3579a]" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white">Generate Quiz from Document</h2>
+            <h2 className="text-lg font-extrabold text-black">Generate Quiz from Document</h2>
             <p className="text-xs text-zinc-500">Upload a study file and AI will create a personalised quiz</p>
           </div>
         </div>
@@ -227,8 +245,8 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
           onDrop={handleDrop}
           className={`relative flex flex-col items-center justify-center gap-4 px-6 py-10 rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer ${
             isDragging
-              ? 'border-[#7C5CFF] bg-[#7C5CFF]/5'
-              : 'border-zinc-700 hover:border-zinc-600 bg-zinc-950/30 hover:bg-zinc-950/50'
+              ? 'border-[#d3579a] bg-[#d3579a]/5'
+              : 'border-zinc-350 bg-white hover:bg-[#fcfaf5] hover:border-zinc-550'
           }`}
           onClick={() => document.getElementById('file-input')?.click()}
         >
@@ -242,24 +260,24 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
 
           {uploading ? (
             <div className="flex flex-col items-center gap-3">
-              <div className="h-14 w-14 rounded-2xl bg-[#7C5CFF]/10 border border-[#7C5CFF]/20 flex items-center justify-center">
-                <Loader2 className="h-7 w-7 text-[#7C5CFF] animate-spin" />
+              <div className="h-14 w-14 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-center justify-center">
+                <Loader2 className="h-7 w-7 text-[#d3579a] animate-spin" />
               </div>
-              <p className="text-sm text-zinc-300 font-medium">Reading document...</p>
+              <p className="text-xs text-zinc-650 font-bold">Reading document...</p>
             </div>
           ) : (
             <>
               <motion.div
                 animate={{ y: isDragging ? -4 : 0 }}
-                className="h-14 w-14 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center"
+                className="h-14 w-14 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-center justify-center shadow-inner"
               >
-                <Upload className={`h-7 w-7 transition-colors ${isDragging ? 'text-[#7C5CFF]' : 'text-zinc-500'}`} />
+                <Upload className={`h-7 w-7 transition-colors ${isDragging ? 'text-[#d3579a]' : 'text-zinc-400'}`} />
               </motion.div>
               <div className="text-center space-y-1">
-                <p className="text-sm font-semibold text-zinc-300">
+                <p className="text-xs font-extrabold text-zinc-700">
                   {isDragging ? 'Drop your file here' : 'Drag & drop or click to upload'}
                 </p>
-                <p className="text-xs text-zinc-600">PDF, DOCX, PPTX, TXT — up to 20 MB</p>
+                <p className="text-[10px] text-zinc-500 font-semibold">PDF, DOCX, PPTX, TXT — up to 20 MB</p>
               </div>
             </>
           )}
@@ -272,7 +290,7 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="flex items-center gap-2 px-4 py-3 bg-[#F1583D]/10 border border-[#F1583D]/20 rounded-xl text-xs text-[#F1583D]"
+              className="flex items-center gap-2 px-4 py-3 bg-red-50 border border-red-100 rounded-xl text-xs text-red-650"
             >
               <AlertCircle className="h-4 w-4 shrink-0" />
               {uploadError}
@@ -283,7 +301,7 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
         {/* Previously Uploaded Files */}
         {existingFiles.length > 0 && (
           <div className="space-y-2.5">
-            <p className="text-[10px] uppercase font-bold tracking-widest text-zinc-500">Your Documents</p>
+            <p className="text-[10px] uppercase font-bold tracking-widest text-[#76777d]">Your Documents</p>
             <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
               {existingFiles.map(f => {
                 const ext = fileExt(f);
@@ -292,23 +310,24 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
                   <button
                     key={f.id}
                     onClick={() => { setSelectedFile(isSelected ? null : f); setForceRegenerate(false); setUploadError(''); }}
-                    className={`w-full flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all duration-200 ${
+                    className="w-full flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all duration-200"
+                    style={
                       isSelected
-                        ? 'border-[#7C5CFF]/40 bg-[#7C5CFF]/8'
-                        : 'border-zinc-800/70 hover:border-zinc-700 bg-zinc-950/20 hover:bg-zinc-950/40'
-                    }`}
+                        ? { backgroundColor: `${C.accentPurple}10`, borderColor: C.accentPurple }
+                        : { backgroundColor: '#ffffff', borderColor: C.surfaceVariant }
+                    }
                   >
                     <FileTypeIcon ext={ext} />
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-semibold truncate ${isSelected ? 'text-white' : 'text-zinc-300'}`}>{f.name}</p>
-                      <p className="text-[10px] text-zinc-600 mt-0.5">
+                      <p className={`text-sm font-semibold truncate ${isSelected ? 'text-black' : 'text-zinc-800'}`}>{f.name}</p>
+                      <p className="text-[10px] text-zinc-500 mt-0.5 font-semibold">
                         {formatFileSize(f.size)} · {new Date(f.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       </p>
                     </div>
                     {isSelected ? (
-                      <CheckCircle2 className="h-5 w-5 text-[#7C5CFF] shrink-0" />
+                      <CheckCircle2 className="h-5 w-5 text-[#d3579a] shrink-0" />
                     ) : (
-                      <ChevronRight className="h-4 w-4 text-zinc-600 shrink-0" />
+                      <ChevronRight className="h-4 w-4 text-zinc-400 shrink-0" />
                     )}
                   </button>
                 );
@@ -326,16 +345,20 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
               exit={{ opacity: 0, height: 0 }}
               className="space-y-3"
             >
-              <div className="flex items-center justify-between py-2.5 px-4 bg-[#7C5CFF]/8 border border-[#7C5CFF]/20 rounded-xl">
+              <div 
+                className="flex items-center justify-between py-2.5 px-4 rounded-xl border"
+                style={{ backgroundColor: `${C.accentPurple}08`, borderColor: `${C.accentPurple}30` }}
+              >
                 <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="h-4 w-4 text-[#7C5CFF]" />
-                  <span className="text-xs font-semibold text-white truncate max-w-[240px]">{selectedFile.name}</span>
+                  <CheckCircle2 className="h-4 w-4 text-[#d3579a]" />
+                  <span className="text-xs font-semibold text-black truncate max-w-[240px]">{selectedFile.name}</span>
                 </div>
                 <button
                   onClick={() => setForceRegenerate(v => !v)}
-                  className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors ${forceRegenerate ? 'text-[#22D3D0]' : 'text-zinc-600 hover:text-zinc-400'}`}
+                  className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors"
+                  style={{ color: forceRegenerate ? C.accentPurple : '#76777d' }}
                 >
-                  <RefreshCw className={`h-3 w-3 ${forceRegenerate ? 'text-[#22D3D0]' : ''}`} />
+                  <RefreshCw className={`h-3 w-3 ${forceRegenerate ? 'animate-spin' : ''}`} />
                   {forceRegenerate ? 'Regenerating' : 'Regenerate'}
                 </button>
               </div>
@@ -345,21 +368,21 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
 
         {/* Difficulty */}
         <div className="space-y-2">
-          <label className="text-[10px] uppercase font-bold tracking-widest text-zinc-500">Difficulty</label>
+          <label className="text-[10px] uppercase font-bold tracking-widest text-[#76777d]">Difficulty</label>
           <div className="flex gap-2">
             {difficulties.map(d => (
               <button
                 key={d.value}
                 onClick={() => setDifficulty(d.value)}
-                className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 border ${
+                className="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 border"
+                style={
                   difficulty === d.value
-                    ? 'border-transparent text-zinc-950'
-                    : 'border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700 bg-zinc-950/40'
-                }`}
-                style={difficulty === d.value ? { backgroundColor: d.color } : {}}
+                    ? { backgroundColor: `${d.color}15`, borderColor: d.color, color: d.color }
+                    : { backgroundColor: '#ffffff', borderColor: C.surfaceVariant, color: C.onSurfaceVariant }
+                }
               >
                 <span className="block">{d.label}</span>
-                <span className={`text-[9px] font-normal ${difficulty === d.value ? 'text-zinc-900/70' : 'text-zinc-600'}`}>{d.desc}</span>
+                <span className="text-[9px] font-normal opacity-85 mt-0.5 block">{d.desc}</span>
               </button>
             ))}
           </div>
@@ -367,28 +390,29 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
 
         {/* Question Count */}
         <div className="space-y-2">
-          <label className="text-[10px] uppercase font-bold tracking-widest text-zinc-500">
-            Questions: <span className="text-[#22D3D0]">{questionCount}</span>
+          <label className="text-[10px] uppercase font-bold tracking-widest text-[#76777d]">
+            Questions: <span className="text-black font-extrabold">{questionCount}</span>
           </label>
           <input
             type="range" min={5} max={30} step={1} value={questionCount}
             onChange={e => setQuestionCount(parseInt(e.target.value))}
-            className="w-full h-2 rounded-full appearance-none bg-zinc-800 accent-[#7C5CFF] cursor-pointer"
+            className="w-full h-1.5 rounded-full appearance-none bg-zinc-200 accent-[#d3579a] cursor-pointer"
           />
-          <div className="flex justify-between text-[10px] text-zinc-600 font-mono">
-            <span>5</span><span>30</span>
+          <div className="flex justify-between text-[9px] text-[#71717a] font-mono font-bold">
+            <span>5 questions</span><span>30 questions</span>
           </div>
         </div>
 
         {/* Timer Toggle */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <label className="text-[10px] uppercase font-bold tracking-widest text-zinc-500 flex items-center gap-1.5">
-              <Timer className="h-3 w-3" /> Timer
+            <label className="text-[10px] uppercase font-bold tracking-widest text-[#76777d] flex items-center gap-1.5">
+              <Timer className="h-3.5 w-3.5" /> Timer
             </label>
             <button
               onClick={() => setTimerEnabled(!timerEnabled)}
-              className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${timerEnabled ? 'bg-[#7C5CFF]' : 'bg-zinc-800'}`}
+              className="relative w-11 h-6 rounded-full transition-colors duration-200"
+              style={{ backgroundColor: timerEnabled ? C.accentPurple : C.surfaceVariant }}
             >
               <motion.div
                 className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow"
@@ -403,14 +427,15 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="flex items-center gap-3"
+                className="flex items-center gap-3 pt-1"
               >
                 <input
                   type="number" min={1} max={120} value={timerMinutes}
                   onChange={e => setTimerMinutes(Math.max(1, Math.min(120, parseInt(e.target.value) || 1)))}
-                  className="w-20 px-3 py-2 bg-zinc-950/60 border border-zinc-800 rounded-xl text-white text-sm text-center focus:outline-none focus:border-[#7C5CFF] focus:ring-1 focus:ring-[#7C5CFF] transition-all"
+                  className="w-20 px-3 py-2 bg-white border rounded-xl text-black text-sm text-center focus:outline-none focus:ring-1 focus:ring-[#d3579a] transition-all"
+                  style={{ borderColor: C.surfaceVariant }}
                 />
-                <span className="text-xs text-zinc-500">minutes</span>
+                <span className="text-xs text-zinc-500 font-semibold">minutes</span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -420,7 +445,8 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
         <button
           onClick={handleStart}
           disabled={!selectedFile || generating || uploading}
-          className="w-full py-3.5 bg-gradient-to-r from-[#7C5CFF] to-[#22D3D0] text-zinc-950 font-bold text-sm rounded-2xl hover:opacity-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#7C5CFF]/15 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-full py-3.5 font-bold text-sm rounded-2xl hover:opacity-95 transition-all flex items-center justify-center gap-2 shadow disabled:opacity-40 disabled:cursor-not-allowed"
+          style={{ backgroundColor: C.accentPurple, color: '#ffffff' }}
         >
           {generating ? (
             <>
@@ -429,7 +455,7 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
             </>
           ) : (
             <>
-              <Play className="h-4 w-4 fill-zinc-950" />
+              <Play className="h-4 w-4 fill-white text-white" />
               {selectedFile ? 'Generate & Start Quiz' : 'Select or upload a document first'}
             </>
           )}

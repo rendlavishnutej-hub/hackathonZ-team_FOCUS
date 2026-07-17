@@ -3,11 +3,34 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
-  History, Clock, Trophy, Target, ChevronDown, ChevronUp,
-  Loader2, BookOpen, Filter
+  History, Clock, Target, ChevronDown, ChevronUp,
+  Loader2, Filter
 } from 'lucide-react';
 import type { QuizAttempt, Difficulty } from '@/lib/quiz/types';
 import QuizResults from './QuizResults';
+
+const C = {
+  cream: '#fef9f2',
+  primary: '#000000',
+  onPrimary: '#ffffff',
+  surfaceContainerLowest: '#ffffff',
+  surfaceContainerLow: '#f8f3ec',
+  surfaceContainer: '#f2ede6',
+  surfaceContainerHigh: '#ece7e1',
+  surfaceVariant: '#e6e2db',
+  onSurface: '#1d1c18',
+  onSurfaceVariant: '#45464d',
+  outline: '#76777d',
+  outlineVariant: '#c6c6cd',
+  inverseOnSurface: '#f5f0e9',
+  inverseSurface: '#32302c',
+  accentYellow: '#ffe24c',
+  accentBlue: '#bec6e0',
+  accentPink: '#ffafd3',
+  accentGreen: '#86efac',
+  accentPurple: '#d3579a',
+  secondaryContainer: '#fcdf46',
+};
 
 interface QuizHistoryProps {
   userId: string;
@@ -62,30 +85,36 @@ export default function QuizHistory({ userId }: QuizHistoryProps) {
       return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
     });
 
-  const gradeColors: Record<string, string> = {
-    'A+': 'text-[#3DD68C] bg-[#3DD68C]/10 border-[#3DD68C]/20',
-    'A': 'text-[#3DD68C] bg-[#3DD68C]/10 border-[#3DD68C]/20',
-    'B': 'text-[#22D3D0] bg-[#22D3D0]/10 border-[#22D3D0]/20',
-    'C': 'text-[#F5B942] bg-[#F5B942]/10 border-[#F5B942]/20',
-    'F': 'text-[#F1583D] bg-[#F1583D]/10 border-[#F1583D]/20',
+  const gradeColors: Record<string, { bg: string; text: string; border: string }> = {
+    'A+': { bg: '#ecfdf5', text: '#047857', border: '#a7f3d0' },
+    'A':  { bg: '#ecfdf5', text: '#047857', border: '#a7f3d0' },
+    'B':  { bg: '#eff6ff', text: '#1d4ed8', border: '#bfdbfe' },
+    'C':  { bg: '#fffbeb', text: '#d97706', border: '#fde68a' },
+    'F':  { bg: '#fef2f2', text: '#dc2626', border: '#fca5a5' },
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 text-[#7C5CFF] animate-spin" />
+        <Loader2 className="h-8 w-8 text-[#d3579a] animate-spin" />
       </div>
     );
   }
 
   if (attempts.length === 0) {
     return (
-      <div className="border border-dashed border-zinc-800 p-12 rounded-3xl text-center space-y-4 bg-zinc-950/20">
-        <div className="h-12 w-12 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mx-auto text-[#22D3D0]">
+      <div 
+        className="border border-dashed p-12 rounded-3xl text-center space-y-4 bg-white"
+        style={{ borderColor: C.surfaceVariant }}
+      >
+        <div 
+          className="h-12 w-12 rounded-2xl flex items-center justify-center mx-auto text-[#d3579a] border"
+          style={{ backgroundColor: `${C.accentPurple}10`, borderColor: `${C.accentPurple}30` }}
+        >
           <History className="h-6 w-6" />
         </div>
         <div className="space-y-1.5">
-          <h4 className="text-white font-bold text-sm">No Quiz History Yet</h4>
+          <h4 className="text-black font-extrabold text-sm">No Quiz History Yet</h4>
           <p className="text-xs text-zinc-500 max-w-sm mx-auto">
             Complete your first quiz to see your history here. Head to the Start Quiz tab to begin!
           </p>
@@ -95,22 +124,23 @@ export default function QuizHistory({ userId }: QuizHistoryProps) {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 font-sans" style={{ color: C.onSurface }}>
       {/* Filter Controls */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-widest text-zinc-500">
-          <Filter className="h-3 w-3" /> Filters:
+          <Filter className="h-3.5 w-3.5" /> Filters:
         </div>
-        <div className="flex gap-1.5">
+        <div className="flex gap-1.5 flex-wrap">
           {(['all', 'easy', 'medium', 'hard'] as const).map(d => (
             <button
               key={d}
               onClick={() => setFilterDifficulty(d)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all border"
+              style={
                 filterDifficulty === d
-                  ? 'bg-[#7C5CFF]/15 border border-[#7C5CFF]/30 text-[#7C5CFF]'
-                  : 'bg-zinc-900/40 border border-zinc-800 text-zinc-500 hover:text-zinc-300'
-              }`}
+                  ? { backgroundColor: `${C.accentPurple}15`, borderColor: C.accentPurple, color: C.accentPurple }
+                  : { backgroundColor: '#ffffff', borderColor: C.surfaceVariant, color: C.onSurfaceVariant }
+              }
             >
               {d.charAt(0).toUpperCase() + d.slice(1)}
             </button>
@@ -118,50 +148,63 @@ export default function QuizHistory({ userId }: QuizHistoryProps) {
         </div>
         <button
           onClick={() => setSortOrder(prev => prev === 'newest' ? 'oldest' : 'newest')}
-          className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-900/40 border border-zinc-800 text-zinc-500 hover:text-zinc-300 transition-all ml-auto"
+          className="px-3 py-1.5 rounded-lg text-xs font-bold border transition-all sm:ml-auto bg-white"
+          style={{ borderColor: C.surfaceVariant, color: C.onSurfaceVariant }}
         >
           {sortOrder === 'newest' ? '↓ Newest First' : '↑ Oldest First'}
         </button>
       </div>
 
       {/* Attempts List */}
-      <div className="space-y-2">
+      <div className="space-y-3">
         {filtered.map((attempt, idx) => (
           <motion.div
             key={attempt.id}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.04 }}
-            className="glass-panel rounded-2xl border border-white/5 bg-[#13131A]/40 overflow-hidden"
+            className="rounded-2xl border bg-white overflow-hidden"
+            style={{ borderColor: C.surfaceVariant }}
           >
             <button
               onClick={() => handleExpand(attempt.id)}
-              className="w-full flex items-center gap-4 p-5 text-left hover:bg-white/[0.02] transition-colors"
+              className="w-full flex items-center gap-4 p-5 text-left hover:bg-zinc-50 transition-colors"
             >
               {/* Grade Badge */}
-              <span className={`h-10 w-10 rounded-xl flex items-center justify-center text-sm font-display border shrink-0 ${gradeColors[attempt.grade] || 'text-zinc-400 bg-zinc-800 border-zinc-700'}`}>
-                {attempt.grade}
-              </span>
+              {(() => {
+                const colors = gradeColors[attempt.grade] || { bg: '#f4f4f5', text: '#71717a', border: '#e4e4e7' };
+                return (
+                  <span 
+                    className="h-10 w-10 rounded-xl flex items-center justify-center text-sm font-extrabold border shrink-0"
+                    style={{ backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }}
+                  >
+                    {attempt.grade}
+                  </span>
+                );
+              })()}
 
               {/* Details */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <h4 className="text-sm font-bold text-white truncate">{attempt.subjectName} — {attempt.topicName}</h4>
-                  <span className={`px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full border ${
-                    attempt.difficulty === 'easy' ? 'text-[#3DD68C] bg-[#3DD68C]/10 border-[#3DD68C]/20' :
-                    attempt.difficulty === 'medium' ? 'text-[#F5B942] bg-[#F5B942]/10 border-[#F5B942]/20' :
-                    'text-[#F1583D] bg-[#F1583D]/10 border-[#F1583D]/20'
-                  }`}>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h4 className="text-sm font-extrabold text-black truncate max-w-[260px] md:max-w-md">{attempt.subjectName} — {attempt.topicName}</h4>
+                  <span 
+                    className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full border"
+                    style={
+                      attempt.difficulty === 'easy' ? { color: '#047857', backgroundColor: '#ecfdf5', borderColor: '#a7f3d0' } :
+                      attempt.difficulty === 'medium' ? { color: '#d97706', backgroundColor: '#fffbeb', borderColor: '#fde68a' } :
+                      { color: '#dc2626', backgroundColor: '#fef2f2', borderColor: '#fca5a5' }
+                    }
+                  >
                     {attempt.difficulty}
                   </span>
                 </div>
-                <div className="flex items-center gap-4 mt-1 text-xs text-zinc-500">
+                <div className="flex items-center gap-4 mt-1 text-xs text-zinc-550 font-semibold">
                   <span className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
+                    <Clock className="h-3.5 w-3.5" />
                     {new Date(attempt.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </span>
                   <span className="flex items-center gap-1">
-                    <Target className="h-3 w-3" />
+                    <Target className="h-3.5 w-3.5" />
                     {attempt.totalQuestions} questions
                   </span>
                 </div>
@@ -169,23 +212,26 @@ export default function QuizHistory({ userId }: QuizHistoryProps) {
 
               {/* Score */}
               <div className="text-right shrink-0">
-                <div className="text-lg font-bold text-white">{attempt.percentage}%</div>
-                <div className="text-[10px] text-zinc-500 font-mono">{attempt.score}/{attempt.maxScore}</div>
+                <div className="text-base font-extrabold text-black">{attempt.percentage}%</div>
+                <div className="text-[10px] text-zinc-500 font-mono font-bold mt-0.5">{attempt.score}/{attempt.maxScore}</div>
               </div>
 
               {expandedAttemptId === attempt.id ? (
-                <ChevronUp className="h-5 w-5 text-zinc-500 shrink-0" />
+                <ChevronUp className="h-5 w-5 text-zinc-400 shrink-0" />
               ) : (
-                <ChevronDown className="h-5 w-5 text-zinc-500 shrink-0" />
+                <ChevronDown className="h-5 w-5 text-zinc-400 shrink-0" />
               )}
             </button>
 
             {/* Expanded Detail */}
             {expandedAttemptId === attempt.id && (
-              <div className="border-t border-zinc-800/50 p-5">
+              <div 
+                className="border-t p-5 bg-[#fcfaf5]"
+                style={{ borderColor: C.surfaceVariant }}
+              >
                 {loadingDetails ? (
                   <div className="flex items-center justify-center py-8">
-                    <Loader2 className="h-6 w-6 text-[#7C5CFF] animate-spin" />
+                    <Loader2 className="h-6 w-6 text-[#d3579a] animate-spin" />
                   </div>
                 ) : expandedData ? (
                   <QuizResults
@@ -212,7 +258,7 @@ export default function QuizHistory({ userId }: QuizHistoryProps) {
                     }}
                   />
                 ) : (
-                  <p className="text-sm text-zinc-500 text-center">Failed to load details.</p>
+                  <p className="text-xs font-semibold text-zinc-500 text-center">Failed to load details.</p>
                 )}
               </div>
             )}
@@ -220,7 +266,7 @@ export default function QuizHistory({ userId }: QuizHistoryProps) {
         ))}
       </div>
 
-      <p className="text-center text-xs text-zinc-600">
+      <p className="text-center text-xs text-zinc-500 font-semibold pt-1">
         Showing {filtered.length} of {attempts.length} attempts
       </p>
     </div>

@@ -7,10 +7,28 @@ import QuizConfigForm from '@/components/quiz/QuizConfigForm';
 import QuizHistory from '@/components/quiz/QuizHistory';
 import QuizAnalytics from '@/components/quiz/QuizAnalytics';
 
-interface QuizHubClientProps {
-  userEmail: string;
-  userId: string;
-}
+const C = {
+  cream: '#fef9f2',
+  primary: '#000000',
+  onPrimary: '#ffffff',
+  surfaceContainerLowest: '#ffffff',
+  surfaceContainerLow: '#f8f3ec',
+  surfaceContainer: '#f2ede6',
+  surfaceContainerHigh: '#ece7e1',
+  surfaceVariant: '#e6e2db',
+  onSurface: '#1d1c18',
+  onSurfaceVariant: '#45464d',
+  outline: '#76777d',
+  outlineVariant: '#c6c6cd',
+  inverseOnSurface: '#f5f0e9',
+  inverseSurface: '#32302c',
+  accentYellow: '#ffe24c',
+  accentBlue: '#bec6e0',
+  accentPink: '#ffafd3',
+  accentGreen: '#86efac',
+  accentPurple: '#d3579a',
+  secondaryContainer: '#fcdf46',
+};
 
 const tabs = [
   { id: 'start', label: 'Start Quiz', icon: Play },
@@ -20,27 +38,38 @@ const tabs = [
 
 type TabId = typeof tabs[number]['id'];
 
+interface QuizHubClientProps {
+  userEmail: string;
+  userId: string;
+}
+
 export default function QuizHubClient({ userEmail, userId }: QuizHubClientProps) {
   const [activeTab, setActiveTab] = useState<TabId>('start');
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
+    <div className="max-w-6xl mx-auto space-y-8 font-sans" style={{ color: C.primary }}>
       {/* Header */}
       <div className="space-y-2">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[#7C5CFF] text-[10px] font-semibold uppercase tracking-wider">
-          <Sparkles className="h-3 w-3 animate-spin-slow" />
+        <div 
+          className="inline-flex items-center gap-1.5 px-3 py-1 border rounded-full text-[10px] font-bold uppercase tracking-wider"
+          style={{ backgroundColor: `${C.accentPurple}10`, borderColor: `${C.accentPurple}30`, color: C.accentPurple }}
+        >
+          <Sparkles className="h-3 w-3" />
           Assessment Module
         </div>
-        <h1 className="font-display text-4xl sm:text-5xl tracking-wide uppercase text-white leading-none">
-          QUIZ <span className="text-gradient">ARENA</span>
+        <h1 className="font-display text-4xl sm:text-5xl tracking-wide uppercase font-extrabold text-black leading-none">
+          QUIZ <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#d3579a] to-[#5a6ba8]">ARENA</span>
         </h1>
-        <p className="text-sm text-zinc-400 font-body">
+        <p className="text-sm font-medium" style={{ color: C.onSurfaceVariant }}>
           Upload your study materials and let AI generate a personalised quiz. Track progress and discover weak areas with intelligent analytics.
         </p>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 p-1 bg-zinc-950/60 border border-zinc-800 rounded-2xl w-fit">
+      <div 
+        className="flex gap-1 p-1 border rounded-2xl w-fit bg-white"
+        style={{ borderColor: C.surfaceVariant }}
+      >
         {tabs.map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -48,21 +77,19 @@ export default function QuizHubClient({ userEmail, userId }: QuizHubClientProps)
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors duration-200 ${
-                isActive
-                  ? 'text-white'
-                  : 'text-zinc-500 hover:text-zinc-300'
-              }`}
+              className="relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors duration-200"
+              style={{ color: isActive ? '#000000' : '#71717a' }}
             >
               {isActive && (
                 <motion.div
                   layoutId="quiz-tab-bg"
-                  className="absolute inset-0 bg-zinc-800 border border-zinc-700 rounded-xl"
+                  className="absolute inset-0 border rounded-xl"
+                  style={{ backgroundColor: C.surfaceContainerLow, borderColor: C.surfaceVariant }}
                   transition={{ type: 'spring', duration: 0.4, bounce: 0.15 }}
                 />
               )}
-              <span className="relative z-10 flex items-center gap-2">
-                <Icon className={`h-4 w-4 ${isActive ? 'text-[#22D3D0]' : ''}`} />
+              <span className="relative z-10 flex items-center gap-2 font-bold">
+                <Icon className={`h-4 w-4 ${isActive ? 'text-[#d3579a]' : ''}`} />
                 {tab.label}
               </span>
             </button>

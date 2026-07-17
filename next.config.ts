@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co https://*.googleusercontent.com https://avatars.githubusercontent.com; connect-src 'self' https://*.supabase.co https://*.upstash.io https://api.pwnedpasswords.com; frame-ancestors 'none';",
+            value: "default-src 'self'; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://*.supabase.co https://*.googleusercontent.com https://avatars.githubusercontent.com; connect-src 'self' https://*.supabase.co https://*.upstash.io https://api.pwnedpasswords.com; frame-ancestors 'none';",
           },
           {
             key: 'X-Frame-Options',

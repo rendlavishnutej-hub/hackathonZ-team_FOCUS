@@ -27,6 +27,7 @@ const C = {
   accentPurple: '#d3579a',
 };
 
+
 interface SidebarProps {
   userEmail: string;
 }
@@ -51,8 +52,7 @@ export default function Sidebar({ userEmail }: SidebarProps) {
     { name: 'Quiz',                 href: '/quiz',            icon: HelpCircle },
     { name: '🎤 AI Mock Interview', href: '/interview',       icon: Mic },
     { name: 'Career Guidance',      href: '/career-guidance', icon: GraduationCap },
-    { name: 'Security Settings',    href: '/settings',        icon: Shield },
-    { name: 'Pricing Tiers',        href: '/pricing',         icon: Award },
+    { name: 'Security Settings',    href: '/settings',        icon: Shield }
   ];
 
   const displayName = userEmail.split('@')[0].toUpperCase();

@@ -99,10 +99,10 @@ export function createClient() {
   const isMock = (
     !supabaseUrl ||
     supabaseUrl.includes('placeholder') ||
+    supabaseUrl.includes('example.com') ||
     !supabaseKey ||
     supabaseKey.includes('placeholder') ||
-    supabaseKey.startsWith('sb_') ||
-    !supabaseKey.includes('.')
+    supabaseKey === 'your-anon-key'
   );
 
   if (isMock) {

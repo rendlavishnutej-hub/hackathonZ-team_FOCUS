@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 
 // ─── Colour constants matching the provided design system ─────────────────────
 const C = {
@@ -34,12 +35,8 @@ function Nav() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
         {/* Logo + Links */}
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-sm"
-              style={{ background: 'linear-gradient(135deg, #bec6e0 0%, #7c839b 100%)', fontFamily: 'var(--font-fredoka), sans-serif' }}>
-              F
-            </div>
-            <span className="text-xl font-bold tracking-tight" style={{ color: C.primary, fontFamily: 'var(--font-fredoka), sans-serif' }}>Focus</span>
+          <Link href="/" className="flex items-center">
+            <span className="text-3xl font-bold tracking-tight animate-pulse-subtle" style={{ color: C.primary, fontFamily: 'var(--font-fredoka), sans-serif' }}>Focus</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-6 text-sm font-medium" style={{ color: C.onSurfaceVariant }}>
@@ -92,11 +89,33 @@ function Nav() {
 
 // ─── Hero Section ─────────────────────────────────────────────────────────────
 function HeroSection() {
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveIdx((prev) => (prev + 1) % 5);
+    }, 2800);
+    return () => clearInterval(timer);
+  }, []);
+
+  const agents = [
+    { letter: 'P', label: 'Planner Agent', desc: 'Designing curriculum blueprint...', color: C.accentGreen, textColor: '#15803d', strokeColor: '#22c55e' },
+    { letter: 'R', label: 'Researcher Agent', desc: 'Sourcing academic references...', color: C.accentBlue, textColor: '#1d4ed8', strokeColor: '#3b82f6' },
+    { letter: 'C', label: 'Coder Agent', desc: 'Generating interactive exercises...', color: C.accentYellow, textColor: '#a16207', strokeColor: '#eab308' },
+    { letter: 'K', label: 'Critic Agent', desc: 'Auditing pedagogy and feedback flow...', color: C.accentPink, textColor: '#be185d', strokeColor: '#ec4899' },
+    { letter: 'Q', label: 'Quizzer Agent', desc: 'Compiling adaptive pariksha...', color: C.accentPurple, textColor: '#ffffff', strokeColor: '#d3579a' },
+  ];
+
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24 overflow-hidden">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         {/* Content */}
-        <div className="max-w-2xl">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="max-w-2xl"
+        >
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-6 border"
             style={{ backgroundColor: `${C.accentYellow}30`, borderColor: `${C.accentYellow}80`, color: '#725e00' }}>
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
@@ -106,7 +125,16 @@ function HeroSection() {
           <h1 className="text-5xl sm:text-6xl font-extrabold leading-tight tracking-tight mb-6"
             style={{ color: C.primary, fontFamily: 'var(--font-jakarta), sans-serif' }}>
             Go From One Prompt to a Complete{' '}
-            <span style={{ color: C.accentBlue.replace('#bec6e0', '#5a6ba8') }}>Course—Instantly.</span>
+            <span className="relative inline-block">
+              <span className="relative z-10" style={{ color: C.accentBlue.replace('#bec6e0', '#5a6ba8') }}>Course—Instantly.</span>
+              <motion.span 
+                className="absolute left-0 bottom-1 w-full h-[6px] rounded-full -z-0" 
+                style={{ backgroundColor: C.accentPink }} 
+                initial={{ width: 0 }}
+                animate={{ width: "100%" }}
+                transition={{ delay: 0.6, duration: 0.8 }}
+              />
+            </span>
           </h1>
 
           <p className="text-lg mb-8 leading-relaxed" style={{ color: C.onSurfaceVariant }}>
@@ -116,14 +144,14 @@ function HeroSection() {
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
               href="/signup"
-              className="text-center px-8 py-4 rounded-full font-semibold transition-all shadow-lg hover:scale-[1.02]"
+              className="text-center px-8 py-4 rounded-full font-semibold transition-all shadow-lg hover:scale-[1.02] hover:-translate-y-0.5 active:translate-y-0"
               style={{ backgroundColor: C.primary, color: C.onPrimary, boxShadow: '0 8px 24px rgba(0,0,0,0.18)' }}
             >
               Shuru Karein (Get Started)
             </Link>
             <a
               href="#how-it-works"
-              className="text-center px-8 py-4 rounded-full font-semibold border-2 transition-all flex items-center justify-center gap-2 hover:bg-[#f2ede6]"
+              className="text-center px-8 py-4 rounded-full font-semibold border-2 transition-all flex items-center justify-center gap-2 hover:bg-[#f2ede6] hover:-translate-y-0.5 active:translate-y-0"
               style={{ borderColor: C.surfaceVariant, color: C.primary, backgroundColor: C.surfaceContainerLowest }}
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -132,77 +160,124 @@ function HeroSection() {
               Watch Agents Collaborate
             </a>
           </div>
-        </div>
+        </motion.div>
 
         {/* Visual */}
-        <div className="relative h-[500px] flex items-center justify-center">
-          {/* Blob shapes */}
-          <div className="absolute inset-0 blob-shape transform rotate-12 scale-110"
-            style={{ background: `${C.accentYellow}50` }} />
-          <div className="absolute inset-0 blob-shape transform -rotate-12 scale-90"
-            style={{ background: `${C.accentPink}30` }} />
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+          className="relative h-[550px] flex items-center justify-center"
+        >
+          {/* Blob shapes with breathing/morphing animation */}
+          <motion.div 
+            className="absolute inset-0 blob-shape"
+            style={{ background: `${C.accentYellow}25`, filter: 'blur(30px)' }}
+            animate={{ 
+              scale: [1, 1.1, 0.95, 1],
+              rotate: [12, 45, -12, 12],
+              borderRadius: ["40% 60% 60% 40% / 40% 50% 50% 60%", "60% 40% 50% 50% / 50% 60% 40% 50%", "40% 60% 60% 40% / 40% 50% 50% 60%"]
+            }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div 
+            className="absolute inset-0 blob-shape"
+            style={{ background: `${C.accentPink}20`, filter: 'blur(30px)' }}
+            animate={{ 
+              scale: [0.9, 1.05, 0.85, 0.9],
+              rotate: [-12, -35, 15, -12],
+              borderRadius: ["50% 50% 40% 60% / 60% 40% 60% 40%", "40% 60% 50% 50% / 50% 50% 40% 60%", "50% 50% 40% 60% / 60% 40% 60% 40%"]
+            }}
+            transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          />
 
           {/* Central card */}
-          <div className="relative z-10 p-8 rounded-3xl shadow-2xl border max-w-sm w-full"
-            style={{ backgroundColor: C.surfaceContainerLowest, borderColor: C.surfaceVariant }}>
+          <div className="relative z-10 p-6 rounded-3xl shadow-2xl border max-w-sm w-full bg-white/80 backdrop-blur-md"
+            style={{ borderColor: C.surfaceVariant }}>
             {/* Hub icon */}
             <div className="flex items-center justify-center mb-6">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center animate-pulse"
-                style={{ backgroundColor: C.accentBlue }}>
-                <svg className="w-8 h-8" style={{ color: C.primary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-14 h-14 rounded-full flex items-center justify-center animate-pulse"
+                style={{ backgroundColor: `${C.accentBlue}50`, boxShadow: `0 0 20px ${C.accentBlue}` }}>
+                <svg className="w-7 h-7" style={{ color: C.primary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path d="M13 10V3L4 14h7v7l9-11h-7z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
                 </svg>
               </div>
             </div>
 
-            {/* Agent rows */}
-            <div className="space-y-3">
-              {[
-                { letter: 'P', label: 'Planner Agent', color: C.accentGreen, textColor: '#166534' },
-                { letter: 'R', label: 'Researcher Agent', color: C.accentBlue, textColor: '#1e3a6e' },
-                { letter: 'C', label: 'Coder Agent', color: C.accentYellow, textColor: '#6b4f00' },
-                { letter: 'K', label: 'Critic Agent', color: C.accentPink, textColor: '#831843' },
-                { letter: 'Q', label: 'Quizzer Agent', color: C.accentPurple, textColor: '#ffffff' },
-              ].map(({ letter, label, color, textColor }) => (
-                <div
-                  key={label}
-                  className="flex items-center gap-3 p-3 rounded-xl border"
-                  style={{ backgroundColor: C.surfaceContainerLow, borderColor: C.surfaceVariant }}
-                >
-                  <div
-                    className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm shrink-0"
-                    style={{ backgroundColor: `${color}40`, color: textColor }}
+            {/* Agent rows with real-time active animation layout */}
+            <div className="space-y-2.5">
+              {agents.map(({ letter, label, desc, color, textColor, strokeColor }, index) => {
+                const isActive = index === activeIdx;
+                return (
+                  <motion.div
+                    key={label}
+                    className="flex items-center gap-3 p-3 rounded-2xl border transition-colors duration-500"
+                    style={{ 
+                      backgroundColor: isActive ? 'white' : `${C.surfaceContainerLow}50`, 
+                      borderColor: isActive ? strokeColor : C.surfaceVariant,
+                      boxShadow: isActive ? `0 8px 20px ${strokeColor}1c` : 'none'
+                    }}
+                    animate={{ scale: isActive ? 1.02 : 1 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
                   >
-                    {letter}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="text-xs font-semibold" style={{ color: C.onSurface }}>{label}</span>
-                    <div className="mt-1.5 space-y-1">
-                      <div className="h-1.5 rounded-full" style={{ backgroundColor: C.surfaceVariant, width: '75%' }} />
-                      <div className="h-1.5 rounded-full" style={{ backgroundColor: C.surfaceVariant, width: '55%' }} />
+                    <div
+                      className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm shrink-0 transition-transform duration-500"
+                      style={{ 
+                        backgroundColor: isActive ? color : `${color}30`, 
+                        color: isActive ? (textColor === '#ffffff' ? '#ffffff' : textColor) : textColor,
+                        boxShadow: isActive ? `0 0 10px ${color}` : 'none'
+                      }}
+                    >
+                      {letter}
                     </div>
-                  </div>
-                </div>
-              ))}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold" style={{ color: C.onSurface }}>{label}</span>
+                        {isActive && (
+                          <span className="text-[8px] font-extrabold tracking-widest px-1.5 py-0.5 rounded bg-zinc-900 text-white animate-pulse">
+                            ACTIVE
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] truncate mt-0.5" style={{ color: isActive ? '#4b5563' : '#9ca3af' }}>
+                        {isActive ? desc : 'Idle'}
+                      </p>
+                      <div className="mt-2 relative h-1.5 w-full bg-zinc-200/50 rounded-full overflow-hidden">
+                        <motion.div 
+                          className="absolute left-0 top-0 h-full rounded-full"
+                          style={{ backgroundColor: strokeColor }}
+                          initial={{ width: '15%' }}
+                          animate={{ width: isActive ? '100%' : '15%' }}
+                          transition={isActive ? { duration: 2.8, ease: "linear", repeat: Infinity } : { duration: 0.3 }}
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
 
-          {/* Floating badges */}
-          <div
-            className="absolute top-8 right-4 px-4 py-2 rounded-xl shadow-lg border flex items-center gap-2 transform rotate-6"
+          {/* Floating badges with custom motion path */}
+          <motion.div
+            className="absolute top-8 right-4 px-4 py-2 rounded-xl shadow-lg border flex items-center gap-2"
             style={{ backgroundColor: C.surfaceContainerLowest, borderColor: C.surfaceVariant }}
+            animate={{ y: [0, -10, 0], rotate: [6, 4, 6] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
           >
-            <span className="w-3 h-3 rounded-full bg-green-500" />
+            <span className="w-3 h-3 rounded-full bg-green-500 animate-ping" />
             <span className="text-sm font-semibold" style={{ color: C.primary }}>Research Complete</span>
-          </div>
-          <div
-            className="absolute bottom-8 left-4 px-4 py-2 rounded-xl shadow-lg border flex items-center gap-2 transform -rotate-6"
+          </motion.div>
+          <motion.div
+            className="absolute bottom-8 left-4 px-4 py-2 rounded-xl shadow-lg border flex items-center gap-2"
             style={{ backgroundColor: C.surfaceContainerLowest, borderColor: C.surfaceVariant }}
+            animate={{ y: [0, 10, 0], rotate: [-6, -4, -6] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
           >
             <span className="w-3 h-3 rounded-full" style={{ backgroundColor: C.accentBlue }} />
             <span className="text-sm font-semibold" style={{ color: C.primary }}>Syllabus Generated</span>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
 
       {/* Stats bar */}
@@ -212,11 +287,17 @@ function HeroSection() {
           { value: '10x', label: 'Faster Creation' },
           { value: '5+', label: 'Specialised Agents' },
           { value: '∞', label: 'Personalisation' },
-        ].map(({ value, label }) => (
-          <div key={label}>
+        ].map(({ value, label }, idx) => (
+          <motion.div 
+            key={label}
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.3 + idx * 0.1 }}
+          >
             <div className="text-3xl font-extrabold" style={{ color: C.primary }}>{value}</div>
             <div className="text-sm font-medium mt-1" style={{ color: C.onSurfaceVariant }}>{label}</div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </section>
@@ -254,11 +335,16 @@ function ProblemSection() {
   }, []);
 
   return (
-    <section style={{ backgroundColor: C.surfaceContainerLowest }} className="py-24">
+    <section style={{ backgroundColor: C.surfaceContainerLowest }} className="py-24 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Character with eye-tracking */}
         <div className="flex justify-center mb-10">
-          <div ref={containerRef} className="w-32 h-32 relative group transition-transform hover:scale-110">
+          <motion.div 
+            ref={containerRef} 
+            className="w-32 h-32 relative group"
+            animate={{ y: [0, -4, 0] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          >
             {/* Owl character SVG */}
             <svg viewBox="0 0 120 120" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
               {/* Body */}
@@ -291,6 +377,7 @@ function ProblemSection() {
                 left: '28%', top: '33%',
                 display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end',
                 padding: 3, zIndex: 20,
+                transform: 'translate(var(--eye-x, 0px), var(--eye-y, 0px))',
               }}
             >
               <div style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: 'white' }} />
@@ -305,20 +392,35 @@ function ProblemSection() {
                 left: '55%', top: '31%',
                 display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end',
                 padding: 4, zIndex: 20,
+                transform: 'translate(var(--eye-x, 0px), var(--eye-y, 0px))',
               }}
             >
               <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'white' }} />
             </div>
-          </div>
+          </motion.div>
         </div>
 
-        <h2 className="text-3xl sm:text-4xl font-extrabold mb-6" style={{ color: C.primary }}>
+        <motion.h2 
+          className="text-3xl sm:text-4xl font-extrabold mb-6" 
+          style={{ color: C.primary }}
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
           The Content Creation{' '}
           <span style={{ color: C.accentPurple }}>Chakravyuh</span>
-        </h2>
-        <p className="max-w-2xl mx-auto mb-12 text-lg leading-relaxed" style={{ color: C.onSurfaceVariant }}>
+        </motion.h2>
+        <motion.p 
+          className="max-w-2xl mx-auto mb-12 text-lg leading-relaxed" 
+          style={{ color: C.onSurfaceVariant }}
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.15 }}
+        >
           Educational content creation requires curriculum design, research, assessment creation, and storytelling. Today, these tasks rely on disconnected tools and immense manual effort. Even specialized AI models operate in silos, failing to deliver unified educational lakshya (objectives).
-        </p>
+        </motion.p>
 
         {/* Pain-point cards */}
         <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -326,16 +428,21 @@ function ProblemSection() {
             { emoji: '⏰', title: '47+ Hours', desc: 'Average time to build one complete course module manually' },
             { emoji: '🔧', title: '8+ Tools', desc: 'Different tools educators juggle to produce one course' },
             { emoji: '📉', title: '72% Dropout', desc: 'Of courses fail due to poor personalisation and pacing' },
-          ].map(({ emoji, title, desc }) => (
-            <div
+          ].map(({ emoji, title, desc }, idx) => (
+            <motion.div
               key={title}
-              className="p-6 rounded-3xl border text-left"
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
+              whileHover={{ scale: 1.03, y: -4 }}
+              className="p-6 rounded-3xl border text-left transition-all duration-300"
               style={{ backgroundColor: C.surfaceContainerLow, borderColor: C.surfaceVariant }}
             >
               <div className="text-3xl mb-3">{emoji}</div>
               <div className="text-2xl font-extrabold mb-1" style={{ color: C.primary }}>{title}</div>
               <p className="text-sm leading-relaxed" style={{ color: C.onSurfaceVariant }}>{desc}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -346,16 +453,30 @@ function ProblemSection() {
 // ─── Solution / Features Section ──────────────────────────────────────────────
 function FeaturesSection() {
   return (
-    <section id="features" style={{ backgroundColor: C.cream }} className="py-24">
+    <section id="features" style={{ backgroundColor: C.cream }} className="py-24 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-extrabold mb-4" style={{ color: C.primary }}>
+          <motion.h2 
+            className="text-3xl sm:text-4xl font-extrabold mb-4" 
+            style={{ color: C.primary }}
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
             Dynamic Multi-Agent{' '}
             <span style={{ color: '#5a6ba8' }}>Sangam</span>
-          </h2>
-          <p className="max-w-2xl mx-auto" style={{ color: C.onSurfaceVariant }}>
+          </motion.h2>
+          <motion.p 
+            className="max-w-2xl mx-auto" 
+            style={{ color: C.onSurfaceVariant }}
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+          >
             Give us an educational challenge. We&apos;ll assemble the ultimate AI mandali (team).
-          </p>
+          </motion.p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8" id="agents">
@@ -394,10 +515,15 @@ function FeaturesSection() {
               title: 'Personalized Margdarshan',
               desc: 'Agents adapt the curriculum in real-time based on learner needs, ensuring an optimized and focused educational journey.',
             },
-          ].map(({ icon, iconBg, iconColor, title, desc }) => (
-            <div
+          ].map(({ icon, iconBg, iconColor, title, desc }, idx) => (
+            <motion.div
               key={title}
-              className="p-8 rounded-3xl border hover:shadow-lg transition-shadow"
+              initial={{ opacity: 0, y: 25 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6, delay: idx * 0.15 }}
+              whileHover={{ y: -6, boxShadow: '0 12px 30px rgba(0,0,0,0.05)' }}
+              className="p-8 rounded-3xl border transition-all duration-300"
               style={{ backgroundColor: C.surfaceContainerLowest, borderColor: C.surfaceVariant }}
             >
               <div
@@ -408,7 +534,7 @@ function FeaturesSection() {
               </div>
               <h3 className="text-xl font-bold mb-3" style={{ color: C.primary }}>{title}</h3>
               <p className="text-sm leading-relaxed" style={{ color: C.onSurfaceVariant }}>{desc}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -426,16 +552,30 @@ function ProcessSection() {
   ];
 
   return (
-    <section id="how-it-works" style={{ backgroundColor: C.surfaceContainerLowest }} className="py-24">
+    <section id="how-it-works" style={{ backgroundColor: C.surfaceContainerLowest }} className="py-24 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-extrabold mb-4" style={{ color: C.primary }}>
+          <motion.h2 
+            className="text-3xl sm:text-4xl font-extrabold mb-4" 
+            style={{ color: C.primary }}
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
             From Prompt to Complete{' '}
             <span style={{ color: C.accentPurple }}>Curriculum</span>
-          </h2>
-          <p className="max-w-2xl mx-auto" style={{ color: C.onSurfaceVariant }}>
+          </motion.h2>
+          <motion.p 
+            className="max-w-2xl mx-auto" 
+            style={{ color: C.onSurfaceVariant }}
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+          >
             See how FOCUS transforms a simple idea into a rich, structured learning journey.
-          </p>
+          </motion.p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
@@ -444,10 +584,18 @@ function ProcessSection() {
             className="hidden md:block absolute top-[22px] left-[10%] right-[10%] h-0.5"
             style={{ backgroundColor: C.surfaceVariant, zIndex: 0 }}
           />
-          {steps.map(({ n, title, desc, accent }) => (
-            <div key={n} className="text-center relative" style={{ backgroundColor: C.surfaceContainerLowest, zIndex: 1 }}>
+          {steps.map(({ n, title, desc, accent }, idx) => (
+            <motion.div 
+              key={n} 
+              className="text-center relative" 
+              style={{ backgroundColor: C.surfaceContainerLowest, zIndex: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: idx * 0.15 }}
+            >
               <div
-                className="w-11 h-11 mx-auto rounded-full flex items-center justify-center font-bold text-lg mb-4 shadow-md"
+                className="w-11 h-11 mx-auto rounded-full flex items-center justify-center font-bold text-lg mb-4 shadow-md transition-transform hover:scale-110"
                 style={{
                   backgroundColor: accent ? C.accentBlue : C.primary,
                   color: accent ? C.primary : C.onPrimary,
@@ -457,7 +605,7 @@ function ProcessSection() {
               </div>
               <h4 className="font-bold text-lg mb-2" style={{ color: C.primary }}>{title}</h4>
               <p className="text-sm" style={{ color: C.onSurfaceVariant }}>{desc}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
 
@@ -465,7 +613,7 @@ function ProcessSection() {
         <div className="mt-16 text-center">
           <Link
             href="/signup"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-[1.02] shadow-lg"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-[1.02] hover:-translate-y-0.5 active:translate-y-0 shadow-lg"
             style={{ backgroundColor: C.primary, color: C.onPrimary, boxShadow: '0 8px 24px rgba(0,0,0,0.18)' }}
           >
             Start Your First Session

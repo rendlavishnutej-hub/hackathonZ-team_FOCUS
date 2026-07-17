@@ -30,7 +30,7 @@ export default function QuizTakeClient({ userId }: QuizTakeClientProps) {
   const questionStartRef = useRef(Date.now());
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load config and fetch questions
+  // Load config and questions — questions may be pre-fetched (document flow) or need fetching (subject flow)
   useEffect(() => {
     const raw = sessionStorage.getItem('focus_quiz_config');
     if (!raw) {
@@ -41,7 +41,27 @@ export default function QuizTakeClient({ userId }: QuizTakeClientProps) {
     setConfig(cfg);
     setTimeRemaining(cfg.timerDuration);
 
-    fetch(`/api/quiz/questions?subjectId=${cfg.subjectId}&topicId=${cfg.topicId}&difficulty=${cfg.difficulty}&count=${cfg.questionCount}`)
+    // Check if questions were pre-generated and stored (document-based flow)
+    const preGenRaw = sessionStorage.getItem('focus_quiz_questions');
+    if (preGenRaw) {
+      try {
+        const preGen = JSON.parse(preGenRaw);
+        if (preGen && preGen.length > 0) {
+          sessionStorage.removeItem('focus_quiz_questions'); // consume it
+          setQuestions(preGen);
+          setVisited(new Set([preGen[0].id]));
+          setPhase('active');
+          return;
+        }
+      } catch { /* fall through to API */ }
+    }
+
+    // Fallback: fetch questions from API (subject-based flow)
+    const url = cfg.fileId
+      ? `/api/quiz/questions?fileId=${cfg.fileId}&difficulty=${cfg.difficulty}&count=${cfg.questionCount}`
+      : `/api/quiz/questions?subjectId=${cfg.subjectId}&topicId=${cfg.topicId}&difficulty=${cfg.difficulty}&count=${cfg.questionCount}`;
+
+    fetch(url)
       .then(r => r.json())
       .then(data => {
         if (data.questions && data.questions.length > 0) {

@@ -16,6 +16,17 @@ export interface Topic {
   name: string;
 }
 
+export interface QuizFile {
+  id: string;
+  userId: string;
+  name: string;
+  type: string;
+  size: number;
+  content: string; // extracted text content
+  rawContent?: string; // base64 representation of raw document
+  createdAt: string;
+}
+
 // ── Question Types ──────────────────────────────────────────────────────────
 
 export type QuestionType = 'mcq' | 'fill-blank' | 'true-false' | 'match' | 'one-word';
@@ -80,6 +91,7 @@ export interface Question {
   id: string;
   subjectId: string;
   topicId: string;
+  fileId?: string;
   difficulty: Difficulty;
   type: QuestionType;
   question: string; // the question text
@@ -97,6 +109,7 @@ export interface QuizConfig {
   subjectName: string;
   topicId: string;
   topicName: string;
+  fileId?: string;
   difficulty: Difficulty;
   questionCount: number;
   timerEnabled: boolean;
@@ -129,6 +142,7 @@ export interface QuizAttempt {
   subjectName: string;
   topicId: string;
   topicName: string;
+  fileId?: string;
   difficulty: Difficulty;
   totalQuestions: number;
   timerEnabled: boolean;

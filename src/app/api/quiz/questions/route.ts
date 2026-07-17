@@ -11,14 +11,20 @@ export async function GET(request: Request) {
     const difficulty = searchParams.get('difficulty');
     const count = parseInt(searchParams.get('count') || '10', 10);
 
+    const fileId = searchParams.get('fileId');
+
     const supabase = await createClient();
     let query = supabase.from('quiz_questions').select('*');
 
-    if (subjectId) {
-      query = query.eq('subjectId', subjectId);
-    }
-    if (topicId) {
-      query = query.eq('topicId', topicId);
+    if (fileId) {
+      query = query.eq('fileId', fileId);
+    } else {
+      if (subjectId) {
+        query = query.eq('subjectId', subjectId);
+      }
+      if (topicId) {
+        query = query.eq('topicId', topicId);
+      }
     }
     if (difficulty) {
       query = query.eq('difficulty', difficulty);

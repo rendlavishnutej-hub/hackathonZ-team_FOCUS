@@ -97,14 +97,8 @@ export default function PricingPage() {
         className="w-full border-b py-4 px-6 sm:px-12 flex justify-between items-center max-w-7xl mx-auto z-10"
         style={{ borderColor: C.surfaceVariant }}
       >
-        <Link href="/" className="flex items-center gap-3 group">
-          <div
-            className="h-9 w-9 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-sm"
-            style={{ background: 'linear-gradient(135deg, #bec6e0 0%, #7c839b 100%)', fontFamily: 'var(--font-fredoka), sans-serif' }}
-          >
-            F
-          </div>
-          <span className="text-2xl font-bold tracking-tight" style={{ color: C.primary, fontFamily: 'var(--font-fredoka), sans-serif' }}>
+        <Link href="/" className="flex items-center group">
+          <span className="text-4xl font-bold tracking-tight" style={{ color: C.primary, fontFamily: 'var(--font-fredoka), sans-serif' }}>
             Focus
           </span>
         </Link>

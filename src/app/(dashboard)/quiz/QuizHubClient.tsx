@@ -35,7 +35,7 @@ export default function QuizHubClient({ userEmail, userId }: QuizHubClientProps)
           QUIZ <span className="text-gradient">ARENA</span>
         </h1>
         <p className="text-sm text-zinc-400 font-body">
-          Test your knowledge, track progress, and discover weak areas with AI-powered analytics.
+          Upload your study materials and let AI generate a personalised quiz. Track progress and discover weak areas with intelligent analytics.
         </p>
       </div>
 

@@ -45,18 +45,18 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
   const router = useRouter();
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
-  const [courses] = useState<CourseItem[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const stored = localStorage.getItem('focus_courses');
-        return stored ? JSON.parse(stored) : [];
-      } catch (e) {
-        console.error(e);
-        return [];
+  const [courses, setCourses] = useState<CourseItem[]>([]);
+
+  React.useEffect(() => {
+    try {
+      const stored = localStorage.getItem('focus_courses');
+      if (stored) {
+        setCourses(JSON.parse(stored));
       }
+    } catch (e) {
+      console.error(e);
     }
-    return [];
-  });
+  }, []);
 
   const handleStartSession = (e: React.FormEvent) => {
     e.preventDefault();

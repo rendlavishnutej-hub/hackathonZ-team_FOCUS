@@ -6,9 +6,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     const supabase = await createClient();
-    const { data: subjects, error } = await supabase
-      .from('quiz_subjects')
-      .select('*');
+    const { data: subjects, error } = await supabase.from('quiz_subjects').select('*');
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });

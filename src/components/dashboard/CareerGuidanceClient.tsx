@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, Loader2, MessageCircle, Briefcase, GraduationCap, ArrowDown } from 'lucide-react';
 import { getCareerSuggestions, type CareerMessage } from '@/lib/careerGuidanceService';
+import { motion } from 'framer-motion';
 
 // ─── Colour constants matching the design system ────────────────────────────
 const C = {
@@ -45,6 +46,37 @@ export default function CareerGuidanceClient({ userEmail }: CareerGuidanceClient
   const inputRef = useRef<HTMLInputElement>(null);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Mascot states
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isJumping, setIsJumping] = useState(false);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const deltaX = e.clientX - centerX;
+      const deltaY = e.clientY - centerY;
+      const angle = Math.atan2(deltaY, deltaX);
+      const maxDist = 6;
+      const dist = Math.min(Math.hypot(deltaX, deltaY) / 40, maxDist);
+      const moveX = Math.cos(angle) * dist;
+      const moveY = Math.sin(angle) * dist;
+      container.style.setProperty('--eye-x', `${moveX}px`);
+      container.style.setProperty('--eye-y', `${moveY}px`);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    return () => document.removeEventListener('mousemove', handleMouseMove);
+  }, [messages]);
 
   // Read courses from localStorage for context
   const getCourses = () => {
@@ -128,14 +160,159 @@ export default function CareerGuidanceClient({ userEmail }: CareerGuidanceClient
 
   const renderEmptyState = () => (
     <div className="flex-1 flex flex-col items-center justify-center px-4 py-16">
-      {/* Hero icon */}
-      <div
-        className="h-20 w-20 rounded-3xl flex items-center justify-center mb-6 shadow-lg"
-        style={{
-          background: 'linear-gradient(135deg, #bec6e0 0%, #7c839b 50%, #d3579a 100%)',
-        }}
-      >
-        <GraduationCap className="h-10 w-10 text-white" />
+      {/* Mascot Bird AI Agent */}
+      <div className="flex justify-center mb-8 select-none">
+        <motion.div 
+          ref={containerRef} 
+          className="w-28 h-28 relative group cursor-pointer"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          onClick={() => {
+            if (isJumping) return;
+            setIsJumping(true);
+            setTimeout(() => setIsJumping(false), 900);
+          }}
+          animate={
+            isJumping
+              ? { 
+                  y: [0, -60, 5, -2, 0],
+                  rotate: [0, 360, 360, 360, 360],
+                  scale: [1, 1.15, 0.92, 1.04, 1] 
+                }
+              : isHovered
+                ? { 
+                    y: [0, -8, 0],
+                    scale: 1.06,
+                    rotate: [0, -1.5, 1.5, 0]
+                  }
+                : { 
+                    y: [0, -3, 0],
+                    scale: 1
+                  }
+          }
+          transition={
+            isJumping
+              ? { duration: 0.9, ease: "easeInOut" }
+              : isHovered
+                ? { duration: 0.6, repeat: Infinity, ease: "easeInOut" }
+                : { duration: 4, repeat: Infinity, ease: "easeInOut" }
+          }
+        >
+          {/* Owl character SVG */}
+          <svg viewBox="0 0 120 120" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="60" cy="75" rx="32" ry="38" fill="#fcdf46" />
+            <circle cx="60" cy="45" r="32" fill="#fcdf46" />
+            <polygon points="35,22 28,8 43,18" fill="#e2a800" />
+            <polygon points="85,22 92,8 77,18" fill="#e2a800" />
+            <circle cx="45" cy="44" r="13" fill="white" />
+            <circle cx="75" cy="44" r="13" fill="white" />
+            <polygon points="60,52 53,62 67,62" fill="#e2a800" />
+            
+            {/* Left Wing */}
+            <motion.g
+              style={{ transformOrigin: '28px 80px' }}
+              animate={
+                isJumping
+                  ? { rotate: [-15, -95, -15], scaleX: [1, 1.1, 1] }
+                  : isHovered
+                    ? { rotate: [-15, -80, 20, -15] }
+                    : { rotate: [-15, -22, -15] }
+              }
+              transition={
+                isJumping
+                  ? { duration: 0.9, ease: "easeInOut" }
+                  : isHovered
+                    ? { duration: 0.22, repeat: Infinity, ease: "easeInOut" }
+                    : { duration: 3.5, repeat: Infinity, ease: "easeInOut" }
+              }
+            >
+              <ellipse cx="28" cy="80" rx="12" ry="22" fill="#e2a800" />
+            </motion.g>
+
+            {/* Right Wing */}
+            <motion.g
+              style={{ transformOrigin: '92px 80px' }}
+              animate={
+                isJumping
+                  ? { rotate: [15, 95, 15], scaleX: [1, 1.1, 1] }
+                  : isHovered
+                    ? { rotate: [15, 80, -20, 15] }
+                    : { rotate: [15, 22, 15] }
+              }
+              transition={
+                isJumping
+                  ? { duration: 0.9, ease: "easeInOut" }
+                  : isHovered
+                    ? { duration: 0.22, repeat: Infinity, ease: "easeInOut" }
+                    : { duration: 3.5, repeat: Infinity, ease: "easeInOut" }
+              }
+            >
+              <ellipse cx="92" cy="80" rx="12" ry="22" fill="#e2a800" />
+            </motion.g>
+
+            {/* Feet */}
+            <motion.g
+              style={{ transformOrigin: '60px 112px' }}
+              animate={
+                isJumping
+                  ? { y: [0, 4, -4, 0], scaleY: [1, 0.7, 1.1, 1] }
+                  : isHovered
+                    ? { y: [0, -2, 0] }
+                    : { y: 0 }
+              }
+              transition={{ duration: 0.6 }}
+            >
+              <ellipse cx="48" cy="112" rx="10" ry="5" fill="#e2a800" />
+              <ellipse cx="72" cy="112" rx="10" ry="5" fill="#e2a800" />
+            </motion.g>
+          </svg>
+
+          {/* Left pupil */}
+          <motion.div
+            className="absolute pupil transition-all duration-75"
+            style={{
+              width: 18, height: 18,
+              borderRadius: '50%',
+              backgroundColor: '#1e293b',
+              left: '29%', top: '33%',
+              display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end',
+              padding: 2.5, zIndex: 20,
+              transform: 'translate(var(--eye-x, 0px), var(--eye-y, 0px))',
+            }}
+            animate={
+              isJumping
+                ? { scaleY: 0.15, scaleX: 1.1 }
+                : isHovered
+                  ? { scale: 1.15 }
+                  : { scale: 1 }
+            }
+          >
+            {!isJumping && <div className="w-1 h-1 rounded-full bg-white" />}
+          </motion.div>
+
+          {/* Right pupil */}
+          <motion.div
+            className="absolute pupil transition-all duration-75"
+            style={{
+              width: 22, height: 22,
+              borderRadius: '50%',
+              backgroundColor: '#1e293b',
+              left: '55%', top: '31%',
+              display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end',
+              padding: 3, zIndex: 20,
+              transform: 'translate(var(--eye-x, 0px), var(--eye-y, 0px))',
+            }}
+            animate={
+              isJumping
+                ? { scaleY: 0.15, scaleX: 1.1 }
+                : isHovered
+                  ? { scale: 1.15 }
+                  : { scale: 1 }
+            }
+          >
+            {!isJumping && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+          </motion.div>
+        </motion.div>
       </div>
 
       <h2

@@ -84,35 +84,41 @@ export async function signUpAction(formData: FormData) {
     console.error('Password breach API check failed:', err);
   }
 
-  // 4. Create user via Supabase Auth
-  const supabase = await createClient();
-  const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+  // 4. Create user via Admin API with auto-confirm (bypasses email rate limits)
+  const adminClient = createAdminClient();
+  const { data: adminData, error: adminError } = await adminClient.auth.admin.createUser({
     email,
     password,
-    options: {
-      data: {
-        display_name: displayName || email.split('@')[0],
-      }
-    }
+    email_confirm: true,
+    user_metadata: {
+      display_name: displayName || email.split('@')[0],
+    },
   });
 
-  if (signUpError) {
-    if (signUpError.message?.includes('already been registered') || signUpError.message?.includes('already exists')) {
+  if (adminError) {
+    // Handle duplicate user gracefully
+    if (adminError.message?.includes('already been registered') || adminError.message?.includes('already exists')) {
       return { error: 'An account with this email already exists. Please sign in instead.' };
     }
-    return { error: signUpError.message };
+    return { error: adminError.message };
   }
 
-  if (!signUpData.session) {
-    return { success: true, message: 'Account created! Please check your email to confirm your account, or sign in.' };
-  }
+  // 5. Immediately sign in the newly created user to establish a session
+  const supabase = await createClient();
+  const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
-  const session = signUpData.session;
+  if (signInError) {
+    // User was created but auto-login failed — they can still sign in manually
+    return { success: true, message: 'Account created successfully! Please sign in with your credentials.' };
+  }
 
   // 6. Log the session
+  const session = signInData.session;
   const sessionId = session ? getSessionIdFromToken(session.access_token) : undefined;
   if (session?.user) {
-    const adminClient = createAdminClient();
     await adminClient.from('sessions_log').insert({
       user_id: session.user.id,
       session_id: sessionId || null,

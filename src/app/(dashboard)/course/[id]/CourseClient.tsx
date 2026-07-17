@@ -1,11 +1,34 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   BookOpen, Code, Award, CheckCircle, HelpCircle, 
   ArrowLeft, Copy, Check, RefreshCw, Sparkles 
 } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
+
+const C = {
+  cream: '#fef9f2',
+  primary: '#000000',
+  onPrimary: '#ffffff',
+  surfaceContainerLowest: '#ffffff',
+  surfaceContainerLow: '#f8f3ec',
+  surfaceContainer: '#f2ede6',
+  surfaceContainerHigh: '#ece7e1',
+  surfaceVariant: '#e6e2db',
+  onSurface: '#1d1c18',
+  onSurfaceVariant: '#45464d',
+  outline: '#76777d',
+  outlineVariant: '#c6c6cd',
+  accentYellow: '#ffe24c',
+  accentBlue: '#bec6e0',
+  accentPink: '#ffafd3',
+  accentGreen: '#86efac',
+  accentPurple: '#d3579a',
+  secondaryContainer: '#fcdf46',
+  inverseSurface: '#32302c',
+};
 
 interface CourseClientProps {
   courseId: string;
@@ -13,7 +36,20 @@ interface CourseClientProps {
 
 export default function CourseClient({ courseId }: CourseClientProps) {
   const router = useRouter();
-  const [course, setCourse] = useState<any | null>(null);
+  const [course, setCourse] = useState<any | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('focus_courses');
+        if (stored) {
+          const list = JSON.parse(stored);
+          return list.find((c: any) => c.id === courseId) || null;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return null;
+  });
   const [activeTab, setActiveTab] = useState<'lesson-1' | 'lesson-2' | 'lesson-3' | 'quiz'>('lesson-1');
   const [copied, setCopied] = useState<string | null>(null);
 
@@ -23,37 +59,25 @@ export default function CourseClient({ courseId }: CourseClientProps) {
   const [quizScore, setQuizScore] = useState<number | null>(null);
   const [quizPassed, setQuizPassed] = useState<boolean | null>(null);
 
-  // Load course from localStorage
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('focus_courses');
-      if (stored) {
-        const list = JSON.parse(stored);
-        const found = list.find((c: any) => c.id === courseId);
-        if (found) {
-          setCourse(found);
-        }
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }, [courseId]);
-
   if (!course) {
     return (
       <div className="max-w-md mx-auto text-center space-y-6 pt-16">
-        <div className="h-14 w-14 bg-zinc-900 border border-zinc-800 rounded-3xl flex items-center justify-center mx-auto text-red-400">
+        <div
+          className="h-14 w-14 rounded-3xl flex items-center justify-center mx-auto"
+          style={{ backgroundColor: C.surfaceContainerLowest, border: `1px solid ${C.surfaceVariant}`, color: '#dc2626' }}
+        >
           <AlertTriangle className="h-7 w-7" />
         </div>
         <div className="space-y-2">
-          <h2 className="text-xl font-bold text-white">Course Workspace Not Found</h2>
-          <p className="text-xs text-zinc-500">
+          <h2 className="text-xl font-bold" style={{ color: C.primary }}>Course Workspace Not Found</h2>
+          <p className="text-xs" style={{ color: C.outline }}>
             The requested course session key is either invalid or expired on this client.
           </p>
         </div>
         <button
           onClick={() => router.push('/dashboard')}
-          className="px-5 py-2.5 bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white rounded-xl text-xs font-semibold"
+          className="px-5 py-2.5 rounded-xl text-xs font-semibold transition-colors hover:opacity-80"
+          style={{ backgroundColor: C.surfaceContainerLowest, border: `1px solid ${C.surfaceVariant}`, color: C.onSurface }}
         >
           Return to Dashboard
         </button>
@@ -136,14 +160,18 @@ export default function CourseClient({ courseId }: CourseClientProps) {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <button
           onClick={() => router.push('/dashboard')}
-          className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-white transition-colors"
+          className="flex items-center gap-1.5 text-xs transition-colors hover:opacity-70"
+          style={{ color: C.outline }}
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Dashboard
         </button>
 
         {course.completed && (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#3DD68C]/10 border border-[#3DD68C]/20 rounded-full text-[#3DD68C] text-[10px] font-bold uppercase tracking-wider">
+          <div
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+            style={{ backgroundColor: '#ecfdf5', border: '1px solid #a7f3d0', color: '#059669' }}
+          >
             <Sparkles className="h-3 w-3 animate-pulse" />
             Graduated Syllabus Workspace
           </div>
@@ -151,17 +179,20 @@ export default function CourseClient({ courseId }: CourseClientProps) {
       </div>
 
       {/* Main Course Title */}
-      <div className="space-y-2 border-b border-zinc-900 pb-6">
-        <h1 className="font-display text-3xl sm:text-5xl tracking-wide uppercase text-white leading-none">
+      <div className="space-y-2 pb-6" style={{ borderBottom: `1px solid ${C.surfaceVariant}` }}>
+        <h1 className="font-display text-3xl sm:text-5xl tracking-wide uppercase leading-none" style={{ color: C.primary }}>
           {course.title}
         </h1>
-        <p className="text-sm text-zinc-400 font-body max-w-2xl leading-relaxed">
+        <p className="text-sm font-body max-w-2xl leading-relaxed" style={{ color: C.onSurfaceVariant }}>
           {course.description}
         </p>
       </div>
 
       {/* Tabs Selector */}
-      <div className="flex border-b border-zinc-900 p-[2px] bg-zinc-950/60 rounded-xl max-w-md">
+      <div
+        className="flex p-[2px] rounded-xl max-w-md"
+        style={{ backgroundColor: C.surfaceContainerLow, border: `1px solid ${C.surfaceVariant}` }}
+      >
         {['lesson-1', 'lesson-2', 'lesson-3', 'quiz'].map((tab) => {
           const isActive = activeTab === tab;
           let label = `Lesson ${tab.split('-')[1]}`;
@@ -171,11 +202,12 @@ export default function CourseClient({ courseId }: CourseClientProps) {
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
-              className={`flex-1 text-center py-2.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all ${
+              className="flex-1 text-center py-2.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all"
+              style={
                 isActive
-                  ? 'bg-zinc-900 text-[#22D3D0] border border-zinc-800'
-                  : 'text-zinc-500 hover:text-zinc-300'
-              }`}
+                  ? { backgroundColor: C.surfaceContainerLowest, color: '#5a6ba8', border: `1px solid ${C.surfaceVariant}` }
+                  : { color: C.outline, backgroundColor: 'transparent', border: '1px solid transparent' }
+              }
             >
               {label}
             </button>
@@ -189,33 +221,43 @@ export default function CourseClient({ courseId }: CourseClientProps) {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Theory half */}
             <div className="lg:col-span-7 space-y-4">
-              <h2 className="font-display text-xl sm:text-2xl tracking-wide uppercase text-white">
+              <h2 className="font-display text-xl sm:text-2xl tracking-wide uppercase" style={{ color: C.primary }}>
                 {activeContent.lesson.title}
               </h2>
-              <p className="text-zinc-400 text-xs font-medium uppercase tracking-wider">
+              <p className="text-xs font-medium uppercase tracking-wider" style={{ color: C.onSurfaceVariant }}>
                 {activeContent.lesson.description}
               </p>
-              <div className="text-sm text-zinc-300 font-body leading-relaxed space-y-4 pt-2 border-t border-zinc-900">
+              <div
+                className="text-sm font-body leading-relaxed space-y-4 pt-2"
+                style={{ borderTop: `1px solid ${C.surfaceVariant}`, color: C.onSurface }}
+              >
                 {activeContent.theory}
               </div>
             </div>
 
             {/* Code Exercises half */}
             <div className="lg:col-span-5 space-y-3">
-              <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-500 block">
-                Code exercise & syntax
+              <span className="text-[10px] uppercase font-bold tracking-widest block" style={{ color: C.outline }}>
+                Code exercise &amp; syntax
               </span>
-              <div className="bg-zinc-950 border border-zinc-900 rounded-2xl overflow-hidden shadow-lg">
+              <div
+                className="rounded-2xl overflow-hidden shadow-lg"
+                style={{ backgroundColor: C.surfaceContainerHigh, border: `1px solid ${C.surfaceVariant}` }}
+              >
                 {/* Editor Header */}
-                <div className="bg-zinc-900/60 px-4 py-2 border-b border-zinc-900 flex justify-between items-center text-[10px] font-mono text-zinc-500">
+                <div
+                  className="px-4 py-2 flex justify-between items-center text-[10px] font-mono"
+                  style={{ backgroundColor: C.surfaceContainerHigh, borderBottom: `1px solid ${C.surfaceVariant}`, color: C.outline }}
+                >
                   <span>workspace.{activeContent.language}</span>
                   <button
                     onClick={() => handleCopyCode(activeContent.code, activeTab)}
-                    className="flex items-center gap-1 hover:text-white transition-colors"
+                    className="flex items-center gap-1 transition-colors hover:opacity-70"
+                    style={{ color: C.onSurfaceVariant }}
                   >
                     {copied === activeTab ? (
                       <>
-                        <Check className="h-3 w-3 text-[#3DD68C]" />
+                        <Check className="h-3 w-3" style={{ color: '#059669' }} />
                         Copied
                       </>
                     ) : (
@@ -227,7 +269,10 @@ export default function CourseClient({ courseId }: CourseClientProps) {
                   </button>
                 </div>
                 {/* Code Area */}
-                <pre className="p-4 font-mono text-[11px] text-zinc-300 overflow-x-auto leading-relaxed max-h-[300px]">
+                <pre
+                  className="p-4 font-mono text-[11px] overflow-x-auto leading-relaxed max-h-[300px]"
+                  style={{ backgroundColor: C.inverseSurface, color: '#e8e6e1' }}
+                >
                   <code>{activeContent.code}</code>
                 </pre>
               </div>
@@ -238,29 +283,36 @@ export default function CourseClient({ courseId }: CourseClientProps) {
         {activeTab === 'quiz' && (
           <div className="max-w-2xl space-y-6">
             <div className="space-y-1.5">
-              <h2 className="font-display text-xl sm:text-2xl tracking-wide uppercase text-white">
+              <h2 className="font-display text-xl sm:text-2xl tracking-wide uppercase" style={{ color: C.primary }}>
                 Graduation Challenge
               </h2>
-              <p className="text-xs text-zinc-400 font-body">
+              <p className="text-xs font-body" style={{ color: C.onSurfaceVariant }}>
                 Answer all 3 questions correctly to complete the syllabus and earn your course graduation badge.
               </p>
             </div>
 
             {/* Success Card */}
             {quizSubmitted && quizPassed && (
-              <div className="glass-panel p-6 rounded-2xl border border-[#3DD68C]/30 bg-[#3DD68C]/5 space-y-3 text-center">
-                <div className="h-12 w-12 bg-[#3DD68C]/15 border border-[#3DD68C]/20 rounded-full flex items-center justify-center mx-auto text-[#3DD68C]">
+              <div
+                className="p-6 rounded-2xl space-y-3 text-center"
+                style={{ backgroundColor: '#ecfdf5', border: '1px solid #a7f3d0' }}
+              >
+                <div
+                  className="h-12 w-12 rounded-full flex items-center justify-center mx-auto"
+                  style={{ backgroundColor: '#d1fae5', border: '1px solid #a7f3d0', color: '#059669' }}
+                >
                   <CheckCircle className="h-6 w-6" />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="text-base font-bold text-white">Syllabus Graduation Unlocked!</h3>
-                  <p className="text-xs text-zinc-400">
+                  <h3 className="text-base font-bold" style={{ color: C.primary }}>Syllabus Graduation Unlocked!</h3>
+                  <p className="text-xs" style={{ color: C.onSurfaceVariant }}>
                     Perfect score! You completed all lessons and successfully verified your curriculum metrics.
                   </p>
                 </div>
                 <button
                   onClick={() => router.push('/dashboard')}
-                  className="mt-2 px-4 py-2 bg-gradient-to-r from-[#7C5CFF] to-[#22D3D0] text-zinc-950 font-bold text-xs rounded-xl shadow-md"
+                  className="mt-2 px-4 py-2 font-bold text-xs rounded-xl shadow-md"
+                  style={{ backgroundColor: C.primary, color: C.onPrimary }}
                 >
                   Return to Dashboard
                 </button>
@@ -276,31 +328,46 @@ export default function CourseClient({ courseId }: CourseClientProps) {
                 return (
                   <div 
                     key={q.id}
-                    className="bg-zinc-950/40 border border-zinc-900 p-6 rounded-2xl space-y-4"
+                    className="p-6 rounded-2xl space-y-4"
+                    style={{ backgroundColor: C.surfaceContainerLowest, border: `1px solid ${C.surfaceVariant}` }}
                   >
                     <div className="flex items-start gap-2.5">
-                      <span className="text-zinc-600 font-mono text-xs mt-0.5">{qIdx + 1}.</span>
-                      <p className="text-sm font-semibold text-white leading-relaxed">{q.question}</p>
+                      <span className="font-mono text-xs mt-0.5" style={{ color: C.outline }}>{qIdx + 1}.</span>
+                      <p className="text-sm font-semibold leading-relaxed" style={{ color: C.primary }}>{q.question}</p>
                     </div>
 
                     <div className="grid grid-cols-1 gap-2.5 pl-6">
                       {q.options.map((opt: string, optIdx: number) => {
                         const isSelected = selectedOpt === optIdx;
-                        let optBorder = 'border-zinc-900 bg-zinc-950/20';
-                        let optText = 'text-zinc-400';
+                        let optStyle: React.CSSProperties = {
+                          border: `1px solid ${C.surfaceVariant}`,
+                          backgroundColor: C.surfaceContainerLow,
+                          color: C.onSurfaceVariant,
+                        };
 
                         if (isSelected) {
-                          optBorder = 'border-[#7C5CFF] bg-[#7C5CFF]/5';
-                          optText = 'text-white font-semibold';
+                          optStyle = {
+                            border: `1px solid ${C.accentBlue}`,
+                            backgroundColor: '#eef1f8',
+                            color: C.primary,
+                            fontWeight: 600,
+                          };
                         }
 
                         if (quizSubmitted) {
                           if (optIdx === q.answerIdx) {
-                            optBorder = 'border-[#3DD68C] bg-[#3DD68C]/5';
-                            optText = 'text-[#3DD68C] font-semibold';
+                            optStyle = {
+                              border: '1px solid #a7f3d0',
+                              backgroundColor: '#ecfdf5',
+                              color: '#059669',
+                              fontWeight: 600,
+                            };
                           } else if (isSelected && !isCorrect) {
-                            optBorder = 'border-[#F1583D] bg-[#F1583D]/5';
-                            optText = 'text-[#F1583D]';
+                            optStyle = {
+                              border: '1px solid #fecaca',
+                              backgroundColor: '#fef2f2',
+                              color: '#dc2626',
+                            };
                           }
                         }
 
@@ -309,11 +376,12 @@ export default function CourseClient({ courseId }: CourseClientProps) {
                             key={optIdx}
                             onClick={() => handleSelectOption(q.id, optIdx)}
                             disabled={quizSubmitted}
-                            className={`text-left p-3.5 rounded-xl border text-xs transition-all flex items-center justify-between ${optBorder} ${optText}`}
+                            className="text-left p-3.5 rounded-xl text-xs transition-all flex items-center justify-between"
+                            style={optStyle}
                           >
                             <span>{opt}</span>
                             {quizSubmitted && optIdx === q.answerIdx && (
-                              <span className="text-[#3DD68C] font-bold">✓</span>
+                              <span style={{ color: '#059669', fontWeight: 'bold' }}>✓</span>
                             )}
                           </button>
                         );
@@ -322,8 +390,11 @@ export default function CourseClient({ courseId }: CourseClientProps) {
 
                     {/* Explanatory feedback if wrong */}
                     {quizSubmitted && !isCorrect && (
-                      <div className="bg-[#F1583D]/5 border border-[#F1583D]/20 p-3.5 rounded-xl text-[11px] text-zinc-400 pl-6 leading-relaxed">
-                        <span className="text-[#F1583D] font-bold uppercase block mb-1">Explanatory Note:</span>
+                      <div
+                        className="p-3.5 rounded-xl text-[11px] pl-6 leading-relaxed"
+                        style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: C.onSurfaceVariant }}
+                      >
+                        <span style={{ color: '#dc2626', fontWeight: 'bold', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Explanatory Note:</span>
                         {q.explanation}
                       </div>
                     )}
@@ -338,7 +409,8 @@ export default function CourseClient({ courseId }: CourseClientProps) {
                 <button
                   onClick={handleSubmitQuiz}
                   disabled={Object.keys(answers).length !== course.quiz.questions.length}
-                  className="px-6 py-2.5 bg-gradient-to-r from-[#7C5CFF] to-[#22D3D0] text-zinc-950 font-bold text-xs rounded-xl shadow-md disabled:opacity-50"
+                  className="px-6 py-2.5 font-bold text-xs rounded-xl shadow-md disabled:opacity-50"
+                  style={{ backgroundColor: C.primary, color: C.onPrimary }}
                 >
                   Submit Challenge
                 </button>
@@ -346,7 +418,8 @@ export default function CourseClient({ courseId }: CourseClientProps) {
                 !quizPassed && (
                   <button
                     onClick={handleRetryQuiz}
-                    className="flex items-center gap-1.5 px-6 py-2.5 border border-zinc-800 bg-zinc-900/40 hover:bg-zinc-900 text-zinc-300 hover:text-white text-xs font-bold rounded-xl transition-all"
+                    className="flex items-center gap-1.5 px-6 py-2.5 text-xs font-bold rounded-xl transition-all hover:opacity-80"
+                    style={{ backgroundColor: C.surfaceContainerLowest, border: `1px solid ${C.surfaceVariant}`, color: C.onSurface }}
                   >
                     <RefreshCw className="h-4 w-4 animate-spin-slow" />
                     Retry Quiz
@@ -360,5 +433,3 @@ export default function CourseClient({ courseId }: CourseClientProps) {
     </div>
   );
 }
-// Import AlertTriangle manually
-import { AlertTriangle } from 'lucide-react';

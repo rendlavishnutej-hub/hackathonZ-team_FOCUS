@@ -9,6 +9,27 @@ import {
 import { startRegistration } from '@simplewebauthn/browser';
 import { createClient } from '@/utils/supabase/client';
 
+const C = {
+  cream: '#fef9f2',
+  primary: '#000000',
+  onPrimary: '#ffffff',
+  surfaceContainerLowest: '#ffffff',
+  surfaceContainerLow: '#f8f3ec',
+  surfaceContainer: '#f2ede6',
+  surfaceContainerHigh: '#ece7e1',
+  surfaceVariant: '#e6e2db',
+  onSurface: '#1d1c18',
+  onSurfaceVariant: '#45464d',
+  outline: '#76777d',
+  outlineVariant: '#c6c6cd',
+  accentYellow: '#ffe24c',
+  accentBlue: '#bec6e0',
+  accentPink: '#ffafd3',
+  accentGreen: '#86efac',
+  accentPurple: '#d3579a',
+  secondaryContainer: '#fcdf46',
+};
+
 interface SecurityClientProps {
   initialPasskeys: Array<{ id: string; created_at: string }>;
   initialLogs: Array<{
@@ -168,40 +189,41 @@ export default function SecurityClient({
   return (
     <div className="max-w-5xl mx-auto space-y-8">
       {/* Title */}
-      <div className="space-y-1.5 border-b border-zinc-900 pb-6">
-        <h1 className="font-display text-3xl sm:text-5xl tracking-wide uppercase text-white leading-none">
+      <div className="space-y-1.5 pb-6" style={{ borderBottom: `1px solid ${C.surfaceVariant}` }}>
+        <h1 className="font-display text-3xl sm:text-5xl tracking-wide uppercase leading-none" style={{ color: C.primary }}>
           Grid Settings
         </h1>
-        <p className="text-sm text-zinc-400 font-body">
+        <p className="text-sm font-body" style={{ color: C.onSurfaceVariant }}>
           Manage your credentials, active login keys, and audit logs.
         </p>
       </div>
 
       {error && (
-        <div className="bg-red-950/40 border border-red-900/40 text-red-200 text-xs p-3.5 rounded-xl flex items-start gap-2.5">
-          <AlertCircle className="h-5 w-5 text-red-400 shrink-0" />
+        <div className="text-xs p-3.5 rounded-xl flex items-start gap-2.5" style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626' }}>
+          <AlertCircle className="h-5 w-5 shrink-0" style={{ color: '#dc2626' }} />
           <span>{error}</span>
         </div>
       )}
 
       {success && (
-        <div className="bg-emerald-950/40 border border-emerald-900/40 text-emerald-200 text-xs p-3.5 rounded-xl flex items-start gap-2.5">
-          <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0" />
+        <div className="text-xs p-3.5 rounded-xl flex items-start gap-2.5" style={{ backgroundColor: '#ecfdf5', border: '1px solid #a7f3d0', color: '#059669' }}>
+          <CheckCircle2 className="h-5 w-5 shrink-0" style={{ color: '#059669' }} />
           <span>{success}</span>
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Passkeys Panel */}
-        <div className="glass-panel p-6 rounded-2xl border border-white/5 bg-[#13131A]/30 space-y-5">
+        <div className="p-6 rounded-2xl space-y-5" style={{ backgroundColor: C.surfaceContainerLowest, border: `1px solid ${C.surfaceVariant}` }}>
           <div className="flex items-center justify-between">
-            <h3 className="font-display text-lg text-white uppercase tracking-wider">
+            <h3 className="font-display text-lg uppercase tracking-wider" style={{ color: C.primary }}>
               Biometric Passkeys
             </h3>
             <button
               onClick={handleRegisterPasskey}
               disabled={passkeyLoading}
-              className="px-3 py-1.5 bg-gradient-to-r from-[#7C5CFF] to-[#22D3D0] text-zinc-950 text-xs font-bold rounded-lg flex items-center gap-1 hover:opacity-90 transition-all disabled:opacity-50"
+              className="px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1 hover:opacity-90 transition-all disabled:opacity-50"
+              style={{ backgroundColor: C.primary, color: C.onPrimary }}
             >
               {passkeyLoading ? (
                 <Loader2 className="h-3 w-3 animate-spin" />
@@ -212,20 +234,20 @@ export default function SecurityClient({
             </button>
           </div>
 
-          <p className="text-xs text-zinc-400 leading-relaxed font-body">
+          <p className="text-xs leading-relaxed font-body" style={{ color: C.onSurfaceVariant }}>
             Register face/fingerprint credentials to sign in directly from this device without typing passwords.
           </p>
 
           <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
             {passkeys.map(pk => (
-              <div key={pk.id} className="flex items-center justify-between bg-zinc-950/60 border border-zinc-900 p-3 rounded-xl text-xs">
+              <div key={pk.id} className="flex items-center justify-between p-3 rounded-xl text-xs" style={{ backgroundColor: C.surfaceContainerLow, border: `1px solid ${C.surfaceVariant}` }}>
                 <div className="flex items-center gap-2">
-                  <Fingerprint className="h-4.5 w-4.5 text-[#22D3D0]" />
+                  <Fingerprint className="h-4.5 w-4.5" style={{ color: '#5a6ba8' }} />
                   <div>
-                    <span className="font-mono text-zinc-300 font-semibold truncate block w-40">
+                    <span className="font-mono font-semibold truncate block w-40" style={{ color: C.onSurface }}>
                       {pk.id.slice(0, 10)}...{pk.id.slice(-6)}
                     </span>
-                    <span className="text-[10px] text-zinc-500 block mt-0.5" suppressHydrationWarning>
+                    <span className="text-[10px] block mt-0.5" style={{ color: C.outline }} suppressHydrationWarning>
                       Added: {new Date(pk.created_at).toLocaleDateString()}
                     </span>
                   </div>
@@ -233,54 +255,56 @@ export default function SecurityClient({
                 <button
                   onClick={() => handleDeletePasskey(pk.id)}
                   disabled={loading === pk.id}
-                  className="p-2 hover:bg-zinc-900 text-zinc-500 hover:text-red-400 rounded-lg transition-colors"
+                  className="p-2 rounded-lg transition-colors hover:bg-red-50"
+                  style={{ color: C.outline }}
                 >
                   {loading === pk.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
                 </button>
               </div>
             ))}
             {passkeys.length === 0 && (
-              <p className="text-xs text-zinc-650 text-center py-6">No passkeys registered yet.</p>
+              <p className="text-xs text-center py-6" style={{ color: C.outline }}>No passkeys registered yet.</p>
             )}
           </div>
         </div>
 
         {/* Multi-Factor Authentication Panel */}
-        <div className="glass-panel p-6 rounded-2xl border border-white/5 bg-[#13131A]/30 space-y-5 flex flex-col justify-between">
+        <div className="p-6 rounded-2xl space-y-5 flex flex-col justify-between" style={{ backgroundColor: C.surfaceContainerLowest, border: `1px solid ${C.surfaceVariant}` }}>
           <div className="space-y-4">
-            <h3 className="font-display text-lg text-white uppercase tracking-wider">
+            <h3 className="font-display text-lg uppercase tracking-wider" style={{ color: C.primary }}>
               Multi-Factor Auth (MFA)
             </h3>
             
-            <p className="text-xs text-zinc-400 leading-relaxed font-body">
+            <p className="text-xs leading-relaxed font-body" style={{ color: C.onSurfaceVariant }}>
               Enable two-step verification using Google Authenticator, Authy, or Microsoft Authenticator to add an extra layer of protection.
             </p>
 
-            <div className="flex items-center gap-3 bg-zinc-950/50 p-4 rounded-xl border border-zinc-900">
+            <div className="flex items-center gap-3 p-4 rounded-xl" style={{ backgroundColor: C.surfaceContainerLow, border: `1px solid ${C.surfaceVariant}` }}>
               {mfaEnabled ? (
                 <>
-                  <ShieldCheck className="h-6 w-6 text-[#3DD68C] shrink-0" />
+                  <ShieldCheck className="h-6 w-6 shrink-0" style={{ color: '#059669' }} />
                   <div>
-                    <span className="text-xs font-bold text-white block">Status: ENABLED & SECURED</span>
-                    <span className="text-[10px] text-zinc-500 block mt-0.5">Account is guarded by a 6-digit TOTP secret.</span>
+                    <span className="text-xs font-bold block" style={{ color: C.primary }}>Status: ENABLED & SECURED</span>
+                    <span className="text-[10px] block mt-0.5" style={{ color: C.outline }}>Account is guarded by a 6-digit TOTP secret.</span>
                   </div>
                 </>
               ) : (
                 <>
-                  <ShieldAlert className="h-6 w-6 text-yellow-500 shrink-0" />
+                  <ShieldAlert className="h-6 w-6 shrink-0" style={{ color: '#d97706' }} />
                   <div>
-                    <span className="text-xs font-bold text-white block">Status: UNPROTECTED</span>
-                    <span className="text-[10px] text-zinc-500 block mt-0.5">MFA is recommended to prevent password compromises.</span>
+                    <span className="text-xs font-bold block" style={{ color: C.primary }}>Status: UNPROTECTED</span>
+                    <span className="text-[10px] block mt-0.5" style={{ color: C.outline }}>MFA is recommended to prevent password compromises.</span>
                   </div>
                 </>
               )}
             </div>
           </div>
 
-          <div className="pt-4 border-t border-zinc-900/60">
+          <div className="pt-4" style={{ borderTop: `1px solid ${C.surfaceVariant}` }}>
             <button
               onClick={() => router.push('/dashboard/mfa/enroll')}
-              className="w-full flex justify-center py-2.5 px-4 border border-zinc-800 bg-zinc-950/40 hover:bg-zinc-900 text-zinc-300 hover:text-white text-xs font-semibold rounded-xl transition-all"
+              className="w-full flex justify-center py-2.5 px-4 text-xs font-semibold rounded-xl transition-all hover:opacity-80"
+              style={{ border: `1px solid ${C.outlineVariant}`, backgroundColor: C.surfaceContainerLow, color: C.onSurface }}
             >
               {mfaEnabled ? 'Manage MFA Factors' : 'Set Up Two-Factor Auth'}
             </button>
@@ -289,26 +313,26 @@ export default function SecurityClient({
       </div>
 
       {/* Active Sessions List */}
-      <div className="glass-panel p-6 sm:p-8 rounded-2xl border border-white/5 bg-[#13131A]/30 space-y-5">
-        <h3 className="font-display text-lg text-white uppercase tracking-wider">
+      <div className="p-6 sm:p-8 rounded-2xl space-y-5" style={{ backgroundColor: C.surfaceContainerLowest, border: `1px solid ${C.surfaceVariant}` }}>
+        <h3 className="font-display text-lg uppercase tracking-wider" style={{ color: C.primary }}>
           Active Sessions ({activeSessions.length})
         </h3>
         
-        <div className="divide-y divide-zinc-900 border border-zinc-900 rounded-xl overflow-hidden bg-zinc-950/50">
+        <div className="rounded-xl overflow-hidden" style={{ border: `1px solid ${C.surfaceVariant}`, backgroundColor: C.surfaceContainerLow }}>
           {activeSessions.map((session, idx) => (
-            <div key={session.id} className="p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-xs">
+            <div key={session.id} className="p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-xs" style={{ borderBottom: idx < activeSessions.length - 1 ? `1px solid ${C.surfaceVariant}` : 'none' }}>
               <div className="flex items-start gap-3">
-                <Laptop className="h-5 w-5 text-zinc-500 mt-0.5 shrink-0" />
+                <Laptop className="h-5 w-5 mt-0.5 shrink-0" style={{ color: C.outline }} />
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-white">{parseUserAgent(session.user_agent)}</span>
+                    <span className="font-bold" style={{ color: C.primary }}>{parseUserAgent(session.user_agent)}</span>
                     {idx === 0 && (
-                      <span className="px-1.5 py-0.5 bg-[#22D3D0]/10 text-[#22D3D0] text-[9px] font-bold rounded border border-[#22D3D0]/15 tracking-wider uppercase">
+                      <span className="px-1.5 py-0.5 text-[9px] font-bold rounded tracking-wider uppercase" style={{ backgroundColor: '#eff6ff', color: '#5a6ba8', border: '1px solid #bec6e0' }}>
                         Current Session
                       </span>
                     )}
                   </div>
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-zinc-500">
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1" style={{ color: C.outline }}>
                     <span className="flex items-center gap-1" suppressHydrationWarning>
                       <Clock className="h-3.5 w-3.5 shrink-0" />
                       Logged in: {new Date(session.created_at).toLocaleString()}
@@ -325,7 +349,8 @@ export default function SecurityClient({
                 <button
                   onClick={() => handleRevokeSession(session.session_id!, idx === 0)}
                   disabled={loading === session.session_id}
-                  className="sm:self-center px-3 py-1.5 border border-red-950/30 text-red-400 hover:text-white hover:bg-red-950/20 text-xs font-semibold rounded-lg transition-all disabled:opacity-50"
+                  className="sm:self-center px-3 py-1.5 text-xs font-semibold rounded-lg transition-all disabled:opacity-50 hover:bg-red-50"
+                  style={{ border: '1px solid #fecaca', color: '#dc2626' }}
                 >
                   {loading === session.session_id ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -340,14 +365,14 @@ export default function SecurityClient({
       </div>
 
       {/* Audit Logs Table */}
-      <div className="glass-panel p-6 sm:p-8 rounded-2xl border border-white/5 bg-[#13131A]/30 space-y-5">
-        <h3 className="font-display text-lg text-white uppercase tracking-wider">
+      <div className="p-6 sm:p-8 rounded-2xl space-y-5" style={{ backgroundColor: C.surfaceContainerLowest, border: `1px solid ${C.surfaceVariant}` }}>
+        <h3 className="font-display text-lg uppercase tracking-wider" style={{ color: C.primary }}>
           Security Audit Trail
         </h3>
         
-        <div className="overflow-x-auto border border-zinc-900 rounded-xl">
-          <table className="w-full text-left text-xs text-zinc-400">
-            <thead className="bg-zinc-950/80 text-zinc-500 font-bold uppercase tracking-wider border-b border-zinc-900">
+        <div className="overflow-x-auto rounded-xl" style={{ border: `1px solid ${C.surfaceVariant}` }}>
+          <table className="w-full text-left text-xs" style={{ color: C.onSurfaceVariant }}>
+            <thead className="font-bold uppercase tracking-wider" style={{ backgroundColor: C.surfaceContainerHigh, color: C.outline, borderBottom: `1px solid ${C.surfaceVariant}` }}>
               <tr>
                 <th className="px-4 py-3">Event</th>
                 <th className="px-4 py-3">Status</th>
@@ -356,18 +381,18 @@ export default function SecurityClient({
                 <th className="px-4 py-3">Timestamp</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-900/60 bg-zinc-950/30">
+            <tbody style={{ backgroundColor: C.surfaceContainerLowest }}>
               {auditLogs.map((log) => (
-                <tr key={log.id} className="hover:bg-zinc-900/10">
-                  <td className="px-4 py-3.5 font-semibold text-white">
+                <tr key={log.id} className="hover:opacity-80" style={{ borderBottom: `1px solid ${C.surfaceVariant}` }}>
+                  <td className="px-4 py-3.5 font-semibold" style={{ color: C.primary }}>
                     {log.login_status === 'failed' ? 'Failed Sign In' : 'Successful Authentication'}
                   </td>
                   <td className="px-4 py-3.5">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase" style={
                       log.login_status === 'failed' 
-                        ? 'bg-[#F1583D]/10 text-[#F1583D] border border-[#F1583D]/15' 
-                        : 'bg-[#3DD68C]/10 text-[#3DD68C] border border-[#3DD68C]/15'
-                    }`}>
+                        ? { backgroundColor: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' } 
+                        : { backgroundColor: '#ecfdf5', color: '#059669', border: '1px solid #a7f3d0' }
+                    }>
                       {log.login_status === 'failed' ? 'Blocked' : 'Authorized'}
                     </span>
                   </td>
@@ -382,7 +407,7 @@ export default function SecurityClient({
               ))}
               {auditLogs.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="text-center py-6 text-zinc-600">
+                  <td colSpan={5} className="text-center py-6" style={{ color: C.outline }}>
                     No historical logs recorded.
                   </td>
                 </tr>

@@ -9,6 +9,29 @@ import {
 import AgentGraph from '@/components/agents/AgentGraph';
 import { BlackboardState } from '@/lib/orchestrator/blackboard';
 
+const C = {
+  cream: '#fef9f2',
+  primary: '#000000',
+  onPrimary: '#ffffff',
+  surfaceContainerLowest: '#ffffff',
+  surfaceContainerLow: '#f8f3ec',
+  surfaceContainer: '#f2ede6',
+  surfaceContainerHigh: '#ece7e1',
+  surfaceVariant: '#e6e2db',
+  onSurface: '#1d1c18',
+  onSurfaceVariant: '#45464d',
+  outline: '#76777d',
+  outlineVariant: '#c6c6cd',
+  accentYellow: '#ffe24c',
+  accentBlue: '#bec6e0',
+  accentPink: '#ffafd3',
+  accentGreen: '#86efac',
+  accentPurple: '#d3579a',
+  secondaryContainer: '#fcdf46',
+  inverseSurface: '#32302c',
+  inverseOnSurface: '#f5f0e8',
+};
+
 interface SessionClientProps {
   sessionId: string;
   prompt: string;
@@ -138,12 +161,18 @@ export default function SessionClient({ sessionId, prompt }: SessionClientProps)
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] uppercase font-bold tracking-widest text-[#7C5CFF]">
+            <span
+              className="text-[10px] uppercase font-bold tracking-widest"
+              style={{ color: C.accentPurple }}
+            >
               ACTIVE DEPLOYMENT
             </span>
             <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-ping" />
           </div>
-          <h2 className="font-display text-2xl tracking-wide uppercase text-white truncate max-w-lg">
+          <h2
+            className="font-display text-2xl tracking-wide uppercase truncate max-w-lg"
+            style={{ color: C.onSurface }}
+          >
             Syllabus: {prompt}
           </h2>
         </div>
@@ -151,7 +180,11 @@ export default function SessionClient({ sessionId, prompt }: SessionClientProps)
         {status === 'completed' && (
           <button
             onClick={() => router.push(`/course/${sessionId}`)}
-            className="flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-[#7C5CFF] to-[#22D3D0] text-zinc-950 font-bold text-xs rounded-xl shadow-lg shadow-[#7C5CFF]/10 transition-all hover:scale-[1.01]"
+            className="flex items-center gap-1.5 px-4 py-2.5 font-bold text-xs rounded-xl shadow-lg transition-all hover:scale-[1.01]"
+            style={{
+              backgroundColor: C.primary,
+              color: C.onPrimary,
+            }}
           >
             Launch Course Workspace
             <ChevronRight className="h-4.5 w-4.5" />
@@ -161,7 +194,10 @@ export default function SessionClient({ sessionId, prompt }: SessionClientProps)
 
       {/* React Flow Graph */}
       <div className="space-y-2">
-        <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-500 block">
+        <span
+          className="text-[10px] uppercase font-bold tracking-widest block"
+          style={{ color: C.outline }}
+        >
           Agent Execution Grid
         </span>
         <AgentGraph
@@ -177,32 +213,59 @@ export default function SessionClient({ sessionId, prompt }: SessionClientProps)
 
       {/* Logs / Execution Timeline Panel */}
       <div className="flex-1 min-h-[220px] flex flex-col space-y-2">
-        <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-500 block">
+        <span
+          className="text-[10px] uppercase font-bold tracking-widest block"
+          style={{ color: C.outline }}
+        >
           Live Agent Activity Stream
         </span>
         
-        <div className="flex-1 bg-zinc-950 border border-zinc-900 rounded-2xl p-5 overflow-y-auto font-mono text-xs space-y-2.5 max-h-64 shadow-inner">
+        <div
+          className="flex-1 rounded-2xl p-5 overflow-y-auto font-mono text-xs space-y-2.5 max-h-64 shadow-inner"
+          style={{
+            backgroundColor: C.inverseSurface,
+            borderWidth: 1,
+            borderStyle: 'solid',
+            borderColor: '#49463f',
+          }}
+        >
           {logs.map((log, idx) => {
-            let color = 'text-zinc-400';
+            let color = C.inverseOnSurface;
             let prefix = 'Info';
             if (log.status === 'success') {
-              color = 'text-[#3DD68C]';
+              color = C.accentGreen;
               prefix = 'Success';
             } else if (log.status === 'warning') {
-              color = 'text-[#F5B942]';
+              color = '#b45309';
               prefix = 'Critique';
             } else if (log.status === 'error') {
-              color = 'text-[#F1583D]';
+              color = '#dc2626';
               prefix = 'Alert';
             }
 
             return (
-              <div key={idx} className="flex items-start gap-2.5 border-b border-zinc-900/40 pb-2">
-                <span className="text-zinc-600 shrink-0 font-sans text-[10px] mt-0.5">[{log.timestamp}]</span>
-                <span className="text-[#7C5CFF] shrink-0 font-bold uppercase text-[10px] px-1.5 py-0.5 bg-[#7C5CFF]/10 rounded border border-[#7C5CFF]/10">
+              <div
+                key={idx}
+                className="flex items-start gap-2.5 pb-2"
+                style={{ borderBottom: `1px solid rgba(255,255,255,0.08)` }}
+              >
+                <span
+                  className="shrink-0 font-sans text-[10px] mt-0.5"
+                  style={{ color: 'rgba(245,240,232,0.5)' }}
+                >
+                  [{log.timestamp}]
+                </span>
+                <span
+                  className="shrink-0 font-bold uppercase text-[10px] px-1.5 py-0.5 rounded"
+                  style={{
+                    color: C.accentPurple,
+                    backgroundColor: 'rgba(211,87,154,0.12)',
+                    border: '1px solid rgba(211,87,154,0.15)',
+                  }}
+                >
                   {log.agentId}
                 </span>
-                <span className={`${color} leading-relaxed`}>
+                <span className="leading-relaxed" style={{ color }}>
                   <strong className="text-[10px] uppercase tracking-wider mr-1.5">({prefix}):</strong>
                   {log.message}
                 </span>
@@ -211,8 +274,8 @@ export default function SessionClient({ sessionId, prompt }: SessionClientProps)
           })}
           
           {status === 'running' && (
-            <div className="flex items-center gap-2 text-zinc-600 animate-pulse pt-2">
-              <Loader2 className="h-3.5 w-3.5 animate-spin text-[#22D3D0]" />
+            <div className="flex items-center gap-2 animate-pulse pt-2" style={{ color: 'rgba(245,240,232,0.5)' }}>
+              <Loader2 className="h-3.5 w-3.5 animate-spin" style={{ color: '#5a6ba8' }} />
               <span>Orchestrating agent loop pipelines...</span>
             </div>
           )}

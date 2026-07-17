@@ -7,6 +7,25 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
+// ─── Colour constants matching the landing page design system ──────────────
+const C = {
+  cream: '#fef9f2',
+  primary: '#000000',
+  onPrimary: '#ffffff',
+  surfaceContainerLowest: '#ffffff',
+  surfaceContainerLow: '#f8f3ec',
+  surfaceContainer: '#f2ede6',
+  surfaceContainerHigh: '#ece7e1',
+  surfaceVariant: '#e6e2db',
+  onSurface: '#1d1c18',
+  onSurfaceVariant: '#45464d',
+  outline: '#76777d',
+  outlineVariant: '#c6c6cd',
+  accentBlue: '#bec6e0',
+  accentGreen: '#86efac',
+  accentPurple: '#d3579a',
+};
+
 interface AgentGraphProps {
   activeAgentId: string | null;
   status: 'idle' | 'running' | 'completed' | 'failed';
@@ -40,22 +59,27 @@ export default function AgentGraph({
       const isActive = activeAgentId === agent.id;
       const isCompleted = agent.hasOutput || (status === 'completed');
       
-      let borderClass = 'border-zinc-800 bg-zinc-950/60';
-      let titleClass = 'text-zinc-500 font-display';
-      let textClass = 'text-zinc-400';
-      let glowStyle = {};
+      let borderColor = C.surfaceVariant;
+      let bgColor = C.surfaceContainerLowest;
+      let titleColor = C.outline;
+      let textColor = C.onSurfaceVariant;
+      let glowStyle: React.CSSProperties = {};
+      let animateClass = '';
 
       if (isActive) {
-        borderClass = 'border-[#7C5CFF] bg-zinc-950 shadow-2xl';
-        titleClass = 'text-[#7C5CFF] font-display font-bold animate-pulse';
-        textClass = 'text-white';
+        borderColor = C.accentPurple;
+        bgColor = C.surfaceContainerLowest;
+        titleColor = C.accentPurple;
+        textColor = C.primary;
+        animateClass = 'animate-pulse';
         glowStyle = {
-          boxShadow: '0 0 20px rgba(124, 92, 255, 0.4)',
+          boxShadow: `0 0 20px ${C.accentPurple}40`,
         };
       } else if (isCompleted) {
-        borderClass = 'border-[#22D3D0] bg-[#22D3D0]/5';
-        titleClass = 'text-[#22D3D0] font-display';
-        textClass = 'text-zinc-300';
+        borderColor = '#5a6ba8';
+        bgColor = `${C.accentBlue}15`;
+        titleColor = '#5a6ba8';
+        textColor = C.onSurface;
       }
 
       return {
@@ -64,25 +88,32 @@ export default function AgentGraph({
         data: {
           label: (
             <div 
-              className={`p-4 rounded-xl border transition-all duration-300 w-52 glass-panel ${borderClass}`}
-              style={glowStyle}
+              className="p-4 rounded-xl border transition-all duration-300 w-52"
+              style={{
+                borderColor,
+                backgroundColor: bgColor,
+                ...glowStyle,
+              }}
             >
               <div className="flex items-center justify-between mb-1.5">
-                <span className={`text-[10px] tracking-widest font-semibold uppercase ${titleClass}`}>
+                <span
+                  className={`text-[10px] tracking-widest font-semibold uppercase ${animateClass}`}
+                  style={{ color: titleColor }}
+                >
                   {agent.name}
                 </span>
                 {isActive && (
                   <span className="flex h-2 w-2 relative">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#7C5CFF] opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#7C5CFF]"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: C.accentPurple }} />
+                    <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: C.accentPurple }} />
                   </span>
                 )}
                 {isCompleted && !isActive && (
-                  <span className="text-[10px] text-[#22D3D0] font-bold">✓</span>
+                  <span className="text-[10px] font-bold" style={{ color: '#5a6ba8' }}>✓</span>
                 )}
               </div>
-              <p className={`text-xs font-semibold ${textClass}`}>{agent.label}</p>
-              <p className="text-[10px] text-zinc-500 mt-1">
+              <p className="text-xs font-semibold" style={{ color: textColor }}>{agent.label}</p>
+              <p className="text-[10px] mt-1" style={{ color: C.outline }}>
                 {isActive ? 'Processing state...' : isCompleted ? 'Completed' : 'Pending activation'}
               </p>
             </div>
@@ -108,9 +139,9 @@ export default function AgentGraph({
     const getEdgeColor = (source: string, target: string) => {
       // Critique revision loop edge
       if (source === 'critic' && target === 'researcher') {
-        return !!criticOutput ? '#7C5CFF' : 'rgba(255,255,255,0.06)';
+        return !!criticOutput ? C.accentPurple : C.outlineVariant;
       }
-      return isCompleted(source) ? '#22D3D0' : 'rgba(255,255,255,0.06)';
+      return isCompleted(source) ? '#5a6ba8' : C.outlineVariant;
     };
 
     return [
@@ -148,7 +179,7 @@ export default function AgentGraph({
         target: 'researcher', 
         animated: activeAgentId === 'critic' && !!criticOutput,
         label: 'Applies Revision',
-        labelStyle: { fill: '#7C5CFF', fontSize: 9, fontWeight: 'bold' },
+        labelStyle: { fill: C.accentPurple, fontSize: 9, fontWeight: 'bold' },
         style: { stroke: getEdgeColor('critic', 'researcher'), strokeWidth: 2, strokeDasharray: '5,5' },
         markerEnd: { type: MarkerType.ArrowClosed, color: getEdgeColor('critic', 'researcher') }
       },
@@ -165,7 +196,13 @@ export default function AgentGraph({
   }, [activeAgentId, plannerOutput, researcherOutput, coderOutput, criticOutput, quizzerOutput]);
 
   return (
-    <div className="h-[400px] w-full rounded-2xl border border-zinc-900 bg-zinc-950/20 relative overflow-hidden">
+    <div
+      className="h-[400px] w-full rounded-2xl border relative overflow-hidden"
+      style={{
+        borderColor: C.surfaceVariant,
+        backgroundColor: C.surfaceContainerLow,
+      }}
+    >
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -179,8 +216,8 @@ export default function AgentGraph({
         panOnDrag={false}
         preventScrolling={true}
       >
-        <Background color="#7C5CFF" gap={16} size={1} className="opacity-[0.05]" />
-        <Controls showInteractive={false} className="!bg-zinc-950 !border-zinc-800 !text-white" />
+        <Background color={C.outlineVariant} gap={16} size={1} className="opacity-30" />
+        <Controls showInteractive={false} />
       </ReactFlow>
     </div>
   );

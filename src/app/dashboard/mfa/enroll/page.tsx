@@ -226,7 +226,7 @@ export default function MfaEnrollPage() {
                 {/* Manual entry secret */}
                 <div className="w-full space-y-1">
                   <span className="block text-[11px] font-medium text-zinc-500 uppercase tracking-wider text-center">
-                    Can't scan? Enter this secret key manually
+                    Can&apos;t scan? Enter this secret key manually
                   </span>
                   <div className="flex items-center justify-between gap-2 bg-zinc-900 border border-zinc-850 px-3 py-1.5 rounded-lg">
                     <span className="font-mono text-xs text-zinc-300 font-semibold truncate select-all">{secretKey}</span>

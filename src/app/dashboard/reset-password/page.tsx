@@ -23,8 +23,6 @@ export default function UpdatePasswordPage() {
 
   useEffect(() => {
     if (!password || password.length < 6) {
-      setIsBreached(null);
-      setBreachCount(0);
       return;
     }
 
@@ -54,6 +52,11 @@ export default function UpdatePasswordPage() {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setPassword(val);
+
+    if (!val || val.length < 6) {
+      setIsBreached(null);
+      setBreachCount(0);
+    }
 
     if (!val) {
       setStrength(null);

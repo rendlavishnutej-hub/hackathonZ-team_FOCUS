@@ -1,18 +1,44 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── Dark FOCUS Theme Tokens (Default) ────────────────────────── */
-  --color-bg-base: #0A0A0F;
-  --color-bg-surface: #13131A;
-  --color-bg-glass: rgba(255, 255, 255, 0.04);
-  --color-border-subtle: rgba(255, 255, 255, 0.08);
-  --color-text-primary: #F5F5F7;
-  --color-text-secondary: #9C9CA8;
-  --color-accent-start: #7C5CFF;
-  --color-accent-end: #22D3D0;
-  --color-success: #3DD68C;
-  --color-warning: #F5B942;
-  --color-error: #F1583D;
+  /* ── Cream Theme Tokens (matching Landing Page) ───────────────── */
+  --color-cream: #fef9f2;
+  --color-on-surface: #1d1c18;
+  --color-surface: #fef9f2;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f8f3ec;
+  --color-surface-container: #f2ede6;
+  --color-surface-container-high: #ece7e1;
+  --color-surface-container-highest: #e6e2db;
+  --color-surface-variant: #e6e2db;
+  --color-surface-dim: #ded9d3;
+  --color-surface-bright: #fef9f2;
+  --color-on-surface-variant: #45464d;
+  --color-outline: #76777d;
+  --color-outline-variant: #c6c6cd;
+  --color-inverse-surface: #32302c;
+  --color-inverse-on-surface: #f5f0e9;
+  --color-primary-container: #131b2e;
+  --color-on-primary: #ffffff;
+  --color-secondary-container: #fcdf46;
+  --color-accent-yellow: #ffe24c;
+  --color-accent-blue: #bec6e0;
+  --color-accent-pink: #ffafd3;
+  --color-accent-green: #86efac;
+  --color-accent-purple: #d3579a;
+
+  /* ── Semantic tokens ───────────────────────────────────────────── */
+  --color-bg-base: #fef9f2;
+  --color-bg-surface: #ffffff;
+  --color-bg-glass: rgba(255, 255, 255, 0.7);
+  --color-border-subtle: #e6e2db;
+  --color-text-primary: #1d1c18;
+  --color-text-secondary: #45464d;
+  --color-accent-start: #bec6e0;
+  --color-accent-end: #7c839b;
+  --color-success: #16a34a;
+  --color-warning: #b45309;
+  --color-error: #dc2626;
 
   /* ── Fonts ──────────────────────────────────────────────────────── */
   --font-display: var(--font-display);
@@ -21,19 +47,19 @@
 }
 
 :root {
-  --background: #0A0A0F;
-  --foreground: #F5F5F7;
+  --background: #fef9f2;
+  --foreground: #1d1c18;
 }
 
 body {
   background: var(--color-bg-base);
   color: var(--color-text-primary);
-  font-family: var(--font-body), sans-serif;
+  font-family: var(--font-jakarta), var(--font-body), 'Plus Jakarta Sans', sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
 }
 
-/* ── Glassmorphism utilities ─────────────────────────────────────────────── */
+/* ── Glassmorphism utilities (cream theme) ───────────────────────────────── */
 .glass-panel {
   background: var(--color-bg-glass);
   backdrop-filter: blur(20px);
@@ -48,9 +74,9 @@ body {
   border: 1px solid var(--color-border-subtle);
 }
 
-/* ── Gradient text (dark theme) ──────────────────────────────────────────── */
+/* ── Gradient text (cream theme — accent blue) ──────────────────────────── */
 .text-gradient {
-  background: linear-gradient(135deg, var(--color-accent-start) 0%, var(--color-accent-end) 100%);
+  background: linear-gradient(135deg, #5a6ba8 0%, #7c839b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -61,9 +87,9 @@ body {
   background: linear-gradient(135deg, var(--color-accent-start) 0%, var(--color-accent-end) 100%);
 }
 
-/* ── Animated dots background (dark) ────────────────────────────────────── */
+/* ── Subtle dots background (cream theme) ────────────────────────────────── */
 .dots-bg {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
@@ -90,21 +116,21 @@ body {
   animation: spin-slow 4s linear infinite;
 }
 
-/* ── Custom Scrollbar ────────────────────────────────────────────────────── */
+/* ── Custom Scrollbar (cream theme) ──────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.03);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.12);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.2);
 }

@@ -11,6 +11,30 @@ import { signInAction } from '../../auth/actions';
 import { startAuthentication } from '@simplewebauthn/browser';
 import { createClient } from '@/utils/supabase/client';
 
+// ─── Colour constants matching the landing page design system ──────────────
+const C = {
+  cream: '#fef9f2',
+  primary: '#000000',
+  onPrimary: '#ffffff',
+  surfaceContainerLowest: '#ffffff',
+  surfaceContainerLow: '#f8f3ec',
+  surfaceContainer: '#f2ede6',
+  surfaceContainerHigh: '#ece7e1',
+  surfaceVariant: '#e6e2db',
+  onSurface: '#1d1c18',
+  onSurfaceVariant: '#45464d',
+  outline: '#76777d',
+  outlineVariant: '#c6c6cd',
+  inverseOnSurface: '#f5f0e9',
+  inverseSurface: '#32302c',
+  accentYellow: '#ffe24c',
+  accentBlue: '#bec6e0',
+  accentPink: '#ffafd3',
+  accentGreen: '#86efac',
+  accentPurple: '#d3579a',
+  secondaryContainer: '#fcdf46',
+};
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -132,44 +156,61 @@ function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md space-y-8 glass-panel p-8 sm:p-10 rounded-3xl border border-white/10 bg-[#13131A]/80 shadow-2xl shadow-[#7C5CFF]/10 relative overflow-hidden">
-      {/* Decorative top border line */}
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#7C5CFF] to-[#22D3D0]" />
-
+    <div
+      className="w-full max-w-md space-y-8 p-8 sm:p-10 rounded-3xl border shadow-xl"
+      style={{
+        backgroundColor: C.surfaceContainerLowest,
+        borderColor: C.surfaceVariant,
+        boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
+      }}
+    >
       <div className="text-center">
-        <h2 className="font-display text-3xl tracking-wide uppercase text-white">
+        <h2
+          className="text-3xl font-extrabold tracking-tight"
+          style={{ color: C.primary, fontFamily: 'var(--font-jakarta), sans-serif' }}
+        >
           Sign In
         </h2>
-        <p className="text-xs text-zinc-400 mt-2">
+        <p className="text-sm mt-2" style={{ color: C.onSurfaceVariant }}>
           New to FOCUS?{' '}
-          <Link href="/signup" className="font-semibold text-[#22D3D0] hover:text-[#22D3D0]/80 transition-colors">
+          <Link href="/signup" className="font-semibold transition-colors" style={{ color: C.accentPurple }}>
             Create an account
           </Link>
         </p>
       </div>
 
       {error && (
-        <div className="bg-red-950/40 border border-red-900/40 text-red-200 text-xs p-3.5 rounded-xl flex items-start gap-2.5">
-          <AlertTriangle className="h-5 w-5 text-red-400 shrink-0" />
+        <div
+          className="text-xs p-3.5 rounded-xl flex items-start gap-2.5"
+          style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b' }}
+        >
+          <AlertTriangle className="h-5 w-5 shrink-0" style={{ color: '#dc2626' }} />
           <span>{error}</span>
         </div>
       )}
 
       {info && (
-        <div className="bg-emerald-950/40 border border-emerald-900/40 text-emerald-200 text-xs p-3.5 rounded-xl flex items-start gap-2.5">
-          <ShieldCheck className="h-5 w-5 text-emerald-400 shrink-0" />
+        <div
+          className="text-xs p-3.5 rounded-xl flex items-start gap-2.5"
+          style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', color: '#166534' }}
+        >
+          <ShieldCheck className="h-5 w-5 shrink-0" style={{ color: '#16a34a' }} />
           <span>{info}</span>
         </div>
       )}
 
       <form className="space-y-5" onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="email" className="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2">
+          <label
+            htmlFor="email"
+            className="block text-xs font-semibold uppercase tracking-wider mb-2"
+            style={{ color: C.outline }}
+          >
             Email address
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Mail className="h-4.5 w-4.5 text-zinc-500" />
+              <Mail className="h-4 w-4" style={{ color: C.outline }} />
             </div>
             <input
               id="email"
@@ -179,23 +220,37 @@ function LoginForm() {
               value={formData.email}
               onChange={handleInputChange}
               placeholder="you@example.com"
-              className="block w-full pl-10 pr-3 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-[#22D3D0] focus:border-[#22D3D0] text-sm transition-all focus:shadow-lg focus:shadow-[#22D3D0]/5"
+              className="block w-full pl-10 pr-3 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 transition-all"
+              style={{
+                backgroundColor: C.surfaceContainerLow,
+                borderColor: C.outlineVariant,
+                color: C.onSurface,
+                '--tw-ring-color': C.primary,
+              } as React.CSSProperties}
             />
           </div>
         </div>
 
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label htmlFor="password" className="block text-xs font-semibold uppercase tracking-wider text-zinc-400">
+            <label
+              htmlFor="password"
+              className="block text-xs font-semibold uppercase tracking-wider"
+              style={{ color: C.outline }}
+            >
               Password
             </label>
-            <Link href="/reset-password" className="text-xs font-semibold text-[#7C5CFF] hover:text-[#7C5CFF]/80">
+            <Link
+              href="/reset-password"
+              className="text-xs font-semibold"
+              style={{ color: C.accentPurple }}
+            >
               Forgot?
             </Link>
           </div>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Key className="h-4.5 w-4.5 text-zinc-500" />
+              <Key className="h-4 w-4" style={{ color: C.outline }} />
             </div>
             <input
               id="password"
@@ -205,7 +260,13 @@ function LoginForm() {
               value={formData.password}
               onChange={handleInputChange}
               placeholder="••••••••••••"
-              className="block w-full pl-10 pr-3 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-[#22D3D0] focus:border-[#22D3D0] text-sm transition-all focus:shadow-lg focus:shadow-[#22D3D0]/5"
+              className="block w-full pl-10 pr-3 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 transition-all"
+              style={{
+                backgroundColor: C.surfaceContainerLow,
+                borderColor: C.outlineVariant,
+                color: C.onSurface,
+                '--tw-ring-color': C.primary,
+              } as React.CSSProperties}
             />
           </div>
         </div>
@@ -214,7 +275,12 @@ function LoginForm() {
           <button
             type="submit"
             disabled={loading || passkeyLoading}
-            className="w-full flex justify-center py-3 px-4 rounded-xl text-sm font-semibold text-zinc-950 bg-gradient-to-r from-[#7C5CFF] to-[#22D3D0] hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-[#7C5CFF]/10 active:scale-[0.99]"
+            className="w-full flex justify-center py-3 px-4 rounded-xl text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:opacity-90 hover:scale-[1.01]"
+            style={{
+              backgroundColor: C.primary,
+              color: C.onPrimary,
+              boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+            }}
           >
             {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Log In'}
           </button>
@@ -222,11 +288,14 @@ function LoginForm() {
       </form>
 
       <div className="relative flex py-2 items-center">
-        <div className="flex-grow border-t border-zinc-900"></div>
-        <span className="flex-shrink mx-4 text-zinc-600 text-[10px] uppercase font-bold tracking-widest">
+        <div className="flex-grow border-t" style={{ borderColor: C.surfaceVariant }} />
+        <span
+          className="flex-shrink mx-4 text-[10px] uppercase font-bold tracking-widest"
+          style={{ color: C.outline }}
+        >
           or secure sign-in
         </span>
-        <div className="flex-grow border-t border-zinc-900"></div>
+        <div className="flex-grow border-t" style={{ borderColor: C.surfaceVariant }} />
       </div>
 
       <div className="space-y-3">
@@ -235,12 +304,17 @@ function LoginForm() {
           type="button"
           onClick={handlePasskeyLogin}
           disabled={loading || passkeyLoading}
-          className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-zinc-800 rounded-xl bg-zinc-950/50 text-sm font-semibold text-zinc-300 hover:text-white hover:bg-zinc-900 transition-all disabled:opacity-50 hover:border-[#22D3D0]/30"
+          className="w-full flex items-center justify-center gap-2 py-3 px-4 border rounded-xl text-sm font-semibold transition-all disabled:opacity-50 hover:shadow-md"
+          style={{
+            borderColor: C.outlineVariant,
+            backgroundColor: C.surfaceContainerLow,
+            color: C.onSurface,
+          }}
         >
           {passkeyLoading ? (
-            <Loader2 className="h-4.5 w-4.5 animate-spin text-[#22D3D0]" />
+            <Loader2 className="h-4 w-4 animate-spin" style={{ color: C.accentPurple }} />
           ) : (
-            <Fingerprint className="h-4.5 w-4.5 text-[#22D3D0]" />
+            <Fingerprint className="h-4 w-4" style={{ color: C.accentPurple }} />
           )}
           Sign In with Passkey
         </button>
@@ -250,12 +324,17 @@ function LoginForm() {
           type="button"
           onClick={() => handleOAuthLogin('google')}
           disabled={oauthLoading !== null}
-          className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-zinc-850 rounded-xl bg-zinc-900/30 text-sm font-semibold text-zinc-300 hover:text-white hover:bg-zinc-900/60 transition-all hover:border-[#7C5CFF]/30"
+          className="w-full flex items-center justify-center gap-2 py-3 px-4 border rounded-xl text-sm font-semibold transition-all hover:shadow-md"
+          style={{
+            borderColor: C.outlineVariant,
+            backgroundColor: C.surfaceContainerLow,
+            color: C.onSurface,
+          }}
         >
           {oauthLoading === 'google' ? (
-            <Loader2 className="h-4.5 w-4.5 animate-spin text-[#7C5CFF]" />
+            <Loader2 className="h-4 w-4 animate-spin" style={{ color: C.primary }} />
           ) : (
-            <Globe className="h-4.5 w-4.5 text-zinc-400" />
+            <Globe className="h-4 w-4" style={{ color: C.outline }} />
           )}
           Continue with Google
         </button>
@@ -266,19 +345,35 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="flex-1 bg-[#0A0A0F] text-[#F5F5F7] flex min-h-screen relative dots-bg overflow-hidden">
+    <div
+      className="flex-1 flex min-h-screen relative overflow-hidden"
+      style={{ backgroundColor: C.cream, color: C.onSurface, fontFamily: 'var(--font-jakarta), sans-serif' }}
+    >
       {/* Visual left pane (split screen) */}
-      <div className="hidden lg:flex w-1/2 bg-zinc-950 border-r border-white/5 flex-col justify-between p-12 relative overflow-hidden">
-        {/* Background glow */}
-        <div className="absolute top-1/4 left-1/4 w-[350px] h-[350px] bg-[#7C5CFF]/10 rounded-full blur-[100px]" />
+      <div
+        className="hidden lg:flex w-1/2 border-r flex-col justify-between p-12 relative overflow-hidden"
+        style={{ backgroundColor: C.surfaceContainerLow, borderColor: C.surfaceVariant }}
+      >
+        {/* Background decorative blobs */}
+        <div
+          className="absolute top-1/4 left-1/4 w-[350px] h-[350px] rounded-full blur-[100px]"
+          style={{ backgroundColor: `${C.accentBlue}40` }}
+        />
+        <div
+          className="absolute bottom-1/3 right-1/4 w-[250px] h-[250px] rounded-full blur-[80px]"
+          style={{ backgroundColor: `${C.accentYellow}30` }}
+        />
         
         <Link href="/" className="flex items-center gap-3 group z-10">
-          <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-[#7C5CFF] to-[#22D3D0] p-[1px]">
-            <div className="h-full w-full bg-zinc-950 rounded-[11px] flex items-center justify-center">
-              <Terminal className="h-4.5 w-4.5 text-[#22D3D0]" />
-            </div>
+          <div
+            className="h-9 w-9 rounded-xl flex items-center justify-center text-white font-bold text-sm"
+            style={{ background: 'linear-gradient(135deg, #bec6e0 0%, #7c839b 100%)' }}
+          >
+            F
           </div>
-          <span className="font-display text-2xl tracking-wide text-white uppercase">FOCUS</span>
+          <span className="text-2xl font-extrabold tracking-tight" style={{ color: C.primary }}>
+            Focus
+          </span>
         </Link>
 
         {/* Dynamic floating network animation mapping to AI agents */}
@@ -299,16 +394,19 @@ export default function LoginPage() {
         </div>
 
         <div className="space-y-6 max-w-md z-10">
-          <h1 className="font-display text-6xl tracking-wide uppercase text-white leading-none">
-            ACCELERATE <br />
-            YOUR <span className="text-gradient">FLOW</span>
+          <h1
+            className="text-5xl font-extrabold tracking-tight leading-tight"
+            style={{ color: C.primary, fontFamily: 'var(--font-jakarta), sans-serif' }}
+          >
+            Accelerate <br />
+            Your <span style={{ color: '#5a6ba8' }}>Flow</span>
           </h1>
-          <p className="text-sm text-zinc-400 leading-relaxed font-body">
+          <p className="text-sm leading-relaxed" style={{ color: C.onSurfaceVariant }}>
             Log in to access your customized agent-generated learning pathways. Switch seamlessly between biometrics, standard keys, or Google Sign-In.
           </p>
         </div>
 
-        <div className="text-[10px] text-zinc-600 uppercase tracking-widest font-bold z-10">
+        <div className="text-[10px] uppercase tracking-widest font-bold z-10" style={{ color: C.outline }}>
           SECURED BY AEGIS PROTOCOL &bull; FOCUS STUDY CORP
         </div>
       </div>
@@ -316,7 +414,7 @@ export default function LoginPage() {
       {/* Form right pane */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 relative">
         <Suspense fallback={
-          <div className="text-zinc-500 flex items-center gap-2">
+          <div className="flex items-center gap-2" style={{ color: C.outline }}>
             <Loader2 className="h-5 w-5 animate-spin" /> Loading forms...
           </div>
         }>

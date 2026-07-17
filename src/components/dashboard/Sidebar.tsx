@@ -9,6 +9,24 @@ import {
 } from 'lucide-react';
 import { createClient as createBrowserClient } from '@/utils/supabase/client';
 
+// ─── Colour constants matching the landing page design system ──────────────
+const C = {
+  cream: '#fef9f2',
+  primary: '#000000',
+  onPrimary: '#ffffff',
+  surfaceContainerLowest: '#ffffff',
+  surfaceContainerLow: '#f8f3ec',
+  surfaceContainer: '#f2ede6',
+  surfaceContainerHigh: '#ece7e1',
+  surfaceVariant: '#e6e2db',
+  onSurface: '#1d1c18',
+  onSurfaceVariant: '#45464d',
+  outline: '#76777d',
+  outlineVariant: '#c6c6cd',
+  accentBlue: '#bec6e0',
+  accentPurple: '#d3579a',
+};
+
 interface SidebarProps {
   userEmail: string;
 }
@@ -37,18 +55,27 @@ export default function Sidebar({ userEmail }: SidebarProps) {
   const displayName = userEmail.split('@')[0].toUpperCase();
 
   return (
-    <aside className="w-64 bg-zinc-950 border-r border-zinc-900 flex flex-col justify-between shrink-0 h-screen sticky top-0">
+    <aside
+      className="w-64 border-r flex flex-col justify-between shrink-0 h-screen sticky top-0"
+      style={{ backgroundColor: C.surfaceContainerLow, borderColor: C.surfaceVariant }}
+    >
       {/* Top Header */}
       <div className="p-6">
         <Link href="/dashboard" className="flex items-center gap-3 group">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-[#7C5CFF] to-[#22D3D0] p-[1px] shadow-lg shadow-[#7C5CFF]/15">
-            <div className="h-full w-full bg-zinc-950 rounded-[11px] flex items-center justify-center">
-              <Terminal className="h-5 w-5 text-[#22D3D0] group-hover:scale-105 transition-transform" />
-            </div>
+          <div
+            className="h-10 w-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-md"
+            style={{ background: 'linear-gradient(135deg, #bec6e0 0%, #7c839b 100%)' }}
+          >
+            F
           </div>
           <div>
-            <span className="font-display text-2xl tracking-wide text-white block">FOCUS</span>
-            <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold block mt-0.5">
+            <span className="text-xl font-extrabold tracking-tight block" style={{ color: C.primary }}>
+              Focus
+            </span>
+            <span
+              className="text-[10px] uppercase tracking-widest font-semibold block mt-0.5"
+              style={{ color: C.outline }}
+            >
               Agent Syllabus
             </span>
           </div>
@@ -64,13 +91,25 @@ export default function Sidebar({ userEmail }: SidebarProps) {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
+                className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150"
+                style={
                   isActive
-                    ? 'bg-zinc-900 text-[#22D3D0] border border-zinc-800'
-                    : 'text-zinc-400 hover:text-white hover:bg-zinc-900/40'
-                }`}
+                    ? {
+                        backgroundColor: C.surfaceContainerLowest,
+                        color: C.primary,
+                        border: `1px solid ${C.surfaceVariant}`,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                      }
+                    : {
+                        color: C.onSurfaceVariant,
+                        border: '1px solid transparent',
+                      }
+                }
               >
-                <Icon className={`h-4.5 w-4.5 ${isActive ? 'text-[#22D3D0]' : 'text-zinc-400'}`} />
+                <Icon
+                  className="h-4 w-4"
+                  style={{ color: isActive ? C.primary : C.outline }}
+                />
                 {item.name}
               </Link>
             );
@@ -79,20 +118,35 @@ export default function Sidebar({ userEmail }: SidebarProps) {
       </div>
 
       {/* User Session profile / Logout */}
-      <div className="p-6 border-t border-zinc-900 space-y-4">
-        <div className="flex items-center gap-3 bg-zinc-900/40 border border-zinc-900 p-3 rounded-xl">
-          <div className="h-8 w-8 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center font-display text-sm text-[#7C5CFF]">
+      <div className="p-6 border-t space-y-4" style={{ borderColor: C.surfaceVariant }}>
+        <div
+          className="flex items-center gap-3 p-3 rounded-xl border"
+          style={{ backgroundColor: C.surfaceContainerLowest, borderColor: C.surfaceVariant }}
+        >
+          <div
+            className="h-8 w-8 rounded-lg flex items-center justify-center font-bold text-sm"
+            style={{ backgroundColor: `${C.accentBlue}40`, color: '#5a6ba8' }}
+          >
             {displayName[0] || 'U'}
           </div>
           <div className="overflow-hidden">
-            <span className="text-xs font-semibold text-zinc-300 block truncate">{displayName}</span>
-            <span className="text-[10px] text-zinc-500 block truncate">{userEmail}</span>
+            <span className="text-xs font-semibold block truncate" style={{ color: C.onSurface }}>
+              {displayName}
+            </span>
+            <span className="text-[10px] block truncate" style={{ color: C.outline }}>
+              {userEmail}
+            </span>
           </div>
         </div>
 
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-zinc-850 hover:bg-zinc-900 text-zinc-400 hover:text-red-400 text-sm font-medium rounded-xl transition-all"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border text-sm font-medium rounded-xl transition-all hover:shadow-md"
+          style={{
+            borderColor: C.outlineVariant,
+            color: C.onSurfaceVariant,
+            backgroundColor: 'transparent',
+          }}
         >
           <LogOut className="h-4 w-4" />
           Logout

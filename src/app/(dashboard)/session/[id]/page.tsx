@@ -26,9 +26,9 @@ export default async function SessionPage({
   }
 
   return (
-    <div className="flex h-screen bg-[#0A0A0F] text-[#F5F5F7] overflow-hidden">
+    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: '#fef9f2', color: '#1d1c18', fontFamily: 'var(--font-jakarta), sans-serif' }}>
       <Sidebar userEmail={user.email!} />
-      <main className="flex-1 overflow-y-auto dots-bg p-8 md:p-12 relative flex flex-col">
+      <main className="flex-1 overflow-y-auto p-8 md:p-12 relative flex flex-col">
         <SessionClient sessionId={id} prompt={prompt} />
       </main>
     </div>

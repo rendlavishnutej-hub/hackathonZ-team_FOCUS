@@ -9,6 +9,29 @@ import {
 } from 'lucide-react';
 import type { FinalReport, InterviewHistoryItem } from '@/lib/agents/interview/orchestrator';
 
+const C = {
+  cream: '#fef9f2',
+  primary: '#000000',
+  onPrimary: '#ffffff',
+  surfaceContainerLowest: '#ffffff',
+  surfaceContainerLow: '#f8f3ec',
+  surfaceContainer: '#f2ede6',
+  surfaceContainerHigh: '#ece7e1',
+  surfaceVariant: '#e6e2db',
+  onSurface: '#1d1c18',
+  onSurfaceVariant: '#45464d',
+  outline: '#76777d',
+  outlineVariant: '#c6c6cd',
+  inverseOnSurface: '#f5f0e9',
+  inverseSurface: '#32302c',
+  accentYellow: '#ffe24c',
+  accentBlue: '#bec6e0',
+  accentPink: '#ffafd3',
+  accentGreen: '#86efac',
+  accentPurple: '#d3579a',
+  secondaryContainer: '#fcdf46',
+};
+
 interface Props {
   report: FinalReport;
   history: InterviewHistoryItem[];
@@ -54,17 +77,17 @@ function SkillRadar({ data }: {
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
       {/* Background levels */}
       {bgPolygons.map((pts, li) => (
-        <polygon key={li} points={pts} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
+        <polygon key={li} points={pts} fill="none" stroke={C.surfaceVariant} strokeWidth="1" />
       ))}
       {/* Axis lines */}
       {keys.map((_, i) => {
         const { x, y } = toXY((2 * Math.PI * i) / n, maxR);
-        return <line key={i} x1={center} y1={center} x2={x} y2={y} stroke="rgba(255,255,255,0.08)" strokeWidth="1" />;
+        return <line key={i} x1={center} y1={center} x2={x} y2={y} stroke={C.surfaceVariant} strokeWidth="1" />;
       })}
       {/* Data polygon */}
       <polygon
         points={dataPts.join(' ')}
-        fill="rgba(211,87,154,0.25)"
+        fill="rgba(211,87,154,0.2)"
         stroke="#d3579a"
         strokeWidth="2"
       />
@@ -83,8 +106,9 @@ function SkillRadar({ data }: {
             y={y}
             textAnchor="middle"
             dominantBaseline="middle"
-            fill="rgba(255,255,255,0.5)"
-            fontSize="8"
+            fill={C.onSurfaceVariant}
+            fontSize="8.5"
+            fontWeight="600"
             style={{ fontFamily: 'var(--font-jakarta)' }}
           >
             {label}
@@ -100,11 +124,12 @@ function ScoreRing({ score }: { score: number }) {
   const r = 58;
   const circ = 2 * Math.PI * r;
   const dash = (score / 100) * circ;
-  const color = score >= 85 ? '#86efac' : score >= 70 ? '#ffe24c' : '#f97316';
+  const color = score >= 85 ? '#047857' : score >= 70 ? '#d97706' : '#ea580c';
+  const circleBg = '#e6e2db';
   return (
     <div className="relative flex items-center justify-center" style={{ width: 140, height: 140 }}>
       <svg width="140" height="140" viewBox="0 0 140 140" style={{ transform: 'rotate(-90deg)' }}>
-        <circle cx="70" cy="70" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="8" />
+        <circle cx="70" cy="70" r={r} fill="none" stroke={circleBg} strokeWidth="8" />
         <circle
           cx="70" cy="70" r={r}
           fill="none"
@@ -112,12 +137,12 @@ function ScoreRing({ score }: { score: number }) {
           strokeWidth="8"
           strokeLinecap="round"
           strokeDasharray={`${dash} ${circ}`}
-          style={{ transition: 'stroke-dasharray 1.2s ease', filter: `drop-shadow(0 0 8px ${color}60)` }}
+          style={{ transition: 'stroke-dasharray 1.2s ease', filter: `drop-shadow(0 2px 4px rgba(0,0,0,0.05))` }}
         />
       </svg>
       <div className="absolute text-center">
         <p className="text-3xl font-extrabold" style={{ color }}>{score}</p>
-        <p className="text-[9px] uppercase tracking-widest text-gray-500">/ 100</p>
+        <p className="text-[9px] uppercase tracking-widest text-[#76777d]">/ 100</p>
       </div>
     </div>
   );
@@ -125,14 +150,14 @@ function ScoreRing({ score }: { score: number }) {
 
 // ─── Metric bar ───────────────────────────────────────────────────────────────
 function MetricBar({ label, value }: { label: string; value: number }) {
-  const color = value >= 85 ? '#86efac' : value >= 70 ? '#ffe24c' : '#f97316';
+  const color = value >= 85 ? '#047857' : value >= 70 ? '#d97706' : '#ea580c';
   return (
     <div className="space-y-1">
       <div className="flex justify-between items-center">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">{label}</span>
+        <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-650">{label}</span>
         <span className="text-xs font-bold" style={{ color }}>{value}</span>
       </div>
-      <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+      <div className="h-1.5 rounded-full bg-zinc-200 overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-1000"
           style={{ width: `${value}%`, backgroundColor: color }}
@@ -152,8 +177,8 @@ export default function InterviewReport({ report, history, role, company, diffic
                 report.overallScore >= 70 ? 'Hire' :
                 report.overallScore >= 60 ? 'Borderline' : 'No Hire';
 
-  const gradeColor = report.overallScore >= 80 ? '#86efac' :
-                     report.overallScore >= 70 ? '#ffe24c' : '#f97316';
+  const gradeColor = report.overallScore >= 80 ? '#047857' :
+                     report.overallScore >= 70 ? '#d97706' : '#ea580c';
 
   const handleDownloadPDF = () => {
     window.print();
@@ -174,38 +199,38 @@ export default function InterviewReport({ report, history, role, company, diffic
     <div
       ref={printRef}
       className="max-w-5xl mx-auto space-y-8 pb-12"
-      style={{ color: '#f0f0f5', fontFamily: 'var(--font-jakarta), sans-serif' }}
+      style={{ color: '#000000', fontFamily: 'var(--font-jakarta), sans-serif' }}
     >
       {/* ── HEADER ─────────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border mb-3"
-            style={{ backgroundColor: 'rgba(134,239,172,0.1)', borderColor: 'rgba(134,239,172,0.25)', color: '#86efac' }}
+            style={{ backgroundColor: '#ecfdf5', borderColor: '#a7f3d0', color: '#047857' }}
           >
             <CheckCircle className="h-3 w-3" />
             Interview Complete
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-white">
+          <h1 className="text-3xl font-extrabold tracking-tight text-black">
             Performance Report
           </h1>
-          <p className="text-sm text-gray-400 mt-1">
+          <p className="text-sm font-medium mt-1" style={{ color: C.onSurfaceVariant }}>
             {role} · {company} · {interviewType} · {difficulty}
           </p>
         </div>
         <div className="flex gap-2 print:hidden">
           <button
             onClick={() => router.push('/interview')}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-semibold transition-all hover:bg-white/5"
-            style={{ borderColor: 'rgba(255,255,255,0.1)', color: '#9ca3af' }}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-semibold transition-all hover:bg-zinc-100 bg-white"
+            style={{ borderColor: C.surfaceVariant, color: C.onSurfaceVariant }}
           >
             <RotateCcw className="h-4 w-4" />
             New Interview
           </button>
           <button
             onClick={handleDownloadPDF}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all"
-            style={{ backgroundColor: '#d3579a', color: '#fff' }}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-md"
+            style={{ backgroundColor: C.accentPurple, color: '#fff' }}
           >
             <Download className="h-4 w-4" />
             Download PDF
@@ -215,33 +240,33 @@ export default function InterviewReport({ report, history, role, company, diffic
 
       {/* ── SCORE + RADAR + VERDICT ─────────────────────────────────────────── */}
       <div
-        className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 rounded-3xl border"
-        style={{ backgroundColor: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.07)' }}
+        className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 rounded-3xl border bg-white"
+        style={{ borderColor: C.surfaceVariant }}
       >
         {/* Score Ring */}
         <div className="flex flex-col items-center justify-center gap-3">
           <ScoreRing score={report.overallScore} />
           <div className="text-center">
             <p className="text-lg font-extrabold" style={{ color: gradeColor }}>{grade}</p>
-            <p className="text-[10px] uppercase tracking-widest text-gray-500 mt-0.5">Hiring Verdict</p>
+            <p className="text-[10px] uppercase tracking-widest text-[#76777d] mt-0.5">Hiring Verdict</p>
           </div>
         </div>
 
         {/* Skill Radar */}
         <div className="flex flex-col items-center justify-center">
           <SkillRadar data={report.skillRadar} />
-          <p className="text-[10px] uppercase tracking-widest text-gray-500 mt-1">Skill Radar</p>
+          <p className="text-[10px] uppercase tracking-widest text-[#76777d] mt-1">Skill Radar</p>
         </div>
 
         {/* Time & verdict text */}
         <div className="space-y-4 flex flex-col justify-center">
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Time Analysis</p>
-            <p className="text-sm text-gray-300 leading-relaxed">{report.timeAnalysis}</p>
+            <p className="text-[10px] uppercase tracking-widest text-zinc-550 font-bold mb-1">Time Analysis</p>
+            <p className="text-xs leading-relaxed text-zinc-700">{report.timeAnalysis}</p>
           </div>
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Career Coach</p>
-            <p className="text-sm text-gray-300 leading-relaxed">{report.careerCoachFeedback}</p>
+            <p className="text-[10px] uppercase tracking-widest text-zinc-550 font-bold mb-1">Career Coach</p>
+            <p className="text-xs leading-relaxed text-zinc-700">{report.careerCoachFeedback}</p>
           </div>
         </div>
       </div>
@@ -263,22 +288,22 @@ export default function InterviewReport({ report, history, role, company, diffic
 
         {/* Strong & Weak Areas */}
         <div className="space-y-4">
-          <Card title="Strong Areas" icon={<CheckCircle className="h-4 w-4" style={{ color: '#86efac' }} />}>
+          <Card title="Strong Areas" icon={<CheckCircle className="h-4 w-4" style={{ color: '#047857' }} />}>
             <ul className="space-y-2">
               {report.strongAreas.map((area, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-gray-300">
-                  <div className="h-1.5 w-1.5 rounded-full mt-2 shrink-0" style={{ backgroundColor: '#86efac' }} />
+                <li key={i} className="flex items-start gap-2 text-sm text-zinc-800">
+                  <div className="h-1.5 w-1.5 rounded-full mt-2 shrink-0 fill-emerald-600 bg-emerald-600" />
                   {area}
                 </li>
               ))}
             </ul>
           </Card>
 
-          <Card title="Improvement Areas" icon={<XCircle className="h-4 w-4" style={{ color: '#f97316' }} />}>
+          <Card title="Improvement Areas" icon={<XCircle className="h-4 w-4" style={{ color: '#ea580c' }} />}>
             <ul className="space-y-2">
               {report.weakAreas.map((area, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-gray-300">
-                  <div className="h-1.5 w-1.5 rounded-full mt-2 shrink-0" style={{ backgroundColor: '#f97316' }} />
+                <li key={i} className="flex items-start gap-2 text-sm text-zinc-800">
+                  <div className="h-1.5 w-1.5 rounded-full mt-2 shrink-0 bg-[#ea580c]" />
                   {area}
                 </li>
               ))}
@@ -293,20 +318,20 @@ export default function InterviewReport({ report, history, role, company, diffic
           {history.map((item, i) => (
             <div
               key={i}
-              className="p-4 rounded-xl border space-y-3"
-              style={{ backgroundColor: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.06)' }}
+              className="p-5 rounded-2xl border space-y-3 bg-white"
+              style={{ borderColor: C.surfaceVariant }}
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="space-y-1 flex-1">
-                  <p className="text-[10px] uppercase tracking-widest text-gray-500">Q{i + 1}</p>
-                  <p className="text-sm font-semibold text-gray-200">{item.question}</p>
+                  <p className="text-[10px] uppercase font-bold tracking-widest text-[#76777d]">Q{i + 1}</p>
+                  <p className="text-sm font-semibold text-black">{item.question}</p>
                 </div>
                 {item.evaluation && (
                   <div
                     className="shrink-0 h-10 w-10 rounded-xl flex items-center justify-center text-sm font-extrabold"
                     style={{
-                      backgroundColor: item.evaluation.score >= 80 ? 'rgba(134,239,172,0.12)' : 'rgba(255,226,76,0.12)',
-                      color: item.evaluation.score >= 80 ? '#86efac' : '#ffe24c'
+                      backgroundColor: item.evaluation.score >= 80 ? 'rgba(134,239,172,0.15)' : 'rgba(255,226,76,0.15)',
+                      color: item.evaluation.score >= 80 ? '#047857' : '#d97706'
                     }}
                   >
                     {item.evaluation.score}
@@ -315,20 +340,20 @@ export default function InterviewReport({ report, history, role, company, diffic
               </div>
 
               <div
-                className="p-3 rounded-lg"
-                style={{ backgroundColor: 'rgba(90,107,168,0.08)', borderLeft: '2px solid rgba(90,107,168,0.4)' }}
+                className="p-3.5 rounded-xl border"
+                style={{ backgroundColor: `${C.accentBlue}08`, borderColor: `${C.accentBlue}40`, borderLeft: `3px solid #5a6ba8` }}
               >
-                <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Your Answer</p>
-                <p className="text-xs text-gray-300 leading-relaxed">{item.answer}</p>
+                <p className="text-[10px] uppercase font-bold tracking-widest text-zinc-500 mb-1">Your Answer</p>
+                <p className="text-xs text-zinc-700 leading-relaxed">{item.answer}</p>
               </div>
 
               {item.evaluation && (
                 <div
-                  className="p-3 rounded-lg"
-                  style={{ backgroundColor: 'rgba(211,87,154,0.06)', borderLeft: '2px solid rgba(211,87,154,0.3)' }}
+                  className="p-3.5 rounded-xl border"
+                  style={{ backgroundColor: `${C.accentPink}06`, borderColor: `${C.accentPink}30`, borderLeft: `3px solid #d3579a` }}
                 >
-                  <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: '#d3579a' }}>AI Feedback</p>
-                  <p className="text-xs text-gray-300 leading-relaxed">{item.evaluation.feedback}</p>
+                  <p className="text-[10px] uppercase font-bold tracking-widest mb-1" style={{ color: '#d3579a' }}>AI Feedback</p>
+                  <p className="text-xs text-zinc-700 leading-relaxed">{item.evaluation.feedback}</p>
                 </div>
               )}
             </div>
@@ -338,10 +363,10 @@ export default function InterviewReport({ report, history, role, company, diffic
 
       {/* ── LEARNING ROADMAP ─────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card title="Topics to Study" icon={<BookOpen className="h-4 w-4" style={{ color: '#ffe24c' }} />}>
+        <Card title="Topics to Study" icon={<BookOpen className="h-4 w-4" style={{ color: C.accentPurple }} />}>
           <ul className="space-y-2">
             {report.topicsToLearn.map((topic, i) => (
-              <li key={i} className="flex items-center gap-2 text-sm text-gray-300">
+              <li key={i} className="flex items-center gap-2 text-sm text-zinc-800">
                 <Zap className="h-3.5 w-3.5 shrink-0" style={{ color: '#ffe24c' }} />
                 {topic}
               </li>
@@ -350,17 +375,16 @@ export default function InterviewReport({ report, history, role, company, diffic
         </Card>
 
         <Card title="Recommended Projects" icon={<Target className="h-4 w-4" style={{ color: '#d3579a' }} />}>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {report.recommendedProjects.map((proj, i) => (
-              <div key={i} className="space-y-1">
-                <p className="text-sm font-bold text-gray-200">{proj.title}</p>
-                <p className="text-xs text-gray-400 leading-relaxed">{proj.description}</p>
-                <div className="flex flex-wrap gap-1 mt-1">
+              <div key={i} className="space-y-1 bg-[#fcfaf5] p-3 rounded-xl border border-zinc-200">
+                <p className="text-sm font-bold text-black">{proj.title}</p>
+                <p className="text-xs text-zinc-650 leading-relaxed">{proj.description}</p>
+                <div className="flex flex-wrap gap-1 mt-1.5">
                   {proj.tech.map(t => (
                     <span
                       key={t}
-                      className="px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider"
-                      style={{ backgroundColor: 'rgba(211,87,154,0.12)', color: '#d3579a' }}
+                      className="px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider bg-zinc-200 text-zinc-800"
                     >
                       {t}
                     </span>
@@ -374,19 +398,18 @@ export default function InterviewReport({ report, history, role, company, diffic
 
       {/* ── RE-INTERVIEW RECOMMENDATION ──────────────────────────────────────── */}
       <div
-        className="p-5 rounded-2xl border flex items-start gap-4"
-        style={{ backgroundColor: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.07)' }}
+        className="p-5 rounded-2xl border flex items-start gap-4 bg-white"
+        style={{ borderColor: C.surfaceVariant }}
       >
-        <div className="h-10 w-10 rounded-xl shrink-0 flex items-center justify-center" style={{ backgroundColor: 'rgba(211,87,154,0.12)' }}>
+        <div className="h-10 w-10 rounded-xl shrink-0 flex items-center justify-center bg-zinc-50 border">
           <Mic className="h-5 w-5" style={{ color: '#d3579a' }} />
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Re-Interview Recommendation</p>
-          <p className="text-sm text-gray-300">{report.reInterviewRecommendation}</p>
+          <p className="text-[10px] uppercase font-bold tracking-widest text-[#76777d] mb-1">Re-Interview Recommendation</p>
+          <p className="text-sm text-zinc-700">{report.reInterviewRecommendation}</p>
           <button
             onClick={() => router.push('/interview')}
-            className="mt-3 flex items-center gap-1.5 text-xs font-semibold"
-            style={{ color: '#d3579a' }}
+            className="mt-3 flex items-center gap-1.5 text-xs font-semibold hover:opacity-85 text-[#d3579a]"
           >
             Schedule another session
             <ChevronRight className="h-3.5 w-3.5" />
@@ -397,7 +420,7 @@ export default function InterviewReport({ report, history, role, company, diffic
       {/* Print-only styles */}
       <style>{`
         @media print {
-          body { background: #0a0a0f !important; -webkit-print-color-adjust: exact; }
+          body { background: #fef9f2 !important; -webkit-print-color-adjust: exact; }
           .print\\:hidden { display: none !important; }
         }
       `}</style>
@@ -409,12 +432,12 @@ export default function InterviewReport({ report, history, role, company, diffic
 function Card({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) {
   return (
     <div
-      className="p-5 rounded-2xl border space-y-4"
-      style={{ backgroundColor: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.07)' }}
+      className="p-5 rounded-2xl border space-y-4 bg-white"
+      style={{ borderColor: C.surfaceVariant }}
     >
       <div className="flex items-center gap-2">
         {icon}
-        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">{title}</span>
+        <span className="text-[10px] font-bold uppercase tracking-widest text-[#76777d]">{title}</span>
       </div>
       {children}
     </div>

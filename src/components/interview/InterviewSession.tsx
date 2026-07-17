@@ -9,6 +9,28 @@ import {
 import { InterviewState } from '@/lib/agents/interview/orchestrator';
 import InterviewReport from './InterviewReport';
 
+const C = {
+  cream: '#fef9f2',
+  primary: '#000000',
+  onPrimary: '#ffffff',
+  surfaceContainerLowest: '#ffffff',
+  surfaceContainerLow: '#f8f3ec',
+  surfaceContainer: '#f2ede6',
+  surfaceContainerHigh: '#ece7e1',
+  surfaceVariant: '#e6e2db',
+  onSurface: '#1d1c18',
+  onSurfaceVariant: '#45464d',
+  outline: '#76777d',
+  outlineVariant: '#c6c6cd',
+  inverseOnSurface: '#f5f0e9',
+  inverseSurface: '#32302c',
+  accentYellow: '#ffe24c',
+  accentBlue: '#bec6e0',
+  accentPink: '#ffafd3',
+  accentGreen: '#86efac',
+  accentPurple: '#d3579a',
+  secondaryContainer: '#fcdf46',
+};
 
 interface Props {
   sessionId: string;
@@ -29,7 +51,7 @@ function Waveform({ mode }: { mode: InterviewMode }) {
       {Array.from({ length: bars }).map((_, i) => {
         const isActive = mode === 'speaking' || mode === 'listening';
         const delay = `${(i * 0.06).toFixed(2)}s`;
-        const hue = mode === 'speaking' ? '#d3579a' : mode === 'listening' ? '#5a6ba8' : '#444';
+        const hue = mode === 'speaking' ? '#d3579a' : mode === 'listening' ? '#5a6ba8' : '#76777d';
         return (
           <div
             key={i}
@@ -56,15 +78,15 @@ function Waveform({ mode }: { mode: InterviewMode }) {
 // ─── Floating AI Avatar ───────────────────────────────────────────────────────
 function AIAvatar({ mode }: { mode: InterviewMode }) {
   const pulseColor =
-    mode === 'speaking'  ? 'rgba(211,87,154,0.4)' :
-    mode === 'listening' ? 'rgba(90,107,168,0.4)' :
-    mode === 'thinking'  ? 'rgba(255,226,76,0.3)' :
-    'rgba(80,80,100,0.2)';
+    mode === 'speaking'  ? 'rgba(211,87,154,0.2)' :
+    mode === 'listening' ? 'rgba(90,107,168,0.2)' :
+    mode === 'thinking'  ? 'rgba(255,226,76,0.15)' :
+    'rgba(80,80,100,0.1)';
 
   const glowColor =
     mode === 'speaking'  ? '#d3579a' :
     mode === 'listening' ? '#5a6ba8' :
-    mode === 'thinking'  ? '#ffe24c' : '#333';
+    mode === 'thinking'  ? '#ffe24c' : '#76777d';
 
   return (
     <div className="relative flex items-center justify-center" style={{ width: 140, height: 140 }}>
@@ -82,18 +104,18 @@ function AIAvatar({ mode }: { mode: InterviewMode }) {
           width: 110,
           height: 110,
           border: `2px solid ${glowColor}40`,
-          boxShadow: `0 0 30px ${glowColor}30`,
+          boxShadow: `0 2px 20px ${glowColor}15`,
           transition: 'all 0.5s ease',
         }}
       />
       {/* Core avatar */}
       <div
-        className="relative z-10 rounded-full flex items-center justify-center font-extrabold text-3xl"
+        className="relative z-10 rounded-full flex items-center justify-center font-extrabold text-3xl bg-white border"
         style={{
           width: 80,
           height: 80,
-          background: `radial-gradient(circle at 35% 35%, ${glowColor}cc, #0a0a1a)`,
-          boxShadow: `0 0 40px ${glowColor}50, inset 0 0 20px rgba(0,0,0,0.5)`,
+          borderColor: C.surfaceVariant,
+          boxShadow: `0 4px 15px ${glowColor}25`,
           transition: 'all 0.4s ease',
         }}
       >
@@ -369,14 +391,14 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
     speaking:     '#d3579a',
     listening:    '#5a6ba8',
     thinking:     '#ffe24c',
-    completed:    '#86efac',
+    completed:    '#047857',
     error:        '#dc2626',
   };
 
   // ─── COMPLETED → show report ──────────────────────────────────────────────
   if (mode === 'completed' && state?.finalReport) {
     return (
-      <div className="h-full overflow-y-auto p-6 md:p-10" style={{ backgroundColor: '#0a0a0f' }}>
+      <div className="h-full overflow-y-auto p-6 md:p-10" style={{ backgroundColor: C.cream }}>
         <InterviewReport
           report={state.finalReport}
           history={state.history}
@@ -393,25 +415,25 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
   return (
     <div
       className="h-full flex flex-col"
-      style={{ backgroundColor: '#0a0a0f', color: '#f0f0f5', fontFamily: 'var(--font-jakarta), sans-serif' }}
+      style={{ backgroundColor: C.cream, color: '#000000', fontFamily: 'var(--font-jakarta), sans-serif' }}
     >
       {/* Decorative background gradients */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full blur-[120px]" style={{ backgroundColor: 'rgba(211,87,154,0.04)' }} />
-        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full blur-[120px]" style={{ backgroundColor: 'rgba(90,107,168,0.05)' }} />
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full blur-[120px]" style={{ backgroundColor: 'rgba(211,87,154,0.02)' }} />
+        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full blur-[120px]" style={{ backgroundColor: 'rgba(90,107,168,0.03)' }} />
       </div>
 
       {/* ── TOP BAR ───────────────────────────────────────────────────────── */}
       <div
-        className="relative z-10 flex items-center justify-between px-6 py-4 border-b shrink-0"
-        style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+        className="relative z-10 flex items-center justify-between px-6 py-4 border-b shrink-0 bg-white"
+        style={{ borderColor: C.surfaceVariant }}
       >
         <div className="flex items-center gap-3">
           <div className="h-2 w-2 rounded-full animate-pulse" style={{ backgroundColor: statusColor[mode] }} />
           <span className="text-[10px] font-bold tracking-widest uppercase" style={{ color: statusColor[mode] }}>
             {statusLabel[mode]}
           </span>
-          <span className="text-[10px] text-gray-500 hidden sm:block">
+          <span className="text-[10px] text-zinc-550 hidden sm:block">
             · {company} · {role} · {difficulty}
           </span>
         </div>
@@ -419,24 +441,24 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
         <div className="flex items-center gap-2">
           <button
             onClick={toggleMute}
-            className="p-2 rounded-lg border transition-all hover:bg-white/5"
-            style={{ borderColor: 'rgba(255,255,255,0.1)' }}
+            className="p-2 rounded-lg border transition-all hover:bg-zinc-50 bg-white"
+            style={{ borderColor: C.surfaceVariant }}
             title={muted ? 'Unmute AI Voice' : 'Mute AI Voice'}
           >
-            {muted ? <VolumeX className="h-4 w-4 text-gray-400" /> : <Volume2 className="h-4 w-4 text-gray-400" />}
+            {muted ? <VolumeX className="h-4 w-4 text-zinc-650" /> : <Volume2 className="h-4 w-4 text-zinc-650" />}
           </button>
           <button
             onClick={() => setShowTextBox(v => !v)}
-            className="p-2 rounded-lg border transition-all hover:bg-white/5"
-            style={{ borderColor: 'rgba(255,255,255,0.1)' }}
+            className="p-2 rounded-lg border transition-all hover:bg-zinc-50 bg-white"
+            style={{ borderColor: C.surfaceVariant }}
             title="Type your answer instead"
           >
-            <Type className="h-4 w-4 text-gray-400" />
+            <Type className="h-4 w-4 text-zinc-650" />
           </button>
           <button
             onClick={handleEndInterview}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all hover:bg-red-900/20"
-            style={{ borderColor: 'rgba(220,38,38,0.3)', color: '#dc2626' }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all hover:bg-red-50 bg-white"
+            style={{ borderColor: '#fca5a5', color: '#dc2626' }}
           >
             <LogOut className="h-3.5 w-3.5" />
             End
@@ -452,7 +474,7 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
           <div onClick={handleInterrupt} className="cursor-pointer" title="Click to interrupt">
             <AIAvatar mode={mode} />
           </div>
-          <p className="text-xs font-semibold tracking-widest uppercase text-gray-500">
+          <p className="text-xs font-semibold tracking-widest uppercase text-zinc-550">
             {mode === 'speaking' ? 'Tap avatar to interrupt' :
              mode === 'listening' ? 'Speak your answer now' :
              mode === 'thinking' ? 'Agents processing…' :
@@ -467,25 +489,25 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
         {/* CURRENT QUESTION */}
         {state?.nextQuestion && (
           <div
-            className="max-w-2xl w-full p-5 rounded-2xl border"
-            style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
+            className="max-w-2xl w-full p-5 rounded-2xl border bg-white shadow-sm"
+            style={{ borderColor: C.surfaceVariant }}
           >
             <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: '#5a6ba8' }}>
               Question {Math.min(state.currentQuestionIndex, state.maxQuestions)} of {state.maxQuestions}
             </p>
-            <p className="text-sm leading-relaxed text-gray-200">{state.nextQuestion}</p>
+            <p className="text-sm font-semibold leading-relaxed text-black">{state.nextQuestion}</p>
           </div>
         )}
 
         {/* LIVE TRANSCRIPT */}
         {(liveText || transcript) && mode === 'listening' && (
           <div
-            className="max-w-2xl w-full p-4 rounded-xl border"
-            style={{ backgroundColor: 'rgba(90,107,168,0.08)', borderColor: 'rgba(90,107,168,0.2)' }}
+            className="max-w-2xl w-full p-4 rounded-xl border bg-white"
+            style={{ borderColor: `${C.accentBlue}50` }}
           >
             <p className="text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color: '#5a6ba8' }}>Your answer (live)</p>
-            <p className="text-sm text-gray-300 leading-relaxed">
-              {transcript} <span className="text-gray-500 animate-pulse">{liveText}</span>
+            <p className="text-sm text-zinc-800 leading-relaxed font-medium">
+              {transcript} <span className="text-zinc-400">{liveText}</span>
             </p>
           </div>
         )}
@@ -498,15 +520,15 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
               value={textInput}
               onChange={e => setTextInput(e.target.value)}
               placeholder="Type your answer here…"
-              className="flex-1 px-4 py-3 rounded-xl border text-sm bg-white/5 text-gray-200 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-purple-500"
-              style={{ borderColor: 'rgba(255,255,255,0.1)' }}
+              className="flex-1 px-4 py-3 rounded-xl border text-sm bg-white text-black placeholder-zinc-455 focus:outline-none focus:ring-1 focus:ring-purple-250"
+              style={{ borderColor: C.surfaceVariant }}
               disabled={mode === 'thinking'}
             />
             <button
               type="submit"
               disabled={!textInput.trim() || mode === 'thinking'}
-              className="px-4 py-3 rounded-xl font-semibold text-sm flex items-center gap-1.5 transition-all disabled:opacity-50"
-              style={{ backgroundColor: '#d3579a', color: '#fff' }}
+              className="px-4 py-3 rounded-xl font-semibold text-sm flex items-center gap-1.5 transition-all disabled:opacity-50 text-white shadow"
+              style={{ backgroundColor: '#d3579a' }}
             >
               <Send className="h-4 w-4" />
               Submit
@@ -517,13 +539,13 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
         {/* ERROR STATE */}
         {mode === 'error' && (
           <div
-            className="max-w-lg w-full p-4 rounded-xl border flex items-center gap-3"
-            style={{ backgroundColor: 'rgba(220,38,38,0.1)', borderColor: 'rgba(220,38,38,0.3)' }}
+            className="max-w-lg w-full p-4 rounded-xl border flex items-center gap-3 bg-red-50"
+            style={{ borderColor: '#fca5a5' }}
           >
             <AlertCircle className="h-5 w-5 shrink-0" style={{ color: '#dc2626' }} />
             <div>
               <p className="text-sm font-semibold" style={{ color: '#dc2626' }}>Connection Error</p>
-              <p className="text-xs text-gray-400 mt-0.5">{error || 'Failed to reach the interview AI. Check your API key or network.'}</p>
+              <p className="text-xs text-zinc-550 mt-0.5">{error || 'Failed to reach the interview AI. Check your API key or network.'}</p>
             </div>
           </div>
         )}
@@ -531,12 +553,12 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
 
       {/* ── AGENT ACTIVITY PANEL ──────────────────────────────────────────── */}
       <div
-        className="relative z-10 border-t shrink-0"
-        style={{ borderColor: 'rgba(255,255,255,0.05)' }}
+        className="relative z-10 border-t shrink-0 bg-white"
+        style={{ borderColor: C.surfaceVariant }}
       >
         <div className="px-6 py-2 flex items-center gap-2">
-          <Sparkles className="h-3 w-3 text-gray-500" />
-          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Agent Activity</span>
+          <Sparkles className="h-3 w-3 text-zinc-400" />
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[#76777d]">Agent Activity</span>
         </div>
         <div
           className="px-6 pb-4 overflow-y-auto max-h-[110px] space-y-1 font-mono text-[10px]"
@@ -544,7 +566,7 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
         >
           {agentLog.map((log, i) => (
             <div key={i} className="flex items-start gap-2">
-              <span className="text-gray-600 shrink-0">[{log.timestamp}]</span>
+              <span className="text-zinc-400 shrink-0">[{log.timestamp}]</span>
               <span
                 className="shrink-0 px-1 rounded uppercase font-bold"
                 style={{
@@ -555,17 +577,17 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
                 {log.agentId}
               </span>
               <span style={{
-                color: log.status === 'success' ? '#86efac' :
-                       log.status === 'warning' ? '#f97316' :
-                       log.status === 'error'   ? '#dc2626' : '#9ca3af'
+                color: log.status === 'success' ? '#047857' :
+                       log.status === 'warning' ? '#ea580c' :
+                       log.status === 'error'   ? '#dc2626' : '#76777d'
               }}>
                 {log.message}
               </span>
             </div>
           ))}
           {mode === 'thinking' && (
-            <div className="flex items-center gap-2 text-gray-600 animate-pulse">
-              <Loader2 className="h-3 w-3 animate-spin text-purple-500" />
+            <div className="flex items-center gap-2 text-zinc-400 animate-pulse">
+              <Loader2 className="h-3 w-3 animate-spin text-purple-650" />
               Agents collaborating…
             </div>
           )}

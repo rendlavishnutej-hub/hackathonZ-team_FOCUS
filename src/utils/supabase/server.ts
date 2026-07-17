@@ -12,6 +12,9 @@ class MockServerQueryBuilder {
   singleFlag = false;
   maybeSingleFlag = false;
   isAdmin = false;
+  orderField: string | undefined = undefined;
+  orderAscending: boolean = true;
+  limitCount: number | undefined = undefined;
 
   constructor(table: string, isAdmin = false) {
     this.table = table;
@@ -45,6 +48,27 @@ class MockServerQueryBuilder {
     return this;
   }
 
+  in(field: string, values: any[]) {
+    this.filters.push({ field, value: values, type: 'in' });
+    return this;
+  }
+
+  neq(field: string, value: any) {
+    this.filters.push({ field, value, type: 'neq' });
+    return this;
+  }
+
+  order(field: string, options?: { ascending?: boolean }) {
+    this.orderField = field;
+    this.orderAscending = options?.ascending ?? true;
+    return this;
+  }
+
+  limit(count: number) {
+    this.limitCount = count;
+    return this;
+  }
+
   single() {
     this.singleFlag = true;
     return this;
@@ -72,6 +96,9 @@ class MockServerQueryBuilder {
         maybeSingleFlag: this.maybeSingleFlag,
         currentUserId,
         isAdmin: this.isAdmin,
+        orderField: this.orderField,
+        orderAscending: this.orderAscending,
+        limitCount: this.limitCount,
       });
       resolve(data);
     } catch (err) {

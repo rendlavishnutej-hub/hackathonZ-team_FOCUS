@@ -165,9 +165,11 @@ export default function SessionClient({ sessionId, prompt }: SessionClientProps)
               className="text-[10px] uppercase font-bold tracking-widest"
               style={{ color: C.accentPurple }}
             >
-              ACTIVE DEPLOYMENT
+              {status === 'completed' ? 'DEPLOYMENT COMPLETED' : 'ACTIVE DEPLOYMENT'}
             </span>
-            <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-ping" />
+            {status !== 'completed' && status !== 'failed' && (
+              <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-ping" />
+            )}
           </div>
           <h2
             className="font-display text-2xl tracking-wide uppercase truncate max-w-lg"
@@ -192,97 +194,195 @@ export default function SessionClient({ sessionId, prompt }: SessionClientProps)
         )}
       </div>
 
-      {/* React Flow Graph */}
-      <div className="space-y-2">
-        <span
-          className="text-[10px] uppercase font-bold tracking-widest block"
-          style={{ color: C.outline }}
-        >
-          Agent Execution Grid
-        </span>
-        <AgentGraph
-          activeAgentId={activeAgentId}
-          status={status}
-          plannerOutput={plannerOutput}
-          researcherOutput={researcherOutput}
-          coderOutput={coderOutput}
-          criticOutput={criticOutput}
-          quizzerOutput={quizzerOutput}
-        />
-      </div>
-
-      {/* Logs / Execution Timeline Panel */}
-      <div className="flex-1 min-h-[220px] flex flex-col space-y-2">
-        <span
-          className="text-[10px] uppercase font-bold tracking-widest block"
-          style={{ color: C.outline }}
-        >
-          Live Agent Activity Stream
-        </span>
-        
+      {/* Main Content Area */}
+      {(status === 'running' || status === 'idle') && (
         <div
-          className="flex-1 rounded-2xl p-5 overflow-y-auto font-mono text-xs space-y-2.5 max-h-64 shadow-inner"
+          className="flex flex-col items-center justify-center p-12 text-center rounded-3xl border shadow-lg space-y-6 animate-pulse"
           style={{
-            backgroundColor: C.inverseSurface,
-            borderWidth: 1,
-            borderStyle: 'solid',
-            borderColor: '#49463f',
+            backgroundColor: C.surfaceContainerLowest,
+            borderColor: C.surfaceVariant,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.04)',
           }}
         >
-          {logs.map((log, idx) => {
-            let color = C.inverseOnSurface;
-            let prefix = 'Info';
-            if (log.status === 'success') {
-              color = C.accentGreen;
-              prefix = 'Success';
-            } else if (log.status === 'warning') {
-              color = '#b45309';
-              prefix = 'Critique';
-            } else if (log.status === 'error') {
-              color = '#dc2626';
-              prefix = 'Alert';
-            }
-
-            return (
-              <div
-                key={idx}
-                className="flex items-start gap-2.5 pb-2"
-                style={{ borderBottom: `1px solid rgba(255,255,255,0.08)` }}
-              >
-                <span
-                  className="shrink-0 font-sans text-[10px] mt-0.5"
-                  style={{ color: 'rgba(245,240,232,0.5)' }}
-                >
-                  [{log.timestamp}]
-                </span>
-                <span
-                  className="shrink-0 font-bold uppercase text-[10px] px-1.5 py-0.5 rounded"
-                  style={{
-                    color: C.accentPurple,
-                    backgroundColor: 'rgba(211,87,154,0.12)',
-                    border: '1px solid rgba(211,87,154,0.15)',
-                  }}
-                >
-                  {log.agentId}
-                </span>
-                <span className="leading-relaxed" style={{ color }}>
-                  <strong className="text-[10px] uppercase tracking-wider mr-1.5">({prefix}):</strong>
-                  {log.message}
-                </span>
-              </div>
-            );
-          })}
-          
-          {status === 'running' && (
-            <div className="flex items-center gap-2 animate-pulse pt-2" style={{ color: 'rgba(245,240,232,0.5)' }}>
-              <Loader2 className="h-3.5 w-3.5 animate-spin" style={{ color: '#5a6ba8' }} />
-              <span>Orchestrating agent loop pipelines...</span>
+          {/* Animated pulsing outer ring */}
+          <div className="relative h-24 w-24 flex items-center justify-center">
+            {/* Spinning/pulsing circles */}
+            <div className="absolute inset-0 rounded-full border-4 border-dashed border-[#5a6ba8]/30 animate-spin" style={{ animationDuration: '6s' }} />
+            <div className="absolute inset-2 rounded-full border-4 border-[#d3579a]/20 animate-pulse" />
+            <div 
+              className="h-14 w-14 rounded-2xl flex items-center justify-center shadow-lg"
+              style={{
+                background: `linear-gradient(135deg, ${C.accentYellow}, ${C.accentPink})`
+              }}
+            >
+              <Loader2 className="h-7 w-7 text-black animate-spin" />
             </div>
-          )}
+          </div>
           
-          <div ref={timelineEndRef} />
+          <div className="space-y-2 max-w-md">
+            <h3 className="text-xl font-bold uppercase tracking-wide" style={{ color: C.primary }}>
+              Orchestrating AI Agent Pipeline
+            </h3>
+            <p className="text-xs font-body leading-relaxed" style={{ color: C.onSurfaceVariant }}>
+              Our specialized AI agents (Planner, Researcher, Coder, Critic) are busy building custom study path nodes, high-fidelity source theory, and code syntax snippets.
+            </p>
+          </div>
+
+          {/* Active agent badge indicator */}
+          <div 
+            className="flex items-center gap-2.5 px-3.5 py-1.5 border rounded-xl shadow-sm bg-white"
+            style={{ borderColor: C.outlineVariant }}
+          >
+            <span className="h-2 w-2 rounded-full bg-green-500 animate-ping" />
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-black">
+              Current Agent: {activeAgentId ? activeAgentId.toUpperCase() : 'PLANNING_CORE'}
+            </span>
+          </div>
+
+          {/* Micro loading step text */}
+          <div className="text-[10px] text-zinc-500 font-mono tracking-wider max-w-lg truncate">
+            {logs[logs.length - 1]?.message || 'Deploying workflow logs...'}
+          </div>
         </div>
-      </div>
+      )}
+
+      {status === 'failed' && (
+        <div
+          className="flex flex-col items-center justify-center p-12 text-center rounded-3xl border shadow-lg space-y-6"
+          style={{
+            backgroundColor: C.surfaceContainerLowest,
+            borderColor: '#fecaca',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div className="h-14 w-14 rounded-2xl bg-red-100 border border-red-200 flex items-center justify-center text-red-600 shadow-sm">
+            <AlertTriangle className="h-7 w-7" />
+          </div>
+          
+          <div className="space-y-1.5 max-w-md">
+            <h3 className="text-lg font-bold text-red-700">Deployment Failed</h3>
+            <p className="text-xs" style={{ color: C.onSurfaceVariant }}>
+              An error occurred during multi-agent orchestration. Please check backend rate limits or configuration.
+            </p>
+          </div>
+
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="px-5 py-2.5 text-xs font-semibold rounded-xl border transition-all hover:bg-zinc-50 shadow-sm"
+            style={{ borderColor: C.outlineVariant, color: C.onSurface }}
+          >
+            Return to Dashboard
+          </button>
+        </div>
+      )}
+
+      {status === 'completed' && plannerOutput && (
+        <div className="space-y-6">
+          {/* Dashboard Structured Notes banner */}
+          <div
+            className="p-6 rounded-3xl border flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md bg-gradient-to-r from-[#ffe24c]/10 to-[#86efac]/10"
+            style={{ borderColor: C.surfaceVariant }}
+          >
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-2xl bg-[#ffe24c] flex items-center justify-center shadow">
+                <BookOpen className="h-6 w-6 text-black" />
+              </div>
+              <div className="text-left space-y-0.5">
+                <h4 className="font-bold text-sm text-black">
+                  Structured Curriculum Roadmap Generated
+                </h4>
+                <p className="text-xs text-zinc-600">
+                  Your customized course notes, exercises, and interactive quiz are ready in the workspace.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => router.push(`/course/${sessionId}`)}
+              className="flex items-center gap-1.5 px-6 py-3 font-bold text-sm rounded-2xl shadow-lg transition-all hover:scale-[1.01]"
+              style={{
+                backgroundColor: C.primary,
+                color: C.onPrimary,
+              }}
+            >
+              Start Study Notes Workspace
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Structured Notes Detail Panel */}
+          <div
+            className="p-8 sm:p-10 rounded-3xl border shadow-lg space-y-8"
+            style={{
+              backgroundColor: C.surfaceContainerLowest,
+              borderColor: C.surfaceVariant,
+            }}
+          >
+            {/* Header */}
+            <div className="space-y-2 pb-6 border-b" style={{ borderColor: C.surfaceVariant }}>
+              <div 
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-[#d3579a]/10 border text-[#d3579a]"
+                style={{ borderColor: `${C.accentPurple}30` }}
+              >
+                Gemini Multi-Agent Structured Notes
+              </div>
+              <h2 className="text-3xl font-extrabold tracking-tight text-black" style={{ fontFamily: 'var(--font-jakarta)' }}>
+                {plannerOutput.title}
+              </h2>
+              <p className="text-sm font-body leading-relaxed" style={{ color: C.onSurfaceVariant }}>
+                {plannerOutput.description}
+              </p>
+            </div>
+
+            {/* Note Sections */}
+            <div className="space-y-8">
+              {plannerOutput.lessons.map((lesson: any, index: number) => {
+                const research = researcherOutput?.lessonContents?.find((l: any) => l.lessonId === lesson.id);
+                const codeSnippet = coderOutput?.snippets?.find((c: any) => c.lessonId === lesson.id);
+                
+                return (
+                  <div key={lesson.id} className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono text-xs px-2 py-1 bg-black text-white rounded font-bold">
+                        0{index + 1}
+                      </span>
+                      <h3 className="text-lg font-bold text-black font-display tracking-wide uppercase">
+                        {lesson.title}
+                      </h3>
+                    </div>
+
+                    <div className="pl-9 space-y-4">
+                      <p className="text-xs italic text-zinc-500 font-body">
+                        {lesson.description}
+                      </p>
+                      
+                      {/* Theory Paragraphs */}
+                      {research?.theory && (
+                        <div className="text-sm font-body leading-relaxed text-zinc-800 space-y-3 bg-[#fdfaf5] p-5 rounded-2xl border" style={{ borderColor: C.surfaceVariant }}>
+                          {research.theory.split('\n\n').map((para: string, pIdx: number) => (
+                            <p key={pIdx}>{para}</p>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Code Snippet Box */}
+                      {codeSnippet?.code && (
+                        <div className="rounded-xl overflow-hidden border bg-[#1d1c18]" style={{ borderColor: C.surfaceVariant }}>
+                          <div className="px-4 py-1.5 flex justify-between items-center text-[10px] font-mono text-zinc-400 bg-black/40 border-b border-[#2d2c28]">
+                            <span>example.{codeSnippet.language || 'ts'}</span>
+                          </div>
+                          <pre className="p-4 font-mono text-[11px] overflow-x-auto leading-relaxed text-[#e8e6e1]">
+                            <code>{codeSnippet.code}</code>
+                          </pre>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

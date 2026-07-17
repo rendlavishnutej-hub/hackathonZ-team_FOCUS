@@ -186,7 +186,7 @@ export async function signInAction(formData: FormData) {
   if (error && error.message.toLowerCase().includes('email not confirmed') && !userId) {
     try {
       const { data: usersData } = await adminClient.auth.admin.listUsers();
-      const authUser = usersData?.users.find(u => u.email?.toLowerCase() === email.toLowerCase());
+      const authUser = usersData?.users.find((u: any) => u.email?.toLowerCase() === email.toLowerCase());
       if (authUser) {
         userId = authUser.id;
       }

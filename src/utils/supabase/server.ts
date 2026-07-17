@@ -3,420 +3,13 @@ import { cookies } from 'next/headers';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 
-class MockServerQueryBuilder {
-  table: string;
-  queryType: 'select' | 'insert' | 'update' | 'delete' = 'select';
-  filters: any[] = [];
-  insertData: any = null;
-  updateData: any = null;
-  singleFlag = false;
-  maybeSingleFlag = false;
-  isAdmin = false;
-  orderField: string | undefined = undefined;
-  orderAscending: boolean = true;
-  limitCount: number | undefined = undefined;
-
-  constructor(table: string, isAdmin = false) {
-    this.table = table;
-    this.isAdmin = isAdmin;
-  }
-
-  select(columns?: string) {
-    this.queryType = 'select';
-    return this;
-  }
-
-  insert(data: any) {
-    this.queryType = 'insert';
-    this.insertData = data;
-    return this;
-  }
-
-  update(data: any) {
-    this.queryType = 'update';
-    this.updateData = data;
-    return this;
-  }
-
-  delete() {
-    this.queryType = 'delete';
-    return this;
-  }
-
-  eq(field: string, value: any) {
-    this.filters.push({ field, value, type: 'eq' });
-    return this;
-  }
-
-  in(field: string, values: any[]) {
-    this.filters.push({ field, value: values, type: 'in' });
-    return this;
-  }
-
-  neq(field: string, value: any) {
-    this.filters.push({ field, value, type: 'neq' });
-    return this;
-  }
-
-  order(field: string, options?: { ascending?: boolean }) {
-    this.orderField = field;
-    this.orderAscending = options?.ascending ?? true;
-    return this;
-  }
-
-  limit(count: number) {
-    this.limitCount = count;
-    return this;
-  }
-
-  single() {
-    this.singleFlag = true;
-    return this;
-  }
-
-  maybeSingle() {
-    this.maybeSingleFlag = true;
-    return this;
-  }
-
-  async then(resolve: any, reject: any) {
-    try {
-      const { runMockQuery, getSessionUser } = await import('./mockDb');
-      const cookieStore = await cookies();
-      
-      let currentUserId: string | null = null;
-      const user = await getSessionUser(cookieStore);
-      if (user?.id) {
-        currentUserId = user.id;
-      } else {
-        const allCookies = cookieStore.getAll();
-        const sbCookie = allCookies.find((c: any) => c.name.startsWith('sb-') && c.name.endsWith('-auth-token'));
-        if (sbCookie?.value) {
-          try {
-            const cleanVal = decodeURIComponent(sbCookie.value);
-            const parsed = JSON.parse(cleanVal);
-            const token = Array.isArray(parsed) ? parsed[0] : parsed.access_token;
-            if (token) {
-              const payloadPart = token.split('.')[1];
-              if (payloadPart) {
-                const payload = JSON.parse(Buffer.from(payloadPart, 'base64').toString('utf8'));
-                currentUserId = payload.sub || null;
-              }
-            }
-          } catch (e) {
-            // Ignore error
-          }
-        }
-      }
-
-      const data = await runMockQuery({
-        table: this.table,
-        queryType: this.queryType,
-        filters: this.filters,
-        insertData: this.insertData,
-        updateData: this.updateData,
-        singleFlag: this.singleFlag,
-        maybeSingleFlag: this.maybeSingleFlag,
-        currentUserId,
-        isAdmin: this.isAdmin,
-        orderField: this.orderField,
-        orderAscending: this.orderAscending,
-        limitCount: this.limitCount,
-      });
-      resolve(data);
-    } catch (err) {
-      reject(err);
-    }
-  }
-}
-
-class SafeQueryBuilderProxy {
-  private table: string;
-  private realBuilder: any;
-  private mockBuilder: any;
-
-  constructor(table: string, realBuilder: any, mockBuilder: any) {
-    this.table = table;
-    this.realBuilder = realBuilder;
-    this.mockBuilder = mockBuilder;
-  }
-
-  private addMethod(method: string, args: any[]) {
-    if (this.realBuilder && typeof this.realBuilder[method] === 'function') {
-      this.realBuilder = this.realBuilder[method](...args);
-    }
-    if (this.mockBuilder && typeof this.mockBuilder[method] === 'function') {
-      this.mockBuilder = this.mockBuilder[method](...args);
-    }
-    return this;
-  }
-
-  select(...args: any[]) { return this.addMethod('select', args); }
-  insert(...args: any[]) { return this.addMethod('insert', args); }
-  update(...args: any[]) { return this.addMethod('update', args); }
-  delete(...args: any[]) { return this.addMethod('delete', args); }
-  eq(...args: any[]) { return this.addMethod('eq', args); }
-  in(...args: any[]) { return this.addMethod('in', args); }
-  neq(...args: any[]) { return this.addMethod('neq', args); }
-  order(...args: any[]) { return this.addMethod('order', args); }
-  limit(...args: any[]) { return this.addMethod('limit', args); }
-  single(...args: any[]) { return this.addMethod('single', args); }
-  maybeSingle(...args: any[]) { return this.addMethod('maybeSingle', args); }
-
-  async then(resolve: any, reject: any) {
-    try {
-      const result = await this.realBuilder;
-      if (result && result.error && (result.error.code === '42P01' || result.error.message?.includes('does not exist') || result.error.message?.includes('violates row-level security'))) {
-        console.warn(`[FOCUS Safe Client] Table/Access issue on "${this.table}" with live database. Falling back to local mock DB.`);
-        const fallbackResult = await this.mockBuilder;
-        return resolve(fallbackResult);
-      }
-      return resolve(result);
-    } catch (realErr: any) {
-      console.warn(`[FOCUS Safe Client] Real query exceptions on "${this.table}". falling back to local mock DB. Error:`, realErr.message || realErr);
-      try {
-        const fallbackResult = await this.mockBuilder;
-        return resolve(fallbackResult);
-      } catch (mockErr) {
-        return reject(mockErr);
-      }
-    }
-  }
-}
-
-function wrapClientWithFailsafe(realClient: any, isAdmin = false) {
-  if (!realClient) return realClient;
-  const originalFrom = realClient.from.bind(realClient);
-  realClient.from = (table: string) => {
-    const realBuilder = originalFrom(table);
-    const mockBuilder = new MockServerQueryBuilder(table, isAdmin);
-    return new SafeQueryBuilderProxy(table, realBuilder, mockBuilder) as any;
-  };
-  return realClient;
-}
-
-// Check if credentials are mock/missing
-function isMockEnabled() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  return (
-    !supabaseUrl ||
-    supabaseUrl.includes('placeholder') ||
-    !supabaseKey ||
-    supabaseKey.includes('placeholder') ||
-    supabaseKey.startsWith('sb_') ||
-    !supabaseKey.includes('.')
-  );
-}
-
-// Server Mock Client Factory helper
-async function getMockServerClient(response?: NextResponse) {
-  const cookieOpts = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax' as const,
-    path: '/',
-  };
-
-  return {
-    auth: {
-      async getUser() {
-        const { getSessionUser } = await import('./mockDb');
-        const cookieStore = await cookies();
-        const user = await getSessionUser(cookieStore);
-        return { data: { user }, error: null };
-      },
-      async signUp(options: any) {
-        const { getMockDb, writeMockDb, generateUUID, createMockToken } = await import('./mockDb');
-        const email = options.email;
-        const displayName = options.options?.data?.display_name || email.split('@')[0];
-        const db = getMockDb();
-
-        if (db.users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
-          return { data: { user: null, session: null }, error: { message: 'A user with this email already exists' } };
-        }
-
-        const userId = generateUUID();
-        const user = { 
-          id: userId, 
-          email, 
-          user_metadata: { display_name: displayName } 
-        };
-        db.users.push(user);
-
-        // Auto-create matching profile row
-        const profile = { 
-          id: userId, 
-          email, 
-          display_name: displayName, 
-          created_at: new Date().toISOString() 
-        };
-        db.profiles.push(profile);
-
-        const sessionId = generateUUID();
-        const token = createMockToken(userId, sessionId);
-        const session = { 
-          session_id: sessionId, 
-          user_id: userId, 
-          access_token: token,
-          expires_at: Math.floor(Date.now() / 1000) + 3600 * 24,
-          user
-        };
-        db.sessions.push(session);
-        writeMockDb(db);
-
-        const cookieStore = await cookies();
-        cookieStore.set('focus_mock_session', token, cookieOpts);
-        if (response) {
-          response.cookies.set('focus_mock_session', token, cookieOpts);
-        }
-
-        return { data: { user, session }, error: null };
-      },
-      async signInWithPassword(options: any) {
-        const { getMockDb, writeMockDb, generateUUID, createMockToken } = await import('./mockDb');
-        const email = options.email;
-        const db = getMockDb();
-        const user = db.users.find(u => u.email.toLowerCase() === email.toLowerCase());
-        if (!user) {
-          return { data: { user: null, session: null }, error: { message: 'Invalid login credentials' } };
-        }
-
-        const sessionId = generateUUID();
-        const token = createMockToken(user.id, sessionId);
-        const session = { 
-          session_id: sessionId, 
-          user_id: user.id, 
-          access_token: token,
-          expires_at: Math.floor(Date.now() / 1000) + 3600 * 24,
-          user
-        };
-        db.sessions.push(session);
-        writeMockDb(db);
-
-        const cookieStore = await cookies();
-        cookieStore.set('focus_mock_session', token, cookieOpts);
-        if (response) {
-          response.cookies.set('focus_mock_session', token, cookieOpts);
-        }
-
-        return { data: { user, session }, error: null };
-      },
-      async signOut() {
-        const { getMockDb, writeMockDb } = await import('./mockDb');
-        const cookieStore = await cookies();
-        const sessionCookie = cookieStore.get('focus_mock_session');
-        if (sessionCookie?.value) {
-          const db = getMockDb();
-          db.sessions = db.sessions.filter(s => s.access_token !== sessionCookie.value);
-          writeMockDb(db);
-        }
-
-        cookieStore.delete('focus_mock_session');
-        if (response) {
-          response.cookies.delete('focus_mock_session');
-        }
-        return { error: null };
-      },
-      async exchangeCodeForSession(code: string) {
-        const { getMockDb, writeMockDb, generateUUID, createMockToken } = await import('./mockDb');
-        const db = getMockDb();
-        let user = db.users[0];
-        if (!user) {
-          const userId = generateUUID();
-          user = { id: userId, email: 'dev@focus.ai', user_metadata: { display_name: 'Developer' } };
-          db.users.push(user);
-          db.profiles.push({ 
-            id: userId, 
-            email: user.email, 
-            display_name: 'Developer', 
-            created_at: new Date().toISOString() 
-          });
-        }
-        
-        const sessionId = generateUUID();
-        const token = createMockToken(user.id, sessionId);
-        const session = { 
-          session_id: sessionId, 
-          user_id: user.id, 
-          access_token: token,
-          expires_at: Math.floor(Date.now() / 1000) + 3600 * 24,
-          user
-        };
-        db.sessions.push(session);
-        writeMockDb(db);
-
-        const cookieStore = await cookies();
-        cookieStore.set('focus_mock_session', token, cookieOpts);
-        if (response) {
-          response.cookies.set('focus_mock_session', token, cookieOpts);
-        }
-
-        return { data: { session, user }, error: null };
-      },
-      async resetPasswordForEmail(email: string, options?: any) {
-        return { data: {}, error: null };
-      },
-      async updateUser(attributes: any) {
-        return { data: {}, error: null };
-      },
-      mfa: {
-        async getAuthenticatorAssuranceLevel() {
-          return { data: { currentLevel: 'aal1', nextLevel: 'aal1' }, error: null };
-        },
-        async listFactors() {
-          return { data: { all: [], totp: [], phone: [] }, error: null };
-        },
-        async enroll(params: any) {
-          return {
-            data: {
-              id: 'mock-factor-id',
-              type: 'totp',
-              totp: { qr_code: 'mock-qr-code', secret: 'mock-secret', uri: 'mock-uri' }
-            },
-            error: null
-          };
-        },
-        async challenge(params: any) {
-          return { data: { id: 'mock-challenge-id' }, error: null };
-        },
-        async verify(params: any) {
-          return { data: {}, error: null };
-        },
-        async unenroll(params: any) {
-          return { data: {}, error: null };
-        }
-      }
-    },
-    from(table: string) {
-      return new MockServerQueryBuilder(table, false);
-    },
-    async rpc(name: string, args: any) {
-      if (name === 'revoke_session') {
-        const targetSessionId = args.target_session_id;
-        const { getMockDb, writeMockDb } = await import('./mockDb');
-        const db = getMockDb();
-        db.sessions_log = db.sessions_log.map(log => 
-          log.session_id === targetSessionId ? { ...log, is_active: false } : log
-        );
-        writeMockDb(db);
-      }
-      return { data: true, error: null };
-    }
-  } as any;
-}
-
 // Standard client for authenticated user requests (Server Components, Server Actions, Route Handlers)
 export async function createClient() {
-  if (isMockEnabled()) {
-    return await getMockServerClient();
-  }
-
   const cookieStore = await cookies();
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key';
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-  const client = createServerClient(
+  return createServerClient(
     supabaseUrl,
     supabaseKey,
     {
@@ -431,26 +24,21 @@ export async function createClient() {
             );
           } catch {
             // The `setAll` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing sessions.
           }
         },
       },
     }
   );
-
-  return wrapClientWithFailsafe(client, false);
 }
 
 // Special client for Route Handlers to ensure cookies are appended to the returned NextResponse
 export async function createClientForResponse(response: NextResponse) {
-  if (isMockEnabled()) {
-    return await getMockServerClient(response);
-  }
-
   const cookieStore = await cookies();
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key';
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-  const client = createServerClient(
+  return createServerClient(
     supabaseUrl,
     supabaseKey,
     {
@@ -471,91 +59,14 @@ export async function createClientForResponse(response: NextResponse) {
       },
     }
   );
-
-  return wrapClientWithFailsafe(client, false);
 }
 
 // Admin client using service role key (for server-side security operations only)
 export function createAdminClient() {
-  if (isMockEnabled()) {
-    return {
-      auth: {
-        admin: {
-          async createUser(params: any) {
-            const { getMockDb, writeMockDb, generateUUID } = await import('./mockDb');
-            const { email, password, user_metadata, email_confirm } = params;
-            const db = getMockDb();
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-            // Check for duplicate email
-            if (db.users.some((u: any) => u.email.toLowerCase() === email.toLowerCase())) {
-              return {
-                data: { user: null },
-                error: { message: 'A user with this email address has already been registered' },
-              };
-            }
-
-            const userId = generateUUID();
-            const user = {
-              id: userId,
-              email,
-              email_confirmed_at: email_confirm ? new Date().toISOString() : null,
-              user_metadata: user_metadata || { display_name: email.split('@')[0] },
-            };
-            db.users.push(user);
-
-            // Auto-create matching profile row
-            db.profiles.push({
-              id: userId,
-              email,
-              display_name: user_metadata?.display_name || email.split('@')[0],
-              created_at: new Date().toISOString(),
-            });
-
-            writeMockDb(db);
-            return { data: { user }, error: null };
-          },
-
-          async getUserById(id: string) {
-            const { getMockDb } = await import('./mockDb');
-            const db = getMockDb();
-            const user = db.users.find((u: any) => u.id === id);
-            return { data: { user: user || { id, email: 'mock-user@focus.ai' } }, error: null };
-          },
-
-          async listUsers() {
-            const { getMockDb } = await import('./mockDb');
-            const db = getMockDb();
-            return { data: { users: db.users }, error: null };
-          },
-
-          async generateLink(params: any) {
-            return {
-              data: {
-                properties: {
-                  action_link: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/callback?code=mock-code`
-                }
-              },
-              error: null
-            };
-          },
-
-          mfa: {
-            async deleteFactor(params: any) {
-              return { data: {}, error: null };
-            }
-          }
-        }
-      },
-      from(table: string) {
-        return new MockServerQueryBuilder(table, true);
-      }
-    } as any;
-  }
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-service-role-key';
-
-  const client = createSupabaseClient(
+  return createSupabaseClient(
     supabaseUrl,
     serviceRoleKey,
     {
@@ -565,6 +76,4 @@ export function createAdminClient() {
       },
     }
   );
-
-  return wrapClientWithFailsafe(client, true);
 }

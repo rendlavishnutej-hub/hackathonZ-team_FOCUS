@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Send, Sparkles, Loader2, MessageCircle, Briefcase, GraduationCap, ArrowDown } from 'lucide-react';
 import { getCareerSuggestions, type CareerMessage } from '@/lib/careerGuidanceService';
+import { motion } from 'framer-motion';
 
 // ─── Colour constants matching the design system ────────────────────────────
 const C = {
@@ -46,6 +47,37 @@ export default function CareerGuidanceClient({ userEmail }: CareerGuidanceClient
   const inputRef = useRef<HTMLInputElement>(null);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Mascot states
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isJumping, setIsJumping] = useState(false);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const deltaX = e.clientX - centerX;
+      const deltaY = e.clientY - centerY;
+      const angle = Math.atan2(deltaY, deltaX);
+      const maxDist = 6;
+      const dist = Math.min(Math.hypot(deltaX, deltaY) / 40, maxDist);
+      const moveX = Math.cos(angle) * dist;
+      const moveY = Math.sin(angle) * dist;
+      container.style.setProperty('--eye-x', `${moveX}px`);
+      container.style.setProperty('--eye-y', `${moveY}px`);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    return () => document.removeEventListener('mousemove', handleMouseMove);
+  }, [messages]);
 
   // Read courses from localStorage for context
   const getCourses = () => {

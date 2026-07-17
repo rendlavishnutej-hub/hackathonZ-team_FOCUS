@@ -33,7 +33,7 @@ export default async function InterviewSessionPage({
   return (
     <div
       className="flex h-screen overflow-hidden"
-      style={{ backgroundColor: '#0a0a0f', color: '#f0f0f5', fontFamily: 'var(--font-jakarta), sans-serif' }}
+      style={{ backgroundColor: '#fef9f2', color: '#000000', fontFamily: 'var(--font-jakarta), sans-serif' }}
     >
       {/* Sidebar — keep consistent */}
       <Sidebar userEmail={user.email!} />

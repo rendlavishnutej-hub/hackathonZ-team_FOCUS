@@ -177,10 +177,31 @@ export async function signInAction(formData: FormData) {
   }
 
   // 3. Authenticate with Supabase Auth
-  const { data, error } = await supabase.auth.signInWithPassword({
+  let { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
+
+  // Fallback: If we didn't find the userId in profiles, try listing users from Auth directly
+  if (error && error.message.toLowerCase().includes('email not confirmed') && !userId) {
+    try {
+      const { data: usersData } = await adminClient.auth.admin.listUsers();
+      const authUser = usersData?.users.find((u: any) => u.email?.toLowerCase() === email.toLowerCase());
+      if (authUser) {
+        userId = authUser.id;
+      }
+    } catch (e) {
+      // Ignore
+    }
+  }
+
+  if (error && error.message.toLowerCase().includes('email not confirmed') && userId) {
+    // Auto-confirm the user to bypass email rate limits on older unconfirmed accounts
+    await adminClient.auth.admin.updateUserById(userId, { email_confirm: true });
+    const retry = await supabase.auth.signInWithPassword({ email, password });
+    data = retry.data;
+    error = retry.error;
+  }
 
   if (error) {
     // Increments failed attempts and logs audit trail
@@ -234,7 +255,7 @@ export async function signInAction(formData: FormData) {
 export async function signOutAction() {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  redirect('/login');
+  return { success: true };
 }
 
 /**

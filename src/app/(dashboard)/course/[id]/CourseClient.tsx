@@ -346,7 +346,7 @@ export default function CourseClient({ courseId }: CourseClientProps) {
                   <div 
                     key={q.id}
                     className="p-6 rounded-2xl space-y-4"
-                    style={{ backgroundColor: C.surfaceContainerLowest, border: `1px solid ${C.surfaceVariant}` }}
+                    style={{ backgroundColor: C.surfaceContainerLow, border: `1px solid ${C.surfaceVariant}` }}
                   >
                     <div className="flex items-start gap-2.5">
                       <span className="font-mono text-xs mt-0.5" style={{ color: C.outline }}>{qIdx + 1}.</span>
@@ -358,7 +358,7 @@ export default function CourseClient({ courseId }: CourseClientProps) {
                         const isSelected = selectedOpt === optIdx;
                         let optStyle: React.CSSProperties = {
                           border: `1px solid ${C.surfaceVariant}`,
-                          backgroundColor: C.surfaceContainerLow,
+                          backgroundColor: C.surfaceContainerLowest,
                           color: C.onSurfaceVariant,
                         };
 

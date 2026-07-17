@@ -47,8 +47,10 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [courses, setCourses] = useState<CourseItem[]>([]);
+  const [isMounted, setIsMounted] = useState(false);
 
   React.useEffect(() => {
+    setIsMounted(true);
     try {
       const stored = localStorage.getItem('focus_courses');
       if (stored) {
@@ -237,7 +239,7 @@ export default function DashboardClient({ userEmail }: DashboardClientProps) {
           Active Syllabus History ({courses.length})
         </motion.h2>
 
-        {courses.length === 0 ? (
+        {(!isMounted || courses.length === 0) ? (
           /* Designed empty state */
           <motion.div
             variants={itemVars}

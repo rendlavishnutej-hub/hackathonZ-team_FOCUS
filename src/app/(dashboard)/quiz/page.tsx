@@ -18,7 +18,7 @@ export default async function QuizPage() {
   }
 
   return (
-    <div className="flex h-screen bg-[#0A0A0F] text-[#F5F5F7] overflow-hidden">
+    <div className="flex h-screen bg-[#fef9f2] text-black overflow-hidden font-sans">
       <Sidebar userEmail={user.email!} />
       
       <main className="flex-1 overflow-y-auto relative perspective-1000">

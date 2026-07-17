@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   BookOpen, Settings, LogOut, Shield, Award,
   Terminal, Activity, Compass, Users, Mic, HelpCircle, GraduationCap
@@ -33,10 +33,12 @@ interface SidebarProps {
 
 export default function Sidebar({ userEmail }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
 
   const handleLogout = async () => {
     try {
       await signOutAction();
+      router.push('/login');
     } catch (err) {
       console.error(err);
       // Fallback

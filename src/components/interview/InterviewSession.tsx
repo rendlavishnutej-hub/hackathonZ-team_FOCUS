@@ -148,6 +148,7 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
   const synthRef         = useRef<SpeechSynthesisUtterance | null>(null);
   const isListeningRef   = useRef(false);
   const isSpeakingRef    = useRef(false);
+  const transcriptRef    = useRef('');
   const logEndRef        = useRef<HTMLDivElement>(null);
 
   // ── Scroll agent log to bottom
@@ -271,7 +272,11 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
         else              interim += res[0].transcript;
       }
       setLiveText(interim || final);
-      if (final) setTranscript(prev => prev + ' ' + final);
+      if (final) {
+        const nextT = transcriptRef.current + ' ' + final;
+        transcriptRef.current = nextT;
+        setTranscript(nextT);
+      }
     };
 
     recog.onspeechend = () => {
@@ -281,9 +286,10 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
     recog.onend = () => {
       isListeningRef.current = false;
       // Submit collected transcript
-      const collected = transcript.trim();
+      const collected = transcriptRef.current.trim();
       if (collected.length > 3) {
         setLiveText('');
+        transcriptRef.current = '';
         setTranscript('');
         submitAnswer(collected, currentState);
       }
@@ -299,7 +305,7 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
 
     recognitionRef.current = recog;
     recog.start();
-  }, [transcript]);
+  }, []);
 
   const stopListening = () => {
     recognitionRef.current?.stop();
@@ -315,6 +321,7 @@ export default function InterviewSessionClient({ sessionId, role, company, diffi
     setLiveText('');
     setTextInput('');
     setTranscript('');
+    transcriptRef.current = '';
     runTurn(cs, answer);
   }, [state, runTurn]);
 

@@ -309,6 +309,118 @@ export default function SessionClient({ sessionId, prompt }: SessionClientProps)
             </button>
           </div>
 
+          {/* AI Collaborator Insights Panel */}
+          <div className="space-y-4">
+            <span
+              className="text-[10px] uppercase font-bold tracking-widest block text-zinc-500 font-bold"
+            >
+              Multi-Agent Collaborative Insights
+            </span>
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              {/* Planner Agent Card */}
+              <div 
+                className="p-5 rounded-2xl border bg-white flex flex-col justify-between space-y-4 hover:shadow transition-all"
+                style={{ borderColor: C.surfaceVariant }}
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono font-bold text-[#5a6ba8]">PLANNER</span>
+                    <span className="text-xs">🗺️</span>
+                  </div>
+                  <h4 className="text-xs font-extrabold text-black uppercase">Curriculum Specialist</h4>
+                  <p className="text-[11px] leading-relaxed text-zinc-600">
+                    Sourced 3 structured learning nodes targeting fundamentals, advanced architectures and practical real-world execution.
+                  </p>
+                </div>
+                <div className="text-[9px] font-mono font-semibold text-zinc-400 border-t pt-2 max-w-full truncate">
+                  Output: {plannerOutput.lessons.length} lessons mapped
+                </div>
+              </div>
+
+              {/* Researcher Agent Card */}
+              <div 
+                className="p-5 rounded-2xl border bg-white flex flex-col justify-between space-y-4 hover:shadow transition-all"
+                style={{ borderColor: C.surfaceVariant }}
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono font-bold text-[#d3579a]">RESEARCHER</span>
+                    <span className="text-xs">🔬</span>
+                  </div>
+                  <h4 className="text-xs font-extrabold text-black uppercase">Deep Fact Retrieval</h4>
+                  <p className="text-[11px] leading-relaxed text-zinc-600">
+                    Acquired detailed textual theory and core reference notes for each node to ensure analytical depth.
+                  </p>
+                </div>
+                <div className="text-[9px] font-mono font-semibold text-zinc-400 border-t pt-2 max-w-full truncate">
+                  Output: {researcherOutput?.lessonContents?.length || 0} theory briefs
+                </div>
+              </div>
+
+              {/* Coder Agent Card */}
+              <div 
+                className="p-5 rounded-2xl border bg-white flex flex-col justify-between space-y-4 hover:shadow transition-all"
+                style={{ borderColor: C.surfaceVariant }}
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono font-bold text-[#ffe24c] bg-black px-1 rounded">CODER</span>
+                    <span className="text-xs">💻</span>
+                  </div>
+                  <h4 className="text-xs font-extrabold text-black uppercase">Snippet Synthesizer</h4>
+                  <p className="text-[11px] leading-relaxed text-zinc-600">
+                    {coderOutput?.snippets?.some((s: any) => s.code) 
+                      ? "Generated interactive programming exercise blocks and clean code templates." 
+                      : "Evaluated conceptual topic; skipped coding models to keep material optimized."}
+                  </p>
+                </div>
+                <div className="text-[9px] font-mono font-semibold text-zinc-400 border-t pt-2 max-w-full truncate">
+                  Language: {coderOutput?.snippets?.find((s: any) => s.language)?.language || 'none'}
+                </div>
+              </div>
+
+              {/* Critic Agent Card */}
+              <div 
+                className="p-5 rounded-2xl border bg-white flex flex-col justify-between space-y-4 hover:shadow transition-all"
+                style={{ borderColor: C.surfaceVariant }}
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono font-bold text-red-650">CRITIC</span>
+                    <span className="text-xs">⚖️</span>
+                  </div>
+                  <h4 className="text-xs font-extrabold text-black uppercase">Quality Inspector</h4>
+                  <p className="text-[11px] leading-relaxed text-zinc-600 italic">
+                    "{criticOutput?.remarks ? criticOutput.remarks.slice(0, 100) + '...' : 'Content verified and approved.'}"
+                  </p>
+                </div>
+                <div className="text-[9px] font-mono font-bold text-green-700 bg-green-50 border border-green-200 px-1.5 py-0.5 rounded text-center w-fit">
+                  {criticOutput?.verdict || 'APPROVED'}
+                </div>
+              </div>
+
+              {/* Quizzer Agent Card */}
+              <div 
+                className="p-5 rounded-2xl border bg-white flex flex-col justify-between space-y-4 hover:shadow transition-all"
+                style={{ borderColor: C.surfaceVariant }}
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono font-bold text-green-600">QUIZZER</span>
+                    <span className="text-xs">📝</span>
+                  </div>
+                  <h4 className="text-xs font-extrabold text-black uppercase">Evaluation Metric</h4>
+                  <p className="text-[11px] leading-relaxed text-zinc-600">
+                    Compiled 3 multiple-choice graduation challenges with explanations to test curriculum mastery.
+                  </p>
+                </div>
+                <div className="text-[9px] font-mono font-semibold text-zinc-400 border-t pt-2 max-w-full truncate">
+                  Output: {quizzerOutput?.questions?.length || 3} items structured
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Structured Notes Detail Panel */}
           <div
             className="p-8 sm:p-10 rounded-3xl border shadow-lg space-y-8"

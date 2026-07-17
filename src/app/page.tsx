@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { Suspense } from 'react';
 import LandingClient from '@/components/marketing/LandingClient';
 
@@ -19,10 +18,9 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div
-      className="font-sans antialiased overflow-x-hidden"
-      style={{ backgroundColor: '#fef9f2', color: '#000000', fontFamily: 'var(--font-jakarta), sans-serif' }}
-    >
+    <div className="flex-1 bg-[#0A0A0F] text-[#F5F5F7] flex flex-col min-h-screen relative dots-bg">
+      <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-[#7C5CFF]/5 rounded-full blur-[100px] pointer-events-none" />
+
       {/* ── JSON-LD Structured Data ── */}
       <script
         type="application/ld+json"

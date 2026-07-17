@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── Dark Dashboard Tokens ─────────────────────────────────────── */
+  /* ── Dark FOCUS Theme Tokens (Default) ────────────────────────── */
   --color-bg-base: #0A0A0F;
   --color-bg-surface: #13131A;
   --color-bg-glass: rgba(255, 255, 255, 0.04);
@@ -13,32 +13,6 @@
   --color-success: #3DD68C;
   --color-warning: #F5B942;
   --color-error: #F1583D;
-
-  /* ── Marketing / Cream Theme Tokens ────────────────────────────── */
-  --color-cream: #fef9f2;
-  --color-on-surface: #1d1c18;
-  --color-surface: #fef9f2;
-  --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #f8f3ec;
-  --color-surface-container: #f2ede6;
-  --color-surface-container-high: #ece7e1;
-  --color-surface-container-highest: #e6e2db;
-  --color-surface-variant: #e6e2db;
-  --color-surface-dim: #ded9d3;
-  --color-surface-bright: #fef9f2;
-  --color-on-surface-variant: #45464d;
-  --color-outline: #76777d;
-  --color-outline-variant: #c6c6cd;
-  --color-inverse-surface: #32302c;
-  --color-inverse-on-surface: #f5f0e9;
-  --color-primary-container: #131b2e;
-  --color-on-primary: #ffffff;
-  --color-secondary-container: #fcdf46;
-  --color-accent-yellow: #ffe24c;
-  --color-accent-blue: #bec6e0;
-  --color-accent-pink: #ffafd3;
-  --color-accent-green: #86efac;
-  --color-accent-purple: #d3579a;
 
   /* ── Fonts ──────────────────────────────────────────────────────── */
   --font-display: var(--font-display);
@@ -59,13 +33,6 @@ body {
   overflow-x: hidden;
 }
 
-/* ── Marketing pages override body to cream ──────────────────────────────── */
-body.marketing {
-  background: #fef9f2;
-  color: #000000;
-  font-family: var(--font-jakarta), 'Plus Jakarta Sans', sans-serif;
-}
-
 /* ── Glassmorphism utilities ─────────────────────────────────────────────── */
 .glass-panel {
   background: var(--color-bg-glass);
@@ -75,10 +42,10 @@ body.marketing {
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(19, 19, 26, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border-subtle);
 }
 
 /* ── Gradient text (dark theme) ──────────────────────────────────────────── */

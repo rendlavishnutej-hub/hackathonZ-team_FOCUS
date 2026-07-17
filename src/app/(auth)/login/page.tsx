@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   Key, Mail, AlertTriangle, Loader2, Fingerprint, 
-  Terminal, ArrowRight, ShieldCheck, Globe 
+  Terminal, ArrowRight, ShieldCheck, Globe, GitBranch 
 } from 'lucide-react';
 import { signInAction } from '../../auth/actions';
 import { startAuthentication } from '@simplewebauthn/browser';
@@ -132,7 +132,10 @@ function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md space-y-8 glass-panel p-8 sm:p-10 rounded-3xl border border-white/5 bg-[#13131A]/60 shadow-xl shadow-[#7C5CFF]/5">
+    <div className="w-full max-w-md space-y-8 glass-panel p-8 sm:p-10 rounded-3xl border border-white/10 bg-[#13131A]/80 shadow-2xl shadow-[#7C5CFF]/10 relative overflow-hidden">
+      {/* Decorative top border line */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#7C5CFF] to-[#22D3D0]" />
+
       <div className="text-center">
         <h2 className="font-display text-3xl tracking-wide uppercase text-white">
           Sign In
@@ -176,7 +179,7 @@ function LoginForm() {
               value={formData.email}
               onChange={handleInputChange}
               placeholder="you@example.com"
-              className="block w-full pl-10 pr-3 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-[#7C5CFF] focus:border-[#7C5CFF] text-sm transition-all"
+              className="block w-full pl-10 pr-3 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-[#22D3D0] focus:border-[#22D3D0] text-sm transition-all focus:shadow-lg focus:shadow-[#22D3D0]/5"
             />
           </div>
         </div>
@@ -202,7 +205,7 @@ function LoginForm() {
               value={formData.password}
               onChange={handleInputChange}
               placeholder="••••••••••••"
-              className="block w-full pl-10 pr-3 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-[#7C5CFF] focus:border-[#7C5CFF] text-sm transition-all"
+              className="block w-full pl-10 pr-3 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-[#22D3D0] focus:border-[#22D3D0] text-sm transition-all focus:shadow-lg focus:shadow-[#22D3D0]/5"
             />
           </div>
         </div>
@@ -211,7 +214,7 @@ function LoginForm() {
           <button
             type="submit"
             disabled={loading || passkeyLoading}
-            className="w-full flex justify-center py-3 px-4 rounded-xl text-sm font-semibold text-zinc-950 bg-gradient-to-r from-[#7C5CFF] to-[#22D3D0] hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+            className="w-full flex justify-center py-3 px-4 rounded-xl text-sm font-semibold text-zinc-950 bg-gradient-to-r from-[#7C5CFF] to-[#22D3D0] hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-[#7C5CFF]/10 active:scale-[0.99]"
           >
             {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Log In'}
           </button>
@@ -232,7 +235,7 @@ function LoginForm() {
           type="button"
           onClick={handlePasskeyLogin}
           disabled={loading || passkeyLoading}
-          className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-zinc-800 rounded-xl bg-zinc-950/50 text-sm font-semibold text-zinc-300 hover:text-white hover:bg-zinc-900 transition-all disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-zinc-800 rounded-xl bg-zinc-950/50 text-sm font-semibold text-zinc-300 hover:text-white hover:bg-zinc-900 transition-all disabled:opacity-50 hover:border-[#22D3D0]/30"
         >
           {passkeyLoading ? (
             <Loader2 className="h-4.5 w-4.5 animate-spin text-[#22D3D0]" />
@@ -247,7 +250,7 @@ function LoginForm() {
           type="button"
           onClick={() => handleOAuthLogin('google')}
           disabled={oauthLoading !== null}
-          className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-zinc-850 rounded-xl bg-zinc-900/30 text-sm font-semibold text-zinc-300 hover:text-white hover:bg-zinc-900/60 transition-all"
+          className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-zinc-850 rounded-xl bg-zinc-900/30 text-sm font-semibold text-zinc-300 hover:text-white hover:bg-zinc-900/60 transition-all hover:border-[#7C5CFF]/30"
         >
           {oauthLoading === 'google' ? (
             <Loader2 className="h-4.5 w-4.5 animate-spin text-[#7C5CFF]" />
@@ -275,8 +278,25 @@ export default function LoginPage() {
               <Terminal className="h-4.5 w-4.5 text-[#22D3D0]" />
             </div>
           </div>
-          <span className="font-display text-2xl tracking-wide text-white">FOCUS</span>
+          <span className="font-display text-2xl tracking-wide text-white uppercase">FOCUS</span>
         </Link>
+
+        {/* Dynamic floating network animation mapping to AI agents */}
+        <div className="relative w-full flex justify-center items-center h-[280px] z-10">
+          <div className="absolute w-[240px] h-[240px] rounded-full border border-dashed border-zinc-800 animate-spin-slow" />
+          <div className="absolute w-[160px] h-[160px] rounded-full border border-zinc-900" />
+
+          {/* Central Orchestrator Core */}
+          <div className="absolute w-12 h-12 rounded-xl bg-gradient-to-tr from-[#7C5CFF] to-[#22D3D0] flex items-center justify-center shadow-lg shadow-[#7C5CFF]/25 animate-pulse">
+            <Terminal className="h-5 w-5 text-zinc-950" />
+          </div>
+
+          {/* Floating Orbiting Agents */}
+          <div className="absolute -translate-x-[120px] w-9 h-9 rounded-full bg-[#13131A] border border-[#7C5CFF]/30 flex items-center justify-center text-xs font-bold text-[#7C5CFF] shadow-md shadow-[#7C5CFF]/5">P</div>
+          <div className="absolute translate-x-[120px] w-9 h-9 rounded-full bg-[#13131A] border border-[#22D3D0]/30 flex items-center justify-center text-xs font-bold text-[#22D3D0] shadow-md shadow-[#22D3D0]/5">R</div>
+          <div className="absolute -translate-y-[120px] w-9 h-9 rounded-full bg-[#13131A] border border-[#3DD68C]/30 flex items-center justify-center text-xs font-bold text-[#3DD68C] shadow-md shadow-[#3DD68C]/5">C</div>
+          <div className="absolute translate-y-[120px] w-9 h-9 rounded-full bg-[#13131A] border border-[#F5B942]/30 flex items-center justify-center text-xs font-bold text-[#F5B942] shadow-md shadow-[#F5B942]/5">K</div>
+        </div>
 
         <div className="space-y-6 max-w-md z-10">
           <h1 className="font-display text-6xl tracking-wide uppercase text-white leading-none">

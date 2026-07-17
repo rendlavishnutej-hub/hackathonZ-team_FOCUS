@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Send, Sparkles, Loader2, MessageCircle, Briefcase, GraduationCap, ArrowDown } from 'lucide-react';
 import { getCareerSuggestions, type CareerMessage } from '@/lib/careerGuidanceService';
-import { motion } from 'framer-motion';
+
 
 // ─── Colour constants matching the design system ────────────────────────────
 const C = {
@@ -159,178 +160,47 @@ export default function CareerGuidanceClient({ userEmail }: CareerGuidanceClient
   // ─── Render helpers ─────────────────────────────────────────────────────────
 
   const renderEmptyState = () => (
-    <div className="flex-1 flex flex-col items-center justify-center px-4 py-16">
-      {/* Mascot Bird AI Agent */}
-      <div className="flex justify-center mb-8 select-none">
-        <motion.div 
-          ref={containerRef} 
-          className="w-28 h-28 relative group cursor-pointer"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          onClick={() => {
-            if (isJumping) return;
-            setIsJumping(true);
-            setTimeout(() => setIsJumping(false), 900);
-          }}
-          animate={
-            isJumping
-              ? { 
-                  y: [0, -60, 5, -2, 0],
-                  rotate: [0, 360, 360, 360, 360],
-                  scale: [1, 1.15, 0.92, 1.04, 1] 
-                }
-              : isHovered
-                ? { 
-                    y: [0, -8, 0],
-                    scale: 1.06,
-                    rotate: [0, -1.5, 1.5, 0]
-                  }
-                : { 
-                    y: [0, -3, 0],
-                    scale: 1
-                  }
-          }
-          transition={
-            isJumping
-              ? { duration: 0.9, ease: "easeInOut" }
-              : isHovered
-                ? { duration: 0.6, repeat: Infinity, ease: "easeInOut" }
-                : { duration: 4, repeat: Infinity, ease: "easeInOut" }
-          }
-        >
-          {/* Owl character SVG */}
-          <svg viewBox="0 0 120 120" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-            <ellipse cx="60" cy="75" rx="32" ry="38" fill="#fcdf46" />
-            <circle cx="60" cy="45" r="32" fill="#fcdf46" />
-            <polygon points="35,22 28,8 43,18" fill="#e2a800" />
-            <polygon points="85,22 92,8 77,18" fill="#e2a800" />
-            <circle cx="45" cy="44" r="13" fill="white" />
-            <circle cx="75" cy="44" r="13" fill="white" />
-            <polygon points="60,52 53,62 67,62" fill="#e2a800" />
-            
-            {/* Left Wing */}
-            <motion.g
-              style={{ transformOrigin: '28px 80px' }}
-              animate={
-                isJumping
-                  ? { rotate: [-15, -95, -15], scaleX: [1, 1.1, 1] }
-                  : isHovered
-                    ? { rotate: [-15, -80, 20, -15] }
-                    : { rotate: [-15, -22, -15] }
-              }
-              transition={
-                isJumping
-                  ? { duration: 0.9, ease: "easeInOut" }
-                  : isHovered
-                    ? { duration: 0.22, repeat: Infinity, ease: "easeInOut" }
-                    : { duration: 3.5, repeat: Infinity, ease: "easeInOut" }
-              }
-            >
-              <ellipse cx="28" cy="80" rx="12" ry="22" fill="#e2a800" />
-            </motion.g>
+    <motion.div 
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, margin: "-50px" }}
+      variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
+      className="flex-1 flex flex-col items-center justify-center px-4 py-16"
+    >
+      {/* Hero icon */}
+      <motion.div
+        variants={{ hidden: { opacity: 0, scale: 0.8 }, show: { opacity: 1, scale: 1, transition: { type: 'spring' } } }}
+        className="h-20 w-20 rounded-3xl flex items-center justify-center mb-6 shadow-lg"
+        style={{
+          background: 'linear-gradient(135deg, #bec6e0 0%, #7c839b 50%, #d3579a 100%)',
+        }}
+      >
+        <GraduationCap className="h-10 w-10 text-white" />
+      </motion.div>
 
-            {/* Right Wing */}
-            <motion.g
-              style={{ transformOrigin: '92px 80px' }}
-              animate={
-                isJumping
-                  ? { rotate: [15, 95, 15], scaleX: [1, 1.1, 1] }
-                  : isHovered
-                    ? { rotate: [15, 80, -20, 15] }
-                    : { rotate: [15, 22, 15] }
-              }
-              transition={
-                isJumping
-                  ? { duration: 0.9, ease: "easeInOut" }
-                  : isHovered
-                    ? { duration: 0.22, repeat: Infinity, ease: "easeInOut" }
-                    : { duration: 3.5, repeat: Infinity, ease: "easeInOut" }
-              }
-            >
-              <ellipse cx="92" cy="80" rx="12" ry="22" fill="#e2a800" />
-            </motion.g>
-
-            {/* Feet */}
-            <motion.g
-              style={{ transformOrigin: '60px 112px' }}
-              animate={
-                isJumping
-                  ? { y: [0, 4, -4, 0], scaleY: [1, 0.7, 1.1, 1] }
-                  : isHovered
-                    ? { y: [0, -2, 0] }
-                    : { y: 0 }
-              }
-              transition={{ duration: 0.6 }}
-            >
-              <ellipse cx="48" cy="112" rx="10" ry="5" fill="#e2a800" />
-              <ellipse cx="72" cy="112" rx="10" ry="5" fill="#e2a800" />
-            </motion.g>
-          </svg>
-
-          {/* Left pupil */}
-          <motion.div
-            className="absolute pupil transition-all duration-75"
-            style={{
-              width: 18, height: 18,
-              borderRadius: '50%',
-              backgroundColor: '#1e293b',
-              left: '29%', top: '33%',
-              display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end',
-              padding: 2.5, zIndex: 20,
-              transform: 'translate(var(--eye-x, 0px), var(--eye-y, 0px))',
-            }}
-            animate={
-              isJumping
-                ? { scaleY: 0.15, scaleX: 1.1 }
-                : isHovered
-                  ? { scale: 1.15 }
-                  : { scale: 1 }
-            }
-          >
-            {!isJumping && <div className="w-1 h-1 rounded-full bg-white" />}
-          </motion.div>
-
-          {/* Right pupil */}
-          <motion.div
-            className="absolute pupil transition-all duration-75"
-            style={{
-              width: 22, height: 22,
-              borderRadius: '50%',
-              backgroundColor: '#1e293b',
-              left: '55%', top: '31%',
-              display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end',
-              padding: 3, zIndex: 20,
-              transform: 'translate(var(--eye-x, 0px), var(--eye-y, 0px))',
-            }}
-            animate={
-              isJumping
-                ? { scaleY: 0.15, scaleX: 1.1 }
-                : isHovered
-                  ? { scale: 1.15 }
-                  : { scale: 1 }
-            }
-          >
-            {!isJumping && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-          </motion.div>
-        </motion.div>
-      </div>
-
-      <h2
+      <motion.h2
+        variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
         className="text-2xl sm:text-3xl font-extrabold tracking-tight text-center mb-2"
         style={{ color: C.primary, fontFamily: 'var(--font-jakarta), sans-serif' }}
       >
         Career Guidance
-      </h2>
-      <p className="text-sm text-center max-w-md mb-10" style={{ color: C.onSurfaceVariant }}>
+      </motion.h2>
+      <motion.p 
+        variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
+        className="text-sm text-center max-w-md mb-10" style={{ color: C.onSurfaceVariant }}
+      >
         Ask me anything about career paths, skills, and opportunities. I&apos;ll give you personalised suggestions
         {getCourses().length > 0 ? ' based on your current courses.' : '.'}
-      </p>
+      </motion.p>
 
       {/* Starter question cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
         {STARTER_QUESTIONS.map((sq, i) => (
-          <button
+          <motion.button
             key={i}
+            variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => handleSend(sq.question)}
             className="group text-left p-4 rounded-2xl border transition-all duration-200 hover:shadow-md"
             style={{
@@ -362,20 +232,23 @@ export default function CareerGuidanceClient({ userEmail }: CareerGuidanceClient
                 </span>
               </div>
             </div>
-          </button>
+          </motion.button>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 
   const renderMessage = (msg: CareerMessage) => {
     const isUser = msg.role === 'user';
 
     return (
-      <div
+      <motion.div
         key={msg.id}
-        className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4 animate-in`}
-        style={{ animation: 'fadeSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}
+        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+        className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}
       >
         {/* Assistant avatar */}
         {!isUser && (
@@ -434,7 +307,7 @@ export default function CareerGuidanceClient({ userEmail }: CareerGuidanceClient
             {displayName[0]?.toUpperCase() || 'U'}
           </div>
         )}
-      </div>
+      </motion.div>
     );
   };
 

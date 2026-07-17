@@ -383,18 +383,22 @@ export default function QuizTakeClient({ userId }: QuizTakeClientProps) {
         </AnimatePresence>
 
         {/* Navigation Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-          <button
+        <div className="flex items-center justify-between gap-3">
+          <motion.button
+            whileHover={currentIndex > 0 ? { scale: 1.05 } : {}}
+            whileTap={currentIndex > 0 ? { scale: 0.95 } : {}}
             onClick={goPrev}
             disabled={currentIndex === 0}
             className="flex items-center gap-1.5 px-4 py-2.5 border rounded-xl text-sm font-semibold text-zinc-650 hover:bg-zinc-50 transition-all bg-white disabled:opacity-30 disabled:cursor-not-allowed"
             style={{ borderColor: C.surfaceVariant }}
           >
             <ChevronLeft className="h-4 w-4" /> Previous
-          </button>
+          </motion.button>
 
           <div className="flex items-center gap-2">
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={toggleBookmark}
               className="flex items-center gap-1.5 px-4 py-2.5 border rounded-xl text-sm font-bold transition-all bg-white"
               style={
@@ -409,45 +413,53 @@ export default function QuizTakeClient({ userId }: QuizTakeClientProps) {
                 <Bookmark className="h-4.5 w-4.5" />
               )}
               {bookmarks.has(currentQuestion?.id || '') ? 'Bookmarked' : 'Bookmark'}
-            </button>
+            </motion.button>
 
-            <button
+            <motion.button
+              whileHover={currentIndex < questions.length - 1 ? { scale: 1.05 } : {}}
+              whileTap={currentIndex < questions.length - 1 ? { scale: 0.95 } : {}}
               onClick={skip}
               disabled={currentIndex === questions.length - 1}
               className="flex items-center gap-1.5 px-4 py-2.5 border rounded-xl text-sm font-semibold text-zinc-650 hover:bg-zinc-50 transition-all bg-white disabled:opacity-30 disabled:cursor-not-allowed"
               style={{ borderColor: C.surfaceVariant }}
             >
               <SkipForward className="h-4 w-4" /> Skip
-            </button>
+            </motion.button>
           </div>
 
           {currentIndex < questions.length - 1 ? (
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={goNext}
               className="flex items-center gap-1.5 px-4 py-2.5 border rounded-xl text-sm font-bold text-black bg-white hover:bg-zinc-55 transition-all"
               style={{ borderColor: C.surfaceVariant }}
             >
               Next <ChevronRight className="h-4 w-4" />
-            </button>
+            </motion.button>
           ) : (
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={handleSubmit}
               className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-bold text-white hover:opacity-95 shadow transition-all"
               style={{ backgroundColor: C.accentPurple }}
             >
               <Send className="h-4 w-4" /> Submit
-            </button>
+            </motion.button>
           )}
         </div>
       </div>
 
       {/* Question Palette (Sidebar) */}
-      <div className="w-full lg:w-64 shrink-0">
-        <div 
-          className="p-5 rounded-2xl border bg-white space-y-4 lg:sticky lg:top-4"
-          style={{ borderColor: C.surfaceVariant }}
+      <div className="hidden lg:block w-64 shrink-0">
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="glass-panel p-5 rounded-2xl border border-white/5 bg-[#13131A]/60 space-y-4 sticky top-4"
         >
-          <h4 className="text-xs font-bold uppercase tracking-widest text-[#76777d]">Question Palette</h4>
+          <h4 className="text-xs font-bold uppercase tracking-widest text-zinc-500">Question Palette</h4>
           <div className="grid grid-cols-5 gap-2">
             {questions.map((q, idx) => {
               const status = getPaletteStatus(q.id);
@@ -482,7 +494,7 @@ export default function QuizTakeClient({ userId }: QuizTakeClientProps) {
           >
             Submit Quiz
           </button>
-        </div>
+        </motion.div>
       </div>
 
       {/* Confirmation Modal */}

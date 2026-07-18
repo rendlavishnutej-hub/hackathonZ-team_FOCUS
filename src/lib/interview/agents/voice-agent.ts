@@ -105,11 +105,11 @@ export async function formatForVoice(
 Convert this interview question into a natural, spoken sentence that sounds like a real person talking. 
 
 Rules:
-- Maximum 40 words total (including feedback if provided)
+- Maximum 25 words total
 - No markdown, no bullets, no special characters
 - No "Question:" prefix
-- Sound conversational, supportive, and natural
-${feedback ? `- BEFORE asking the question, provide ONE very brief, conversational sentence acknowledging their previous answer based on this feedback: "${feedback}"` : '- Do NOT add random transitions or greetings.'}
+- Sound conversational and natural
+- Do NOT add any transitions, greetings, or feedback. Just reformulate the question itself.
 - Preserve the core question's intent exactly
 
 Original Question: "${cleanQuestion}"
@@ -118,13 +118,13 @@ Return ONLY the reformulated spoken response, nothing else.`;
 
       const result = await generateText(prompt, cleanQuestion);
       const formatted = stripMarkdown(result || cleanQuestion);
-      return feedback ? formatted : buildSpokenPrompt(formatted, questionIndex, isFollowUp, lastScore, hintText);
+      return buildSpokenPrompt(formatted, questionIndex, isFollowUp, lastScore, hintText, feedback);
     } catch {
       // Fallback to rule-based formatting
     }
   }
 
-  return buildSpokenPrompt(cleanQuestion, questionIndex, isFollowUp, lastScore, hintText);
+  return buildSpokenPrompt(cleanQuestion, questionIndex, isFollowUp, lastScore, hintText, feedback);
 }
 
 /**
@@ -135,7 +135,8 @@ function buildSpokenPrompt(
   questionIndex: number,
   isFollowUp: boolean,
   lastScore?: number,
-  hintText?: string
+  hintText?: string,
+  feedback?: string
 ): string {
   let transition: string;
 
@@ -160,5 +161,11 @@ function buildSpokenPrompt(
     finalQuestion += '?';
   }
 
-  return `${transition} ${finalQuestion}`;
+  let spokenOutput = transition;
+  if (feedback) {
+    // Clean markdown from feedback just in case
+    spokenOutput += ` ${stripMarkdown(feedback)}`;
+  }
+  
+  return `${spokenOutput} ${finalQuestion}`;
 }

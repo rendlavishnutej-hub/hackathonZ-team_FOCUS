@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   BookOpen, Settings, LogOut, Shield, Award,
-  Terminal, Activity, Compass, Users, Mic, HelpCircle, GraduationCap, FileText
+  Terminal, Activity, Compass, Users, Mic, HelpCircle, GraduationCap, FileText,
+  Menu, X
 } from 'lucide-react';
 import { signOutAction } from '@/app/auth/actions';
 
@@ -35,6 +36,12 @@ interface SidebarProps {
 export default function Sidebar({ userEmail }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Close sidebar on route change on mobile
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
 
   const handleLogout = async () => {
     try {
@@ -51,17 +58,17 @@ export default function Sidebar({ userEmail }: SidebarProps) {
     { name: 'Dashboard',            href: '/dashboard',       icon: Compass },
     { name: 'Study Notes',          href: '/notes',           icon: FileText },
     { name: 'Quiz',                 href: '/quiz',            icon: HelpCircle },
-    { name: '🎤 AI Mock Interview', href: '/interview',       icon: Mic },
+    { name: 'AI Mock Interview',    href: '/interview',       icon: Mic },
     { name: 'Career Guidance',      href: '/career-guidance', icon: GraduationCap },
     { name: 'Security Settings',    href: '/settings',        icon: Shield }
   ];
 
   const displayName = userEmail.split('@')[0].toUpperCase();
 
-  return (
-    <aside
-      className="w-64 border-r flex flex-col justify-between shrink-0 h-screen sticky top-0"
-      style={{ backgroundColor: C.surfaceContainerLow, borderColor: C.surfaceVariant }}
+  const sidebarContent = (
+    <div
+      className="w-full flex flex-col justify-between shrink-0 h-full bg-white md:bg-transparent"
+      style={{ backgroundColor: C.surfaceContainerLow }}
     >
       {/* Top Header */}
       <div className="p-6">
@@ -80,7 +87,7 @@ export default function Sidebar({ userEmail }: SidebarProps) {
         </Link>
 
         {/* Navigation */}
-        <nav className="mt-8 space-y-1.5">
+        <nav className="mt-8 space-y-1.5 overflow-y-auto">
           {navItems.map(item => {
             const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
             const Icon = item.icon;
@@ -116,7 +123,7 @@ export default function Sidebar({ userEmail }: SidebarProps) {
       </div>
 
       {/* User Session profile / Logout */}
-      <div className="p-6 border-t space-y-4" style={{ borderColor: C.surfaceVariant }}>
+      <div className="p-6 border-t space-y-4 shrink-0" style={{ borderColor: C.surfaceVariant }}>
         <div
           className="flex items-center gap-3 p-3 rounded-xl border"
           style={{ backgroundColor: C.surfaceContainerLowest, borderColor: C.surfaceVariant }}
@@ -150,6 +157,53 @@ export default function Sidebar({ userEmail }: SidebarProps) {
           Logout
         </button>
       </div>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Mobile Hamburger Button */}
+      <button
+        onClick={() => setIsOpen(true)}
+        className="lg:hidden fixed top-4 left-4 z-40 p-2.5 rounded-xl shadow-sm border flex items-center justify-center bg-white hover:bg-zinc-50 transition-colors"
+        style={{ borderColor: C.surfaceVariant, color: C.onSurface }}
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
+      {/* Mobile Drawer Overlay */}
+      {isOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" 
+            onClick={() => setIsOpen(false)}
+          />
+          
+          {/* Drawer */}
+          <div 
+            className="relative w-64 max-w-[80vw] h-full flex flex-col transform transition-transform animate-in slide-in-from-left border-r shadow-xl"
+            style={{ borderColor: C.surfaceVariant }}
+          >
+            <button
+              onClick={() => setIsOpen(false)}
+              className="absolute top-4 -right-12 p-2.5 rounded-xl bg-white shadow-sm border flex items-center justify-center text-zinc-500 hover:text-black transition-colors"
+              style={{ borderColor: C.surfaceVariant }}
+            >
+              <X className="h-5 w-5" />
+            </button>
+            {sidebarContent}
+          </div>
+        </div>
+      )}
+
+      {/* Desktop Sidebar */}
+      <aside 
+        className="hidden lg:flex w-64 flex-col justify-between shrink-0 h-screen sticky top-0 border-r"
+        style={{ borderColor: C.surfaceVariant }}
+      >
+        {sidebarContent}
+      </aside>
+    </>
   );
 }

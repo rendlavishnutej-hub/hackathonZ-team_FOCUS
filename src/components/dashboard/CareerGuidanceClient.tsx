@@ -194,7 +194,7 @@ export default function CareerGuidanceClient({ userEmail }: CareerGuidanceClient
       </motion.p>
 
       {/* Starter question cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-4xl">
         {STARTER_QUESTIONS.map((sq, i) => (
           <motion.button
             key={i}
@@ -339,7 +339,7 @@ export default function CareerGuidanceClient({ userEmail }: CareerGuidanceClient
   // ─── Main render ────────────────────────────────────────────────────────────
 
   return (
-    <div className="max-w-4xl mx-auto flex flex-col h-full">
+    <div className="flex flex-col h-full w-full relative z-10">
       {/* Inline keyframe animation */}
       <style>{`
         @keyframes fadeSlideIn {
@@ -348,76 +348,71 @@ export default function CareerGuidanceClient({ userEmail }: CareerGuidanceClient
         }
       `}</style>
 
-      {/* Header */}
-      <div className="space-y-2 mb-6 shrink-0">
-        <div
-          className="inline-flex items-center gap-1.5 px-3 py-1 border rounded-full text-[10px] font-semibold uppercase tracking-wider"
-          style={{
-            backgroundColor: `${C.accentPink}20`,
-            borderColor: `${C.accentPink}60`,
-            color: C.accentPurple,
-          }}
-        >
-          <MessageCircle className="h-3 w-3" />
-          Career AI Advisor
+      {/* Top Bar Header */}
+      <div 
+        className="px-6 py-4 border-b flex items-center justify-between shrink-0 bg-white/60 backdrop-blur-xl"
+        style={{ borderColor: C.surfaceVariant }}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className="h-10 w-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
+            style={{ background: 'linear-gradient(135deg, #bec6e0 0%, #7c839b 100%)' }}
+          >
+            <Sparkles className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <h1
+              className="text-lg sm:text-xl font-extrabold tracking-tight leading-tight"
+              style={{ color: C.primary, fontFamily: 'var(--font-jakarta), sans-serif' }}
+            >
+              Career <span style={{ color: '#5a6ba8' }}>Guidance</span>
+            </h1>
+            <p className="text-[11px] sm:text-xs font-medium uppercase tracking-wider" style={{ color: C.outline }}>
+              AI Advisor Session
+            </p>
+          </div>
         </div>
-        <h1
-          className="text-3xl sm:text-4xl font-extrabold tracking-tight"
-          style={{ color: C.primary, fontFamily: 'var(--font-jakarta), sans-serif' }}
-        >
-          Career <span style={{ color: '#5a6ba8' }}>Guidance</span>
-        </h1>
-        <p className="text-sm" style={{ color: C.onSurfaceVariant }}>
-          Explore career paths tailored to your skills and interests.
-        </p>
       </div>
 
       {/* Chat area */}
-      <div
-        className="flex-1 rounded-3xl border shadow-lg flex flex-col overflow-hidden relative"
-        style={{
-          backgroundColor: C.surfaceContainerLow,
-          borderColor: C.surfaceVariant,
-          boxShadow: '0 8px 32px rgba(0,0,0,0.06)',
-          minHeight: '400px',
-        }}
-      >
+      <div className="flex-1 flex flex-col overflow-hidden relative">
         {/* Messages container */}
         <div
           ref={scrollContainerRef}
-          className="flex-1 overflow-y-auto px-6 py-6"
+          className="flex-1 overflow-y-auto px-6 py-8 md:px-10 lg:px-12 scroll-smooth"
         >
-          {messages.length === 0 && !isLoading ? (
-            renderEmptyState()
-          ) : (
-            <>
-              {messages.map(renderMessage)}
-              {isLoading && renderLoadingBubble()}
-              <div ref={messagesEndRef} />
-            </>
-          )}
+          <div className="w-full flex flex-col min-h-full">
+            {messages.length === 0 && !isLoading ? (
+              renderEmptyState()
+            ) : (
+              <div className="flex flex-col w-full pb-4 flex-1 justify-end">
+                {messages.map(renderMessage)}
+                {isLoading && renderLoadingBubble()}
+                <div ref={messagesEndRef} className="h-4" />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Scroll-to-bottom button */}
         {showScrollBtn && (
           <button
             onClick={scrollToBottom}
-            className="absolute bottom-24 right-6 h-9 w-9 rounded-full border shadow-md flex items-center justify-center transition-all hover:shadow-lg"
+            className="absolute bottom-28 right-8 h-10 w-10 rounded-full border shadow-md flex items-center justify-center transition-all hover:shadow-lg z-20 bg-white"
             style={{
-              backgroundColor: C.surfaceContainerLowest,
               borderColor: C.outlineVariant,
             }}
           >
-            <ArrowDown className="h-4 w-4" style={{ color: C.onSurfaceVariant }} />
+            <ArrowDown className="h-5 w-5" style={{ color: C.onSurfaceVariant }} />
           </button>
         )}
 
         {/* Input bar */}
         <div
-          className="px-4 py-4 border-t shrink-0"
-          style={{ borderColor: C.surfaceVariant, backgroundColor: C.surfaceContainerLowest }}
+          className="px-6 py-5 md:px-10 lg:px-12 border-t bg-white/80 backdrop-blur-xl shrink-0"
+          style={{ borderColor: C.surfaceVariant }}
         >
-          <div className="flex items-center gap-3">
+          <div className="w-full flex items-center gap-4">
             <input
               ref={inputRef}
               type="text"
@@ -426,19 +421,19 @@ export default function CareerGuidanceClient({ userEmail }: CareerGuidanceClient
               onKeyDown={handleKeyDown}
               placeholder="Ask about career paths, skills, opportunities…"
               disabled={isLoading}
-              className="flex-1 px-5 py-3 rounded-xl border text-sm outline-none transition-all duration-150 placeholder:text-gray-400 disabled:opacity-50"
+              className="flex-1 px-5 py-4 rounded-xl border text-sm outline-none transition-all duration-150 placeholder:text-gray-400 disabled:opacity-50 shadow-sm"
               style={{
-                backgroundColor: C.surfaceContainerLow,
+                backgroundColor: C.surfaceContainerLowest,
                 borderColor: C.surfaceVariant,
                 color: C.onSurface,
               }}
-              onFocus={(e) => { e.currentTarget.style.borderColor = '#5a6ba8'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(90,107,168,0.12)'; }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = C.surfaceVariant; e.currentTarget.style.boxShadow = 'none'; }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = '#5a6ba8'; e.currentTarget.style.boxShadow = '0 0 0 4px rgba(90,107,168,0.12)'; }}
+              onBlur={(e) => { e.currentTarget.style.borderColor = C.surfaceVariant; e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)'; }}
             />
             <button
               onClick={() => handleSend()}
               disabled={!input.trim() || isLoading}
-              className="h-11 w-11 rounded-xl flex items-center justify-center transition-all duration-150 shrink-0 disabled:opacity-40"
+              className="h-14 w-14 rounded-xl flex items-center justify-center transition-all duration-150 shrink-0 disabled:opacity-40 shadow-sm"
               style={{
                 backgroundColor: input.trim() && !isLoading ? C.primary : C.surfaceContainerHigh,
                 color: input.trim() && !isLoading ? C.onPrimary : C.outline,
@@ -446,18 +441,18 @@ export default function CareerGuidanceClient({ userEmail }: CareerGuidanceClient
               onMouseEnter={(e) => {
                 if (input.trim() && !isLoading) {
                   e.currentTarget.style.transform = 'scale(1.05)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
                 }
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'scale(1)';
-                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
               }}
             >
               {isLoading ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
+                <Loader2 className="h-6 w-6 animate-spin" />
               ) : (
-                <Send className="h-5 w-5" />
+                <Send className="h-6 w-6" />
               )}
             </button>
           </div>

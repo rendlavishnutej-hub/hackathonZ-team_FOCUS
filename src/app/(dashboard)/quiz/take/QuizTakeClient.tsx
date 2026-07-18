@@ -14,23 +14,11 @@ const C = {
   cream: '#fef9f2',
   primary: '#000000',
   onPrimary: '#ffffff',
-  surfaceContainerLowest: '#ffffff',
-  surfaceContainerLow: '#f8f3ec',
-  surfaceContainer: '#f2ede6',
-  surfaceContainerHigh: '#ece7e1',
-  surfaceVariant: '#e6e2db',
-  onSurface: '#1d1c18',
-  onSurfaceVariant: '#45464d',
-  outline: '#76777d',
-  outlineVariant: '#c6c6cd',
-  inverseOnSurface: '#f5f0e9',
-  inverseSurface: '#32302c',
   accentYellow: '#ffe24c',
   accentBlue: '#bec6e0',
   accentPink: '#ffafd3',
   accentGreen: '#86efac',
   accentPurple: '#d3579a',
-  secondaryContainer: '#fcdf46',
 };
 
 interface QuizTakeClientProps {
@@ -195,11 +183,11 @@ export default function QuizTakeClient({ userId }: QuizTakeClientProps) {
   };
 
   const paletteColors: Record<PaletteStatus, string> = {
-    'not-visited': 'bg-white border-zinc-200 text-zinc-500',
-    'answered': 'bg-[#d3579a] border-transparent text-white',
-    'not-answered': 'bg-red-50 text-[#dc2626] border-red-200',
-    'marked': 'bg-amber-50 text-[#d97706] border-amber-250',
-    'answered-marked': 'bg-emerald-50 text-[#047857] border-emerald-250',
+    'not-visited': 'bg-white border-black text-black',
+    'answered': 'bg-[#000000] border-[#000000] text-white',
+    'not-answered': 'bg-[#ffafd3] text-black border-black',
+    'marked': 'bg-[#ffe24c] text-black border-black',
+    'answered-marked': 'bg-[#86efac] text-black border-black',
   };
 
   const answeredCount = questions.filter(q => answers[q.id] !== undefined && answers[q.id] !== null && answers[q.id] !== '').length;
@@ -265,10 +253,10 @@ export default function QuizTakeClient({ userId }: QuizTakeClientProps) {
 
   if (phase === 'loading') {
     return (
-      <div className="flex items-center justify-center h-full py-28 font-sans">
+      <div className="flex items-center justify-center h-full py-28 font-display uppercase tracking-wide text-2xl text-black">
         <div className="text-center space-y-4">
-          <Loader2 className="h-10 w-10 text-[#d3579a] animate-spin mx-auto" />
-          <p className="text-sm font-semibold text-zinc-550">Preparing your quiz...</p>
+          <Loader2 className="h-16 w-16 text-black animate-spin mx-auto" />
+          <p>INITIALIZING TERMINAL...</p>
         </div>
       </div>
     );
@@ -279,23 +267,24 @@ export default function QuizTakeClient({ userId }: QuizTakeClientProps) {
   }
 
   return (
-    <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-6 relative font-sans" style={{ color: C.onSurface }}>
+    <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8 relative font-display uppercase tracking-wider text-black">
       {/* Main Quiz Area */}
-      <div className="flex-1 space-y-5">
-        {/* Top Bar: Progress + Timer */}
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex-1">
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[10px] uppercase font-bold tracking-widest text-[#76777d]">
-                Question {currentIndex + 1} of {questions.length}
+      <div className="flex-1 space-y-8">
+        
+        {/* TOP BAR: Brutalist Progress + Timer */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-6">
+          <div className="flex-1 border-4 border-black bg-white p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm md:text-xl">
+                Q {currentIndex + 1} / {questions.length}
               </span>
-              <span className="text-[10px] uppercase font-bold tracking-widest text-[#76777d]">
-                {answeredCount} answered
+              <span className="text-sm md:text-xl text-[#d3579a]">
+                {answeredCount} DONE
               </span>
             </div>
-            <div className="w-full h-2 bg-zinc-200 rounded-full overflow-hidden">
+            <div className="w-full h-4 bg-zinc-200 border-2 border-black overflow-hidden">
               <motion.div
-                className="h-full bg-gradient-to-r from-[#d3579a] to-[#5a6ba8] rounded-full"
+                className="h-full bg-[#d3579a] border-r-2 border-black"
                 initial={{ width: 0 }}
                 animate={{ width: `${((answeredCount) / questions.length) * 100}%` }}
                 transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
@@ -305,15 +294,13 @@ export default function QuizTakeClient({ userId }: QuizTakeClientProps) {
 
           {config?.timerEnabled && (
             <div
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl border font-mono text-sm font-bold ${
+              className={`flex items-center justify-center gap-3 px-6 py-4 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-2xl sm:text-4xl ${
                 timeRemaining <= 60
-                  ? 'bg-red-50 border-red-200 text-red-600 animate-pulse'
-                  : timeRemaining <= 300
-                    ? 'bg-amber-50 border-amber-250 text-amber-600'
-                    : 'bg-white border-zinc-250 text-black'
+                  ? 'bg-[#ffafd3] text-black animate-pulse'
+                  : 'bg-[#ffe24c] text-black'
               }`}
             >
-              <Clock className="h-4 w-4" />
+              <Clock className="h-6 w-6 sm:h-8 sm:w-8" strokeWidth={3} />
               {formatTime(timeRemaining)}
             </div>
           )}
@@ -323,34 +310,30 @@ export default function QuizTakeClient({ userId }: QuizTakeClientProps) {
         <AnimatePresence mode="wait">
           <motion.div
             key={currentQuestion?.id}
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -30 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="p-8 rounded-[2rem] border bg-white shadow-sm space-y-6"
-            style={{ borderColor: C.surfaceVariant }}
+            className="p-6 sm:p-10 border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] space-y-8"
           >
             {/* Question Type Badge */}
-            <div className="flex items-center justify-between">
-              <span 
-                className="px-2.5 py-1 text-[9px] font-bold tracking-wider uppercase rounded-full border"
-                style={{ backgroundColor: `${C.accentPurple}10`, borderColor: `${C.accentPurple}35`, color: C.accentPurple }}
-              >
+            <div className="flex items-center justify-between border-b-4 border-black pb-4">
+              <span className="px-4 py-2 text-sm sm:text-xl bg-[#bec6e0] border-4 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                 {currentQuestion?.type.replace('-', ' ')}
               </span>
-              <span className="text-[10px] text-zinc-550 font-mono font-bold">
-                {currentQuestion?.marks} mark{currentQuestion?.marks !== 1 ? 's' : ''}
-                {currentQuestion?.negativeMarks > 0 && ` · -${currentQuestion.negativeMarks} penalty`}
+              <span className="text-lg sm:text-2xl">
+                {currentQuestion?.marks} PTS
+                {currentQuestion?.negativeMarks > 0 && ` (-${currentQuestion.negativeMarks} PENALTY)`}
               </span>
             </div>
 
             {/* Question Text */}
-            <h3 className="text-lg font-extrabold text-black leading-relaxed whitespace-pre-wrap">
+            <h3 className="text-2xl sm:text-4xl md:text-5xl leading-[1.1] whitespace-pre-wrap">
               {currentQuestion?.question}
             </h3>
 
-            {/* Answer Input — type-specific */}
-            <div className="space-y-3 pt-2">
+            {/* Answer Input */}
+            <div className="pt-6">
               {currentQuestion?.type === 'mcq' && (
                 <MCQInput
                   options={(currentQuestion.payload as any).options}
@@ -393,92 +376,73 @@ export default function QuizTakeClient({ userId }: QuizTakeClientProps) {
         </AnimatePresence>
 
         {/* Navigation Controls */}
-        <div className="flex items-center justify-between gap-3">
-          <motion.button
-            whileHover={currentIndex > 0 ? { scale: 1.05 } : {}}
-            whileTap={currentIndex > 0 ? { scale: 0.95 } : {}}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-4">
+          <button
             onClick={goPrev}
             disabled={currentIndex === 0}
-            className="flex items-center gap-1.5 px-4 py-2.5 border rounded-xl text-sm font-semibold text-zinc-650 hover:bg-zinc-50 transition-all bg-white disabled:opacity-30 disabled:cursor-not-allowed"
-            style={{ borderColor: C.surfaceVariant }}
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-4 border-4 border-black bg-white text-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[4px] active:translate-x-[4px] transition-all disabled:opacity-50 disabled:pointer-events-none"
           >
-            <ChevronLeft className="h-4 w-4" /> Previous
-          </motion.button>
+            <ChevronLeft className="h-6 w-6" strokeWidth={3} /> PREV
+          </button>
 
-          <div className="flex items-center gap-2">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+          <div className="flex items-center gap-4 flex-1 justify-center">
+            <button
               onClick={toggleBookmark}
-              className="flex items-center gap-1.5 px-4 py-2.5 border rounded-xl text-sm font-bold transition-all bg-white"
-              style={
-                bookmarks.has(currentQuestion?.id || '')
-                  ? { borderColor: '#fde68a', backgroundColor: '#fffbeb', color: '#d97706' }
-                  : { borderColor: C.surfaceVariant, color: '#71717a' }
-              }
+              className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-4 border-4 border-black text-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[4px] active:translate-x-[4px] transition-all ${
+                bookmarks.has(currentQuestion?.id || '') ? 'bg-[#ffe24c]' : 'bg-white'
+              }`}
             >
               {bookmarks.has(currentQuestion?.id || '') ? (
-                <BookmarkCheck className="h-4.5 w-4.5 text-[#d97706]" />
+                <BookmarkCheck className="h-6 w-6" strokeWidth={3} />
               ) : (
-                <Bookmark className="h-4.5 w-4.5" />
+                <Bookmark className="h-6 w-6" strokeWidth={3} />
               )}
-              {bookmarks.has(currentQuestion?.id || '') ? 'Bookmarked' : 'Bookmark'}
-            </motion.button>
+              <span className="hidden sm:inline">
+                {bookmarks.has(currentQuestion?.id || '') ? 'BOOKMARKED' : 'BOOKMARK'}
+              </span>
+            </button>
 
-            <motion.button
-              whileHover={currentIndex < questions.length - 1 ? { scale: 1.05 } : {}}
-              whileTap={currentIndex < questions.length - 1 ? { scale: 0.95 } : {}}
+            <button
               onClick={skip}
               disabled={currentIndex === questions.length - 1}
-              className="flex items-center gap-1.5 px-4 py-2.5 border rounded-xl text-sm font-semibold text-zinc-650 hover:bg-zinc-50 transition-all bg-white disabled:opacity-30 disabled:cursor-not-allowed"
-              style={{ borderColor: C.surfaceVariant }}
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-4 border-4 border-black bg-[#bec6e0] text-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[4px] active:translate-x-[4px] transition-all disabled:opacity-50 disabled:pointer-events-none"
             >
-              <SkipForward className="h-4 w-4" /> Skip
-            </motion.button>
+              <SkipForward className="h-6 w-6" strokeWidth={3} /> SKIP
+            </button>
           </div>
 
           {currentIndex < questions.length - 1 ? (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <button
               onClick={goNext}
-              className="flex items-center gap-1.5 px-4 py-2.5 border rounded-xl text-sm font-bold text-black bg-white hover:bg-zinc-55 transition-all"
-              style={{ borderColor: C.surfaceVariant }}
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-8 py-4 border-4 border-black bg-[#86efac] text-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[4px] active:translate-x-[4px] transition-all"
             >
-              Next <ChevronRight className="h-4 w-4" />
-            </motion.button>
+              NEXT <ChevronRight className="h-6 w-6" strokeWidth={3} />
+            </button>
           ) : (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <button
               onClick={handleSubmit}
-              className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-bold text-white hover:opacity-95 shadow transition-all"
-              style={{ backgroundColor: C.accentPurple }}
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-8 py-4 border-4 border-black bg-[#d3579a] text-white text-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-[4px] active:translate-x-[4px] transition-all"
             >
-              <Send className="h-4 w-4" /> Submit
-            </motion.button>
+              <Send className="h-6 w-6" strokeWidth={3} /> SUBMIT
+            </button>
           )}
         </div>
       </div>
 
-      {/* Question Palette (Sidebar) */}
-      <div className="hidden lg:block w-64 shrink-0">
-        <motion.div 
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="glass-panel p-5 rounded-2xl border border-white/5 bg-[#13131A]/60 space-y-4 sticky top-4"
-        >
-          <h4 className="text-xs font-bold uppercase tracking-widest text-zinc-500">Question Palette</h4>
-          <div className="grid grid-cols-5 gap-2">
+      {/* Question Palette Sidebar */}
+      <div className="w-full lg:w-80 shrink-0">
+        <div className="bg-white border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] sticky top-6 space-y-6">
+          <h4 className="text-2xl border-b-4 border-black pb-4 text-center">MATRIX</h4>
+          
+          <div className="grid grid-cols-5 gap-3">
             {questions.map((q, idx) => {
               const status = getPaletteStatus(q.id);
               return (
                 <button
                   key={q.id}
                   onClick={() => goTo(idx)}
-                  className={`h-9 w-9 rounded-lg text-xs font-bold border transition-all ${paletteColors[status]} ${
-                    idx === currentIndex ? 'ring-2 ring-zinc-550 ring-offset-2 ring-offset-white' : ''
+                  className={`h-12 w-full text-xl flex items-center justify-center border-4 border-black transition-all hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${paletteColors[status]} ${
+                    idx === currentIndex ? 'ring-4 ring-black ring-offset-2' : ''
                   }`}
                 >
                   {idx + 1}
@@ -487,24 +451,21 @@ export default function QuizTakeClient({ userId }: QuizTakeClientProps) {
             })}
           </div>
 
-          {/* Legend */}
-          <div className="space-y-1.5 pt-3 border-t" style={{ borderColor: C.surfaceVariant }}>
-            <LegendItem color="bg-white border-zinc-250" label="Not Visited" />
-            <LegendItem color="bg-[#d3579a]" label="Answered" />
-            <LegendItem color="bg-red-50 border-red-200" label="Not Answered" />
-            <LegendItem color="bg-amber-50 border-amber-250" label="Marked for Review" />
-            <LegendItem color="bg-emerald-50 border-emerald-250" label="Answered & Marked" />
+          <div className="space-y-3 pt-6 border-t-4 border-black">
+            <LegendItem color="bg-white border-black" label="UNVISITED" />
+            <LegendItem color="bg-black text-white" label="ANSWERED" />
+            <LegendItem color="bg-[#ffafd3] border-black" label="SKIPPED" />
+            <LegendItem color="bg-[#ffe24c] border-black" label="REVIEW" />
+            <LegendItem color="bg-[#86efac] border-black" label="DONE + REVIEW" />
           </div>
 
-          {/* Submit Button */}
           <button
             onClick={handleSubmit}
-            className="w-full py-2.5 rounded-xl text-sm font-bold text-white hover:opacity-95 transition-all shadow"
-            style={{ backgroundColor: C.accentPurple }}
+            className="w-full py-4 mt-4 border-4 border-black text-2xl text-white bg-black hover:bg-[#d3579a] transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
           >
-            Submit Quiz
+            END SIMULATION
           </button>
-        </motion.div>
+        </div>
       </div>
 
       {/* Confirmation Modal */}
@@ -514,51 +475,46 @@ export default function QuizTakeClient({ userId }: QuizTakeClientProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 font-display uppercase tracking-wider"
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="p-8 rounded-[2rem] border bg-white max-w-md w-full mx-4 space-y-6 shadow-2xl"
-              style={{ borderColor: C.surfaceVariant }}
+              initial={{ scale: 0.9, y: 50 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 50 }}
+              className="p-8 border-8 border-black bg-white max-w-xl w-full shadow-[16px_16px_0px_0px_rgba(255,226,76,1)] space-y-8"
             >
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center">
-                  <AlertTriangle className="h-5 w-5 text-[#d97706]" />
-                </div>
-                <h3 className="text-lg font-extrabold text-black">Submit Quiz?</h3>
+              <div className="flex items-center gap-4 border-b-4 border-black pb-6">
+                <AlertTriangle className="h-12 w-12 text-black" strokeWidth={3} />
+                <h3 className="text-4xl md:text-5xl text-black">SUBMIT QUIZ?</h3>
               </div>
 
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between py-2 border-b" style={{ borderColor: C.surfaceVariant }}>
-                  <span className="text-zinc-650 font-semibold">Answered</span>
-                  <span className="text-[#047857] font-extrabold">{answeredCount}</span>
+              <div className="space-y-4 text-2xl text-black">
+                <div className="flex justify-between border-b-4 border-black pb-4">
+                  <span>ANSWERED</span>
+                  <span className="text-[#86efac] px-3 py-1 bg-black">{answeredCount}</span>
                 </div>
-                <div className="flex justify-between py-2 border-b" style={{ borderColor: C.surfaceVariant }}>
-                  <span className="text-zinc-650 font-semibold">Unanswered</span>
-                  <span className="text-[#dc2626] font-extrabold">{unansweredCount}</span>
+                <div className="flex justify-between border-b-4 border-black pb-4">
+                  <span>UNANSWERED</span>
+                  <span className="text-[#ffafd3] px-3 py-1 bg-black">{unansweredCount}</span>
                 </div>
-                <div className="flex justify-between py-2">
-                  <span className="text-zinc-650 font-semibold">Bookmarked</span>
-                  <span className="text-[#d97706] font-extrabold">{bookmarkedCount}</span>
+                <div className="flex justify-between pb-2">
+                  <span>BOOKMARKED</span>
+                  <span className="text-[#ffe24c] px-3 py-1 bg-black">{bookmarkedCount}</span>
                 </div>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t-4 border-black">
                 <button
                   onClick={() => setPhase('active')}
-                  className="flex-1 py-2.5 border rounded-xl text-sm font-bold text-zinc-500 hover:bg-zinc-50 transition-all bg-white"
-                  style={{ borderColor: C.surfaceVariant }}
+                  className="flex-1 py-4 border-4 border-black bg-white text-2xl text-black hover:bg-zinc-200 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:translate-x-1 active:shadow-none transition-all"
                 >
-                  Cancel
+                  CANCEL
                 </button>
                 <button
                   onClick={handleSubmit}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white hover:opacity-95 transition-all"
-                  style={{ backgroundColor: C.accentPurple }}
+                  className="flex-1 py-4 border-4 border-black bg-[#d3579a] text-white text-2xl hover:bg-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:translate-x-1 active:shadow-none transition-all"
                 >
-                  Confirm Submit
+                  CONFIRM EXECUTION
                 </button>
               </div>
             </motion.div>
@@ -570,11 +526,11 @@ export default function QuizTakeClient({ userId }: QuizTakeClientProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 font-display uppercase tracking-widest text-white"
           >
-            <div className="text-center space-y-4">
-              <Loader2 className="h-10 w-10 text-[#d3579a] animate-spin mx-auto" />
-              <p className="text-sm font-semibold text-zinc-600">Grading your quiz...</p>
+            <div className="text-center space-y-8">
+              <Loader2 className="h-24 w-24 text-[#ffe24c] animate-spin mx-auto" strokeWidth={3} />
+              <p className="text-4xl sm:text-6xl text-[#ffe24c]">CALCULATING SCORE...</p>
             </div>
           </motion.div>
         )}
@@ -587,40 +543,34 @@ export default function QuizTakeClient({ userId }: QuizTakeClientProps) {
 
 function LegendItem({ color, label }: { color: string; label: string }) {
   return (
-    <div className="flex items-center gap-2">
-      <div className={`h-3 w-3 rounded border ${color}`} />
-      <span className="text-[10px] text-zinc-500 font-semibold">{label}</span>
+    <div className="flex items-center gap-4">
+      <div className={`h-6 w-6 border-4 ${color}`} />
+      <span className="text-lg text-black">{label}</span>
     </div>
   );
 }
 
 function MCQInput({ options, selected, onSelect }: { options: string[]; selected: number | undefined; onSelect: (v: number) => void }) {
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-4 text-black">
       {options.map((opt, idx) => {
         const isSelected = selected === idx;
         return (
           <button
             key={idx}
             onClick={() => onSelect(idx)}
-            className="w-full text-left px-5 py-3.5 rounded-xl border text-sm font-medium transition-all duration-205 flex items-center"
-            style={
-              isSelected
-                ? { borderColor: C.accentPurple, backgroundColor: `${C.accentPurple}08` }
-                : { borderColor: C.surfaceVariant, backgroundColor: '#ffffff' }
-            }
+            className={`w-full text-left px-6 py-5 border-4 border-black transition-all flex items-center gap-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${
+              isSelected ? 'bg-[#ffe24c]' : 'bg-white hover:bg-zinc-100'
+            }`}
           >
             <span 
-              className="inline-flex items-center justify-center h-6 w-6 rounded-lg mr-3 text-xs font-bold shrink-0 border"
-              style={
-                isSelected
-                  ? { backgroundColor: C.accentPurple, color: '#ffffff', borderColor: C.accentPurple }
-                  : { backgroundColor: '#f9f9fafb', color: '#71717a', borderColor: C.surfaceVariant }
-              }
+              className={`flex items-center justify-center h-10 w-10 shrink-0 border-4 border-black text-xl ${
+                isSelected ? 'bg-black text-white' : 'bg-white text-black'
+              }`}
             >
               {String.fromCharCode(65 + idx)}
             </span>
-            <span className={isSelected ? 'text-black font-semibold' : 'text-zinc-800'}>{opt}</span>
+            <span className="text-xl sm:text-2xl leading-[1.2] pt-1">{opt}</span>
           </button>
         );
       })}
@@ -630,23 +580,22 @@ function MCQInput({ options, selected, onSelect }: { options: string[]; selected
 
 function TrueFalseInput({ selected, onSelect }: { selected: boolean | undefined; onSelect: (v: boolean) => void }) {
   return (
-    <div className="flex gap-3">
+    <div className="flex flex-col sm:flex-row gap-6 text-black">
       {[true, false].map(val => {
         const isSelected = selected === val;
         return (
           <button
             key={String(val)}
             onClick={() => onSelect(val)}
-            className="flex-1 py-4 rounded-xl border text-sm font-extrabold transition-all duration-200"
-            style={
+            className={`flex-1 py-8 border-4 border-black text-3xl sm:text-4xl transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] ${
               isSelected
                 ? val
-                  ? { borderColor: '#86efac', backgroundColor: '#f0fdf4', color: '#166534' }
-                  : { borderColor: '#fca5a5', backgroundColor: '#fef2f2', color: '#991b1b' }
-                : { borderColor: C.surfaceVariant, backgroundColor: '#ffffff', color: '#4b5563' }
-            }
+                  ? 'bg-[#86efac]'
+                  : 'bg-[#ffafd3]'
+                : 'bg-white hover:bg-zinc-100'
+            }`}
           >
-            {val ? '✓ True' : '✗ False'}
+            {val ? 'TRUE' : 'FALSE'}
           </button>
         );
       })}
@@ -661,8 +610,8 @@ function FillBlankInput({ value, onChange }: { value: string | string[]; onChang
       type="text"
       value={val}
       onChange={e => onChange(e.target.value)}
-      placeholder="Type your answer here..."
-      className="w-full px-5 py-3.5 bg-white border border-zinc-200 rounded-xl text-black text-sm placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-[#d3579a] transition-all"
+      placeholder="ENTER VALUE..."
+      className="w-full px-6 py-6 bg-white border-4 border-black text-2xl sm:text-4xl placeholder-zinc-300 focus:outline-none focus:ring-4 focus:ring-[#ffe24c] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all text-black"
     />
   );
 }
@@ -673,8 +622,8 @@ function OneWordInput({ value, onChange }: { value: string; onChange: (v: string
       type="text"
       value={value}
       onChange={e => onChange(e.target.value)}
-      placeholder="Type a single word or short answer..."
-      className="w-full px-5 py-3.5 bg-white border border-zinc-200 rounded-xl text-black text-sm placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-[#d3579a] transition-all"
+      placeholder="ENTER SINGLE WORD..."
+      className="w-full px-6 py-6 bg-white border-4 border-black text-2xl sm:text-4xl placeholder-zinc-300 focus:outline-none focus:ring-4 focus:ring-[#d3579a] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all text-black"
     />
   );
 }
@@ -697,23 +646,19 @@ function MatchInput({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-6 text-black">
       {leftItems.map((left, idx) => (
-        <div key={idx} className="flex flex-wrap items-center gap-3">
-          <span 
-            className="flex-1 min-w-[200px] px-4 py-2.5 border rounded-xl text-sm text-black font-semibold bg-zinc-50"
-            style={{ borderColor: C.surfaceVariant }}
-          >
+        <div key={idx} className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4">
+          <span className="flex-1 px-6 py-4 border-4 border-black bg-[#bec6e0] text-xl sm:text-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
             {left}
           </span>
-          <span className="text-zinc-400 font-bold">→</span>
+          <span className="hidden lg:block text-4xl">→</span>
           <select
             value={selected[idx] ?? -1}
             onChange={e => handleChange(idx, parseInt(e.target.value))}
-            className="flex-1 min-w-[200px] px-4 py-2.5 bg-white border rounded-xl text-sm text-black focus:outline-none focus:ring-1 focus:ring-[#d3579a] transition-all cursor-pointer font-medium"
-            style={{ borderColor: C.surfaceVariant }}
+            className="flex-1 px-6 py-4 bg-white border-4 border-black text-xl sm:text-2xl focus:outline-none focus:ring-4 focus:ring-[#86efac] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-pointer appearance-none text-black"
           >
-            <option value={-1}>— Select —</option>
+            <option value={-1}>— ASSIGN MATCH —</option>
             {rightItems.map((right, rIdx) => (
               <option key={rIdx} value={rIdx}>{right}</option>
             ))}

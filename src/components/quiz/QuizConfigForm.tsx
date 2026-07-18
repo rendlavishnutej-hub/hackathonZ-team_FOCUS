@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play, Loader2, Timer, Zap, FileText, Upload,
-  CheckCircle2, AlertCircle, ChevronRight, RefreshCw
+  CheckCircle2, AlertCircle, ChevronRight, RefreshCw, X
 } from 'lucide-react';
 import type { Difficulty, QuizFile } from '@/lib/quiz/types';
 
@@ -22,14 +22,11 @@ const C = {
   onSurfaceVariant: '#45464d',
   outline: '#76777d',
   outlineVariant: '#c6c6cd',
-  inverseOnSurface: '#f5f0e9',
-  inverseSurface: '#32302c',
   accentYellow: '#ffe24c',
   accentBlue: '#bec6e0',
   accentPink: '#ffafd3',
   accentGreen: '#86efac',
   accentPurple: '#d3579a',
-  secondaryContainer: '#fcdf46',
 };
 
 interface QuizConfigFormProps {
@@ -37,9 +34,9 @@ interface QuizConfigFormProps {
 }
 
 const difficulties: { value: Difficulty; label: string; color: string; desc: string }[] = [
-  { value: 'easy', label: 'Easy', color: '#047857', desc: '2 pts / -0.5' },
-  { value: 'medium', label: 'Medium', color: '#d97706', desc: '3 pts / -0.75' },
-  { value: 'hard', label: 'Hard', color: '#ea580c', desc: '4 pts / -1' },
+  { value: 'easy', label: 'EASY', color: '#86efac', desc: '2 PTS / -0.5' },
+  { value: 'medium', label: 'MEDIUM', color: '#ffe24c', desc: '3 PTS / -0.75' },
+  { value: 'hard', label: 'HARD', color: '#ffafd3', desc: '4 PTS / -1' },
 ];
 
 const ACCEPTED_TYPES: Record<string, string> = {
@@ -58,13 +55,9 @@ function formatFileSize(bytes: number): string {
 }
 
 function FileTypeIcon({ ext }: { ext: string }) {
-  const colors: Record<string, string> = { pdf: '#ea580c', docx: '#3B82F6', doc: '#3B82F6', pptx: '#ffe24c', ppt: '#ffe24c', txt: '#76777d' };
   return (
-    <div 
-      className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0 border" 
-      style={{ backgroundColor: `${colors[ext] || '#76777d'}12`, borderColor: `${colors[ext] || '#76777d'}25` }}
-    >
-      <FileText className="h-4 w-4" style={{ color: colors[ext] || '#76777d' }} />
+    <div className="h-12 w-12 border-4 border-black bg-[#bec6e0] flex items-center justify-center shrink-0">
+      <FileText className="h-6 w-6 text-black" strokeWidth={3} />
     </div>
   );
 }
@@ -122,11 +115,11 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
   const processFile = useCallback(async (rawFile: File) => {
     setUploadError('');
     if (!ACCEPTED_TYPES[rawFile.type]) {
-      setUploadError('Unsupported file type. Please upload PDF, DOCX, PPTX, or TXT.');
+      setUploadError('UNSUPPORTED FORMAT! PDF, DOCX, PPTX, OR TXT ONLY.');
       return;
     }
     if (rawFile.size > 20 * 1024 * 1024) {
-      setUploadError('File too large. Maximum size is 20 MB.');
+      setUploadError('FILE TOO LARGE! MAX 20MB.');
       return;
     }
 
@@ -150,13 +143,13 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Upload failed');
+      if (!res.ok) throw new Error(data.error || 'UPLOAD FAILED');
 
       setExistingFiles(prev => [data.file, ...prev]);
       setSelectedFile(data.file);
       setForceRegenerate(false);
     } catch (err: any) {
-      setUploadError(err.message || 'Upload failed. Please try again.');
+      setUploadError(err.message || 'UPLOAD FAILED. TRY AGAIN.');
     } finally {
       setUploading(false);
     }
@@ -192,7 +185,7 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
       });
 
       const genData = await genRes.json();
-      if (!genRes.ok) throw new Error(genData.error || 'Generation failed');
+      if (!genRes.ok) throw new Error(genData.error || 'GENERATION FAILED');
 
       const config = {
         subjectId: 'generated',
@@ -211,7 +204,7 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
 
       router.push('/quiz/take');
     } catch (err: any) {
-      setUploadError(err.message || 'Failed to generate quiz. Please try again.');
+      setUploadError(err.message || 'GENERATION FAILED. TRY AGAIN.');
       setGenerating(false);
     }
   };
@@ -219,21 +212,20 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
   const fileExt = (f: QuizFile) => ACCEPTED_TYPES[f.type] || f.name.split('.').pop() || 'file';
 
   return (
-    <div className="max-w-2xl space-y-5 font-sans" style={{ color: C.onSurface }}>
+    <div className="max-w-3xl space-y-8 font-sans">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="p-8 rounded-[2rem] border bg-white shadow-sm space-y-7"
-        style={{ borderColor: C.surfaceVariant }}
+        className="p-8 sm:p-10 border-8 border-black bg-white shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] space-y-10"
       >
         {/* Header */}
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-zinc-50 border flex items-center justify-center shadow-inner">
-            <Zap className="h-5 w-5 text-[#d3579a]" />
+        <div className="flex items-center gap-4 border-b-8 border-black pb-6">
+          <div className="h-16 w-16 border-4 border-black bg-[#d3579a] flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <Zap className="h-8 w-8 text-white" strokeWidth={3} />
           </div>
           <div>
-            <h2 className="text-lg font-extrabold text-black">Generate Quiz from Document</h2>
-            <p className="text-xs text-zinc-500">Upload a study file and AI will create a personalised quiz</p>
+            <h2 className="text-4xl sm:text-5xl font-display text-black uppercase leading-none mt-2">NEW ARENA</h2>
+            <p className="text-xl font-bold uppercase tracking-widest text-zinc-600">UPLOAD TO INITIATE</p>
           </div>
         </div>
 
@@ -243,10 +235,10 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          className={`relative flex flex-col items-center justify-center gap-4 px-6 py-10 rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer ${
+          className={`relative flex flex-col items-center justify-center gap-6 px-6 py-16 border-4 border-dashed border-black transition-all duration-300 cursor-pointer ${
             isDragging
-              ? 'border-[#d3579a] bg-[#d3579a]/5'
-              : 'border-zinc-350 bg-white hover:bg-[#fcfaf5] hover:border-zinc-550'
+              ? 'bg-[#86efac]'
+              : 'bg-white hover:bg-[#fef9f2]'
           }`}
           onClick={() => document.getElementById('file-input')?.click()}
         >
@@ -259,25 +251,27 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
           />
 
           {uploading ? (
-            <div className="flex flex-col items-center gap-3">
-              <div className="h-14 w-14 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-center justify-center">
-                <Loader2 className="h-7 w-7 text-[#d3579a] animate-spin" />
+            <div className="flex flex-col items-center gap-4">
+              <div className="h-20 w-20 border-4 border-black bg-white flex items-center justify-center shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                <Loader2 className="h-10 w-10 text-black animate-spin" strokeWidth={3} />
               </div>
-              <p className="text-xs text-zinc-650 font-bold">Reading document...</p>
+              <p className="text-2xl font-display uppercase tracking-widest text-black mt-2">PROCESSING...</p>
             </div>
           ) : (
             <>
               <motion.div
-                animate={{ y: isDragging ? -4 : 0 }}
-                className="h-14 w-14 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-center justify-center shadow-inner"
+                animate={{ y: isDragging ? -10 : 0 }}
+                className="h-20 w-20 border-4 border-black bg-[#ffe24c] flex items-center justify-center shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
               >
-                <Upload className={`h-7 w-7 transition-colors ${isDragging ? 'text-[#d3579a]' : 'text-zinc-400'}`} />
+                <Upload className="h-10 w-10 text-black" strokeWidth={3} />
               </motion.div>
-              <div className="text-center space-y-1">
-                <p className="text-xs font-extrabold text-zinc-700">
-                  {isDragging ? 'Drop your file here' : 'Drag & drop or click to upload'}
+              <div className="text-center space-y-2 mt-2">
+                <p className="text-3xl font-display uppercase tracking-widest text-black">
+                  {isDragging ? 'DROP IT HERE' : 'CLICK OR DRAG FILE'}
                 </p>
-                <p className="text-[10px] text-zinc-500 font-semibold">PDF, DOCX, PPTX, TXT — up to 20 MB</p>
+                <p className="text-lg font-bold uppercase tracking-wider text-zinc-600 bg-white border-2 border-black inline-block px-3 py-1">
+                  PDF, DOCX, PPTX, TXT / MAX 20MB
+                </p>
               </div>
             </>
           )}
@@ -290,9 +284,9 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="flex items-center gap-2 px-4 py-3 bg-red-50 border border-red-100 rounded-xl text-xs text-red-650"
+              className="flex items-center gap-4 px-6 py-4 bg-[#ffafd3] border-4 border-black text-2xl font-display uppercase tracking-widest text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
             >
-              <AlertCircle className="h-4 w-4 shrink-0" />
+              <AlertCircle className="h-8 w-8 shrink-0" strokeWidth={3} />
               {uploadError}
             </motion.div>
           )}
@@ -300,9 +294,9 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
 
         {/* Previously Uploaded Files */}
         {existingFiles.length > 0 && (
-          <div className="space-y-2.5">
-            <p className="text-[10px] uppercase font-bold tracking-widest text-[#76777d]">Your Documents</p>
-            <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+          <div className="space-y-4">
+            <h3 className="text-2xl font-display uppercase tracking-widest text-black underline decoration-4 underline-offset-4">VAULT</h3>
+            <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
               {existingFiles.map(f => {
                 const ext = fileExt(f);
                 const isSelected = selectedFile?.id === f.id;
@@ -310,24 +304,23 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
                   <button
                     key={f.id}
                     onClick={() => { setSelectedFile(isSelected ? null : f); setForceRegenerate(false); setUploadError(''); }}
-                    className="w-full flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all duration-200"
-                    style={
+                    className={`w-full flex items-center gap-4 p-4 border-4 border-black text-left transition-all duration-200 ${
                       isSelected
-                        ? { backgroundColor: `${C.accentPurple}10`, borderColor: C.accentPurple }
-                        : { backgroundColor: '#ffffff', borderColor: C.surfaceVariant }
-                    }
+                        ? 'bg-[#86efac] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-y-1 -translate-x-1'
+                        : 'bg-white hover:bg-[#f8f3ec]'
+                    }`}
                   >
                     <FileTypeIcon ext={ext} />
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-semibold truncate ${isSelected ? 'text-black' : 'text-zinc-800'}`}>{f.name}</p>
-                      <p className="text-[10px] text-zinc-500 mt-0.5 font-semibold">
-                        {formatFileSize(f.size)} · {new Date(f.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      <p className="text-xl font-bold uppercase tracking-wider truncate text-black">{f.name}</p>
+                      <p className="text-sm font-bold uppercase tracking-widest text-zinc-700 mt-1">
+                        {formatFileSize(f.size)} // {new Date(f.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       </p>
                     </div>
                     {isSelected ? (
-                      <CheckCircle2 className="h-5 w-5 text-[#d3579a] shrink-0" />
+                      <CheckCircle2 className="h-8 w-8 text-black shrink-0" strokeWidth={3} />
                     ) : (
-                      <ChevronRight className="h-4 w-4 text-zinc-400 shrink-0" />
+                      <ChevronRight className="h-8 w-8 text-black shrink-0" strokeWidth={3} />
                     )}
                   </button>
                 );
@@ -343,122 +336,125 @@ export default function QuizConfigForm({ userId }: QuizConfigFormProps) {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="space-y-3"
+              className="space-y-4 pt-4 border-t-8 border-black"
             >
-              <div 
-                className="flex items-center justify-between py-2.5 px-4 rounded-xl border"
-                style={{ backgroundColor: `${C.accentPurple}08`, borderColor: `${C.accentPurple}30` }}
-              >
-                <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="h-4 w-4 text-[#d3579a]" />
-                  <span className="text-xs font-semibold text-black truncate max-w-[240px]">{selectedFile.name}</span>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border-4 border-black bg-black text-white">
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="h-6 w-6 text-[#86efac]" strokeWidth={3} />
+                  <span className="text-xl font-bold uppercase tracking-wider truncate max-w-[200px] sm:max-w-xs">{selectedFile.name}</span>
                 </div>
                 <button
                   onClick={() => setForceRegenerate(v => !v)}
-                  className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors"
-                  style={{ color: forceRegenerate ? C.accentPurple : '#76777d' }}
+                  className={`flex items-center justify-center gap-2 px-4 py-2 border-2 border-white font-display text-xl uppercase tracking-widest transition-colors ${
+                    forceRegenerate ? 'bg-[#ffafd3] text-black border-black' : 'hover:bg-white hover:text-black'
+                  }`}
                 >
-                  <RefreshCw className={`h-3 w-3 ${forceRegenerate ? 'animate-spin' : ''}`} />
-                  {forceRegenerate ? 'Regenerating' : 'Regenerate'}
+                  <RefreshCw className={`h-5 w-5 ${forceRegenerate ? 'animate-spin' : ''}`} strokeWidth={3} />
+                  {forceRegenerate ? 'REBOOTING' : 'FORCE REBOOT'}
                 </button>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Difficulty */}
-        <div className="space-y-2">
-          <label className="text-[10px] uppercase font-bold tracking-widest text-[#76777d]">Difficulty</label>
-          <div className="flex gap-2">
-            {difficulties.map(d => (
-              <button
-                key={d.value}
-                onClick={() => setDifficulty(d.value)}
-                className="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 border"
-                style={
-                  difficulty === d.value
-                    ? { backgroundColor: `${d.color}15`, borderColor: d.color, color: d.color }
-                    : { backgroundColor: '#ffffff', borderColor: C.surfaceVariant, color: C.onSurfaceVariant }
-                }
-              >
-                <span className="block">{d.label}</span>
-                <span className="text-[9px] font-normal opacity-85 mt-0.5 block">{d.desc}</span>
-              </button>
-            ))}
+        {/* Configurations Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+          
+          {/* Difficulty */}
+          <div className="space-y-4">
+            <label className="text-2xl font-display uppercase tracking-widest text-black block bg-[#ffe24c] px-3 py-1 border-4 border-black w-fit shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">DIFFICULTY</label>
+            <div className="flex flex-col gap-3">
+              {difficulties.map(d => (
+                <button
+                  key={d.value}
+                  onClick={() => setDifficulty(d.value)}
+                  className={`flex items-center justify-between p-4 border-4 border-black text-left transition-all duration-200 ${
+                    difficulty === d.value
+                      ? 'shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-y-1 -translate-x-1'
+                      : 'bg-white hover:bg-zinc-100'
+                  }`}
+                  style={{ backgroundColor: difficulty === d.value ? d.color : '#ffffff' }}
+                >
+                  <span className="text-2xl font-display text-black">{d.label}</span>
+                  <span className="text-sm font-bold text-black uppercase tracking-widest bg-white border-2 border-black px-2 py-0.5">{d.desc}</span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Question Count */}
-        <div className="space-y-2">
-          <label className="text-[10px] uppercase font-bold tracking-widest text-[#76777d]">
-            Questions: <span className="text-black font-extrabold">{questionCount}</span>
-          </label>
-          <input
-            type="range" min={5} max={30} step={1} value={questionCount}
-            onChange={e => setQuestionCount(parseInt(e.target.value))}
-            className="w-full h-1.5 rounded-full appearance-none bg-zinc-200 accent-[#d3579a] cursor-pointer"
-          />
-          <div className="flex justify-between text-[9px] text-[#71717a] font-mono font-bold">
-            <span>5 questions</span><span>30 questions</span>
-          </div>
-        </div>
-
-        {/* Timer Toggle */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <label className="text-[10px] uppercase font-bold tracking-widest text-[#76777d] flex items-center gap-1.5">
-              <Timer className="h-3.5 w-3.5" /> Timer
-            </label>
-            <button
-              onClick={() => setTimerEnabled(!timerEnabled)}
-              className="relative w-11 h-6 rounded-full transition-colors duration-200"
-              style={{ backgroundColor: timerEnabled ? C.accentPurple : C.surfaceVariant }}
-            >
-              <motion.div
-                className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow"
-                animate={{ x: timerEnabled ? 20 : 0 }}
-                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-              />
-            </button>
-          </div>
-          <AnimatePresence>
-            {timerEnabled && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="flex items-center gap-3 pt-1"
-              >
+          <div className="space-y-8">
+            {/* Question Count */}
+            <div className="space-y-4">
+              <label className="text-2xl font-display uppercase tracking-widest text-black flex items-center gap-3 bg-[#bec6e0] px-3 py-1 border-4 border-black w-fit shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                TARGETS: <span className="bg-white px-2 py-0.5 border-2 border-black">{questionCount}</span>
+              </label>
+              <div className="pt-2">
                 <input
-                  type="number" min={1} max={120} value={timerMinutes}
-                  onChange={e => setTimerMinutes(Math.max(1, Math.min(120, parseInt(e.target.value) || 1)))}
-                  className="w-20 px-3 py-2 bg-white border rounded-xl text-black text-sm text-center focus:outline-none focus:ring-1 focus:ring-[#d3579a] transition-all"
-                  style={{ borderColor: C.surfaceVariant }}
+                  type="range" min={5} max={30} step={1} value={questionCount}
+                  onChange={e => setQuestionCount(parseInt(e.target.value))}
+                  className="w-full h-4 rounded-none appearance-none bg-black cursor-pointer border-2 border-black"
                 />
-                <span className="text-xs text-zinc-500 font-semibold">minutes</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                <div className="flex justify-between text-sm font-bold uppercase tracking-widest text-black mt-2">
+                  <span>MIN 5</span><span>MAX 30</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Timer Toggle */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between border-4 border-black p-4 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <label className="text-2xl font-display uppercase tracking-widest text-black flex items-center gap-2">
+                  <Timer className="h-6 w-6" strokeWidth={3} /> COUNTDOWN
+                </label>
+                <button
+                  onClick={() => setTimerEnabled(!timerEnabled)}
+                  className={`relative w-16 h-8 border-4 border-black transition-colors duration-200 ${timerEnabled ? 'bg-[#86efac]' : 'bg-zinc-300'}`}
+                >
+                  <motion.div
+                    className="absolute top-0 left-0 w-7 h-7 bg-white border-r-4 border-black"
+                    animate={{ x: timerEnabled ? 32 : 0 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  />
+                </button>
+              </div>
+              <AnimatePresence>
+                {timerEnabled && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="flex items-center gap-4 bg-white border-4 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                  >
+                    <input
+                      type="number" min={1} max={120} value={timerMinutes}
+                      onChange={e => setTimerMinutes(Math.max(1, Math.min(120, parseInt(e.target.value) || 1)))}
+                      className="w-24 px-4 py-2 bg-zinc-100 border-4 border-black text-black text-2xl font-display text-center focus:outline-none focus:bg-[#ffe24c] transition-colors"
+                    />
+                    <span className="text-xl font-bold uppercase tracking-widest text-black">MINUTES</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
         </div>
 
         {/* Start Button */}
         <motion.button
-          whileHover={{ scale: 1.02, y: -2 }}
-          whileTap={{ scale: 0.98 }}
+          whileHover={{ scale: 1.01, y: -2, x: -2 }}
+          whileTap={{ scale: 0.99, y: 0, x: 0 }}
           onClick={handleStart}
           disabled={!selectedFile || generating || uploading}
-          className="w-full py-3.5 font-bold text-sm rounded-2xl hover:opacity-95 transition-all flex items-center justify-center gap-2 shadow disabled:opacity-40 disabled:cursor-not-allowed"
-          style={{ backgroundColor: C.accentPurple, color: '#ffffff' }}
+          className="w-full py-6 font-display text-3xl sm:text-4xl tracking-widest rounded-none border-8 border-black flex items-center justify-center gap-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-black hover:text-[#86efac] transition-colors bg-[#86efac] text-black uppercase"
         >
           {generating ? (
             <>
-              <Loader2 className="h-5 w-5 animate-spin" />
-              {forceRegenerate ? 'Regenerating quiz with AI...' : 'Generating quiz with AI...'}
+              <Loader2 className="h-10 w-10 animate-spin" strokeWidth={3} />
+              {forceRegenerate ? 'REBOOTING ARENA...' : 'CONSTRUCTING ARENA...'}
             </>
           ) : (
             <>
-              <Play className="h-4 w-4 fill-white text-white" />
-              {selectedFile ? 'Generate & Start Quiz' : 'Select or upload a document first'}
+              <Play className="h-10 w-10 fill-current" strokeWidth={3} />
+              {selectedFile ? 'ENTER ARENA' : 'UPLOAD TO UNLOCK'}
             </>
           )}
         </motion.button>

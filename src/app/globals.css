@@ -94,6 +94,15 @@ body {
   background-size: 24px 24px;
 }
 
+/* ── Crazy Grid Background (cream theme) ────────────────────────────────── */
+.grid-bg {
+  background-size: 60px 60px;
+  background-image: 
+    linear-gradient(to right, rgba(124, 92, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(124, 92, 255, 0.07) 1px, transparent 1px);
+  background-position: center center;
+}
+
 /* ── Blob shape morph ────────────────────────────────────────────────────── */
 .blob-shape {
   border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
   Key, Mail, User, CheckCircle2, AlertTriangle, 
-  Loader2, XCircle, ShieldCheck, Terminal 
+  Loader2, XCircle, ShieldCheck, Brain, Globe, GitBranch, Fingerprint 
 } from 'lucide-react';
 import { evaluatePassword, type PasswordStrengthResult } from '@/utils/passwordStrength';
 import { signUpAction } from '../../auth/actions';
@@ -45,6 +45,32 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [oauthLoading, setOauthLoading] = useState<string | null>(null);
+
+  const handleOAuthLogin = async (provider: 'google') => {
+    setError(null);
+    setOauthLoading(provider);
+    
+    try {
+      const { createClient } = await import('@/utils/supabase/client');
+      const supabase = createClient();
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${appUrl}/auth/callback?next=/dashboard`,
+        },
+      });
+
+      if (oauthError) {
+        throw oauthError;
+      }
+    } catch (err: any) {
+      console.error(`${provider} login error:`, err);
+      setError(`OAuth authentication failed: ${err.message}`);
+      setOauthLoading(null);
+    }
+  };
 
   // Live zxcvbn strength state
   const [strength, setStrength] = useState<PasswordStrengthResult | null>(null);
@@ -172,7 +198,7 @@ export default function SignupPage() {
     >
       {/* Visual left pane (split screen) */}
       <div
-        className="hidden lg:flex w-1/2 border-r flex-col justify-between p-12 relative overflow-hidden"
+        className="hidden lg:flex w-1/2 border-r flex-col items-center justify-between p-12 relative overflow-hidden"
         style={{ backgroundColor: C.surfaceContainerLow, borderColor: C.surfaceVariant }}
       >
         {/* Background decorative blobs */}
@@ -191,7 +217,38 @@ export default function SignupPage() {
           </span>
         </Link>
 
-        <div className="space-y-6 max-w-md z-10">
+        {/* Dynamic floating network animation mapping to AI agents */}
+        <div className="relative w-full flex justify-center items-center h-[320px] z-10 my-8">
+          {/* Outer glowing ring */}
+          <div className="absolute w-[300px] h-[300px] rounded-full border border-zinc-800/10" style={{ animation: 'spin 25s linear infinite' }} />
+          
+          <div className="absolute w-[240px] h-[240px] rounded-full border-2 border-dashed border-zinc-800/20 flex items-center justify-center" style={{ animation: 'spin 18s linear infinite' }}>
+            {/* Floating Orbiting Agents */}
+            <div className="absolute -translate-x-[120px] w-12 h-12 rounded-full bg-white border border-[#7C5CFF]/30 flex items-center justify-center shadow-[0_0_20px_rgba(124,92,255,0.2)]" style={{ animation: 'spin 18s linear infinite reverse' }}>
+              <Globe className="h-5 w-5 text-[#7C5CFF]" />
+            </div>
+            <div className="absolute translate-x-[120px] w-12 h-12 rounded-full bg-white border border-[#22D3D0]/30 flex items-center justify-center shadow-[0_0_20px_rgba(34,211,208,0.2)]" style={{ animation: 'spin 18s linear infinite reverse' }}>
+              <ShieldCheck className="h-5 w-5 text-[#22D3D0]" />
+            </div>
+            <div className="absolute -translate-y-[120px] w-12 h-12 rounded-full bg-white border border-[#3DD68C]/30 flex items-center justify-center shadow-[0_0_20px_rgba(61,214,140,0.2)]" style={{ animation: 'spin 18s linear infinite reverse' }}>
+              <GitBranch className="h-5 w-5 text-[#3DD68C]" />
+            </div>
+            <div className="absolute translate-y-[120px] w-12 h-12 rounded-full bg-white border border-[#F5B942]/30 flex items-center justify-center shadow-[0_0_20px_rgba(245,185,66,0.2)]" style={{ animation: 'spin 18s linear infinite reverse' }}>
+              <User className="h-5 w-5 text-[#F5B942]" />
+            </div>
+          </div>
+          
+          {/* Middle pulsing rings */}
+          <div className="absolute w-[160px] h-[160px] rounded-full border border-[#7C5CFF]/40 animate-ping" style={{ animationDuration: '3s' }} />
+          <div className="absolute w-[120px] h-[120px] rounded-full border-2 border-[#22D3D0]/50 animate-pulse" style={{ animationDuration: '2s' }} />
+
+          {/* Central Orchestrator Core */}
+          <div className="absolute w-[72px] h-[72px] rounded-2xl bg-gradient-to-tr from-[#7C5CFF] via-[#d3579a] to-[#22D3D0] flex items-center justify-center shadow-[0_0_40px_rgba(124,92,255,0.4)] z-20">
+            <Brain className="h-10 w-10 text-white drop-shadow-md" />
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center text-center space-y-6 max-w-md z-10">
           <h1
             className="text-5xl font-extrabold tracking-tight leading-tight"
             style={{ color: C.primary, fontFamily: 'var(--font-jakarta), sans-serif' }}
@@ -204,7 +261,7 @@ export default function SignupPage() {
           </p>
         </div>
 
-        <div className="text-[10px] uppercase tracking-widest font-bold z-10" style={{ color: C.outline }}>
+        <div className="text-[10px] uppercase tracking-widest font-bold z-10 text-center" style={{ color: C.outline }}>
           SECURED BY AEGIS PROTOCOL &bull; FOCUS STUDY CORP
         </div>
       </div>
@@ -212,13 +269,16 @@ export default function SignupPage() {
       {/* Form right pane */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 relative overflow-y-auto">
         <div
-          className="w-full max-w-md space-y-8 p-8 sm:p-10 rounded-3xl border shadow-xl"
+          className="w-full max-w-md space-y-8 p-8 sm:p-10 rounded-[2rem] border relative overflow-hidden transition-all duration-500 hover:shadow-2xl"
           style={{
-            backgroundColor: C.surfaceContainerLowest,
-            borderColor: C.surfaceVariant,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
+            backgroundColor: 'rgba(255, 255, 255, 0.85)',
+            backdropFilter: 'blur(20px)',
+            borderColor: 'rgba(255, 255, 255, 0.5)',
+            boxShadow: '0 20px 40px -15px rgba(0,0,0,0.05), inset 0 0 0 1px rgba(255,255,255,0.2)',
           }}
         >
+          <div className="absolute -top-32 -right-32 w-64 h-64 bg-gradient-to-br from-[#7C5CFF]/10 to-[#22D3D0]/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-gradient-to-tr from-[#3DD68C]/10 to-[#F5B942]/10 rounded-full blur-3xl pointer-events-none" />
           <div className="text-center">
             <h2
               className="text-3xl font-extrabold tracking-tight"
@@ -431,6 +491,39 @@ export default function SignupPage() {
               </button>
             </div>
           </form>
+
+          <div className="relative flex py-2 items-center">
+            <div className="flex-grow border-t" style={{ borderColor: C.surfaceVariant }} />
+            <span
+              className="flex-shrink mx-4 text-[10px] uppercase font-bold tracking-widest"
+              style={{ color: C.outline }}
+            >
+              or secure sign-up
+            </span>
+            <div className="flex-grow border-t" style={{ borderColor: C.surfaceVariant }} />
+          </div>
+
+          <div className="space-y-3">
+            {/* Google OAuth Login */}
+            <button
+              type="button"
+              onClick={() => handleOAuthLogin('google')}
+              disabled={oauthLoading !== null}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 border rounded-xl text-sm font-semibold transition-all hover:shadow-md"
+              style={{
+                borderColor: C.outlineVariant,
+                backgroundColor: C.surfaceContainerLow,
+                color: C.onSurface,
+              }}
+            >
+              {oauthLoading === 'google' ? (
+                <Loader2 className="h-4 w-4 animate-spin" style={{ color: C.primary }} />
+              ) : (
+                <Globe className="h-4 w-4" style={{ color: C.outline }} />
+              )}
+              Continue with Google
+            </button>
+          </div>
         </div>
       </div>
     </div>

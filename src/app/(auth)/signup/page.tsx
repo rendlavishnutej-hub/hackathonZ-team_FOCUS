@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
   Key, Mail, User, CheckCircle2, AlertTriangle, 
-  Loader2, XCircle, ShieldCheck, Terminal 
+  Loader2, XCircle, ShieldCheck, Brain, Globe, GitBranch, Fingerprint 
 } from 'lucide-react';
 import { evaluatePassword, type PasswordStrengthResult } from '@/utils/passwordStrength';
 import { signUpAction } from '../../auth/actions';
@@ -191,6 +191,37 @@ export default function SignupPage() {
           </span>
         </Link>
 
+        {/* Dynamic floating network animation mapping to AI agents */}
+        <div className="relative w-full flex justify-center items-center h-[320px] z-10 my-8">
+          {/* Outer glowing ring */}
+          <div className="absolute w-[300px] h-[300px] rounded-full border border-zinc-800/10" style={{ animation: 'spin 25s linear infinite' }} />
+          
+          <div className="absolute w-[240px] h-[240px] rounded-full border-2 border-dashed border-zinc-800/20 flex items-center justify-center" style={{ animation: 'spin 18s linear infinite' }}>
+            {/* Floating Orbiting Agents */}
+            <div className="absolute -translate-x-[120px] w-12 h-12 rounded-full bg-white border border-[#7C5CFF]/30 flex items-center justify-center shadow-[0_0_20px_rgba(124,92,255,0.2)]" style={{ animation: 'spin 18s linear infinite reverse' }}>
+              <Globe className="h-5 w-5 text-[#7C5CFF]" />
+            </div>
+            <div className="absolute translate-x-[120px] w-12 h-12 rounded-full bg-white border border-[#22D3D0]/30 flex items-center justify-center shadow-[0_0_20px_rgba(34,211,208,0.2)]" style={{ animation: 'spin 18s linear infinite reverse' }}>
+              <ShieldCheck className="h-5 w-5 text-[#22D3D0]" />
+            </div>
+            <div className="absolute -translate-y-[120px] w-12 h-12 rounded-full bg-white border border-[#3DD68C]/30 flex items-center justify-center shadow-[0_0_20px_rgba(61,214,140,0.2)]" style={{ animation: 'spin 18s linear infinite reverse' }}>
+              <GitBranch className="h-5 w-5 text-[#3DD68C]" />
+            </div>
+            <div className="absolute translate-y-[120px] w-12 h-12 rounded-full bg-white border border-[#F5B942]/30 flex items-center justify-center shadow-[0_0_20px_rgba(245,185,66,0.2)]" style={{ animation: 'spin 18s linear infinite reverse' }}>
+              <User className="h-5 w-5 text-[#F5B942]" />
+            </div>
+          </div>
+          
+          {/* Middle pulsing rings */}
+          <div className="absolute w-[160px] h-[160px] rounded-full border border-[#7C5CFF]/40 animate-ping" style={{ animationDuration: '3s' }} />
+          <div className="absolute w-[120px] h-[120px] rounded-full border-2 border-[#22D3D0]/50 animate-pulse" style={{ animationDuration: '2s' }} />
+
+          {/* Central Orchestrator Core */}
+          <div className="absolute w-[72px] h-[72px] rounded-2xl bg-gradient-to-tr from-[#7C5CFF] via-[#d3579a] to-[#22D3D0] flex items-center justify-center shadow-[0_0_40px_rgba(124,92,255,0.4)] z-20 transition-transform duration-500 hover:scale-110" style={{ animation: 'bounce 3s infinite' }}>
+            <Brain className="h-10 w-10 text-white drop-shadow-md" style={{ animation: 'pulse 2s infinite' }} />
+          </div>
+        </div>
+
         <div className="space-y-6 max-w-md z-10">
           <h1
             className="text-5xl font-extrabold tracking-tight leading-tight"
@@ -212,13 +243,16 @@ export default function SignupPage() {
       {/* Form right pane */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 relative overflow-y-auto">
         <div
-          className="w-full max-w-md space-y-8 p-8 sm:p-10 rounded-3xl border shadow-xl"
+          className="w-full max-w-md space-y-8 p-8 sm:p-10 rounded-[2rem] border relative overflow-hidden transition-all duration-500 hover:shadow-2xl"
           style={{
-            backgroundColor: C.surfaceContainerLowest,
-            borderColor: C.surfaceVariant,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
+            backgroundColor: 'rgba(255, 255, 255, 0.85)',
+            backdropFilter: 'blur(20px)',
+            borderColor: 'rgba(255, 255, 255, 0.5)',
+            boxShadow: '0 20px 40px -15px rgba(0,0,0,0.05), inset 0 0 0 1px rgba(255,255,255,0.2)',
           }}
         >
+          <div className="absolute -top-32 -right-32 w-64 h-64 bg-gradient-to-br from-[#7C5CFF]/10 to-[#22D3D0]/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-gradient-to-tr from-[#3DD68C]/10 to-[#F5B942]/10 rounded-full blur-3xl pointer-events-none" />
           <div className="text-center">
             <h2
               className="text-3xl font-extrabold tracking-tight"

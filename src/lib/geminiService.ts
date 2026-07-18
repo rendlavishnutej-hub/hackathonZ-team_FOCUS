@@ -77,6 +77,16 @@ ${courseContextPhrase}Here are some highly recommended career trajectories:
 **Recommended Next Steps:**
 - Partner with developers to understand software workflow patterns.
 - Read case study analyses on successful tech startups.`;
+  } else if (query.includes('career') || query.includes('job') || query.includes('work') || query.includes('study') || query.includes('future') || query.includes('skill') || query.includes('interest') || query.includes('help') || query.includes('options') || query.length < 5 || query.includes('hello') || query.includes('hi') || query.includes('hey')) {
+    response = `Hello! I am your **Career AI Advisor**. ${courseContextPhrase}How can I help you map out your professional future today?
+
+You can ask me questions like:
+- "What career paths suit someone good at maths and art?"
+- "What career paths are available for someone learning programming?"
+- "I love science and research, what can I do?"
+- "Tell me about business and entrepreneurship."
+
+Feel free to share your skills, interests, or subjects you enjoy, and I'll recommend suitable paths!`;
   } else {
     response = `I'm sorry, but as a Career AI Advisor, I am programmed to only assist with questions related to career guidance, professional development, and education. Please ask me a career-related question!`;
   }
@@ -136,7 +146,10 @@ Formatting Guidelines:
   });
 
   const models = [
-    'gemini-1.5-flash'
+    'gemini-1.5-flash',
+    'gemini-2.0-flash',
+    'gemini-1.5-flash-8b',
+    'gemini-1.5-pro'
   ];
 
   let lastError: any = null;

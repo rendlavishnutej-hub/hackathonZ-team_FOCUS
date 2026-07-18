@@ -172,7 +172,7 @@ export default function SignupPage() {
     >
       {/* Visual left pane (split screen) */}
       <div
-        className="hidden lg:flex w-1/2 border-r flex-col justify-between p-12 relative overflow-hidden"
+        className="hidden lg:flex w-1/2 border-r flex-col items-center justify-between p-12 relative overflow-hidden"
         style={{ backgroundColor: C.surfaceContainerLow, borderColor: C.surfaceVariant }}
       >
         {/* Background decorative blobs */}
@@ -217,12 +217,12 @@ export default function SignupPage() {
           <div className="absolute w-[120px] h-[120px] rounded-full border-2 border-[#22D3D0]/50 animate-pulse" style={{ animationDuration: '2s' }} />
 
           {/* Central Orchestrator Core */}
-          <div className="absolute w-[72px] h-[72px] rounded-2xl bg-gradient-to-tr from-[#7C5CFF] via-[#d3579a] to-[#22D3D0] flex items-center justify-center shadow-[0_0_40px_rgba(124,92,255,0.4)] z-20 transition-transform duration-500 hover:scale-110" style={{ animation: 'bounce 3s infinite' }}>
-            <Brain className="h-10 w-10 text-white drop-shadow-md" style={{ animation: 'pulse 2s infinite' }} />
+          <div className="absolute w-[72px] h-[72px] rounded-2xl bg-gradient-to-tr from-[#7C5CFF] via-[#d3579a] to-[#22D3D0] flex items-center justify-center shadow-[0_0_40px_rgba(124,92,255,0.4)] z-20">
+            <Brain className="h-10 w-10 text-white drop-shadow-md" />
           </div>
         </div>
 
-        <div className="space-y-6 max-w-md z-10">
+        <div className="flex flex-col items-center text-center space-y-6 max-w-md z-10">
           <h1
             className="text-5xl font-extrabold tracking-tight leading-tight"
             style={{ color: C.primary, fontFamily: 'var(--font-jakarta), sans-serif' }}
@@ -235,7 +235,7 @@ export default function SignupPage() {
           </p>
         </div>
 
-        <div className="text-[10px] uppercase tracking-widest font-bold z-10" style={{ color: C.outline }}>
+        <div className="text-[10px] uppercase tracking-widest font-bold z-10 text-center" style={{ color: C.outline }}>
           SECURED BY AEGIS PROTOCOL &bull; FOCUS STUDY CORP
         </div>
       </div>

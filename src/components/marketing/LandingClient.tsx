@@ -74,10 +74,9 @@ function Nav() {
 
   const navLinks = (
     <>
-      <a href="#features" onClick={() => setMobileOpen(false)} className="hover:text-black transition-colors">Features</a>
       <a href="#how-it-works" onClick={() => setMobileOpen(false)} className="hover:text-black transition-colors">How it works</a>
+      <a href="#capabilities" onClick={() => setMobileOpen(false)} className="hover:text-black transition-colors">Capabilities</a>
       <a href="#agents" onClick={() => setMobileOpen(false)} className="hover:text-black transition-colors">Agents</a>
-      <Link href="/pricing" onClick={() => setMobileOpen(false)} className="hover:text-black transition-colors">Pricing</Link>
     </>
   );
 
@@ -113,27 +112,8 @@ function Nav() {
           </div>
         </div>
 
-        {/* Search + CTA */}
+        {/* CTA */}
         <div className="hidden md:flex items-center gap-4 flex-1 justify-end">
-          <div className="relative max-w-xs w-full group">
-            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="h-4 w-4 transition-colors group-focus-within:text-black" style={{ color: C.outline }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-              </svg>
-            </span>
-            <input
-              type="text"
-              placeholder="Search capabilities..."
-              suppressHydrationWarning
-              className="block w-full pl-9 pr-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-offset-1 transition-shadow"
-              style={{
-                borderColor: C.outlineVariant,
-                backgroundColor: C.surfaceContainerLowest,
-                color: C.onSurface,
-                '--tw-ring-color': C.primary,
-              } as React.CSSProperties}
-            />
-          </div>
           <Link
             href="/login"
             className="px-5 py-2 rounded-full text-sm font-semibold hover:opacity-80 transition-all whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
@@ -724,95 +704,143 @@ function ProblemSection() {
   );
 }
 
-// ─── Solution / Features Section ──────────────────────────────────────────────
-function FeaturesSection() {
+// ─── Capabilities / Features Section ───────────────────────────────────────────
+function CapabilitiesSection() {
+  const capabilities = [
+    {
+      id: 'career',
+      title: 'AI Career Guidance',
+      desc: 'Map out your future with personalized, data-driven career pathways tailored to your skills and goals.',
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+        </svg>
+      ),
+      bg: C.accentPurple,
+      textColor: '#ffffff',
+      colSpan: 'md:col-span-2',
+      imagePlaceholder: 'Career mapping network graph simulation'
+    },
+    {
+      id: 'quiz',
+      title: 'Adaptive Quiz Arena',
+      desc: 'Test your knowledge with agent-generated mocks, instantly adjusting to your weak points.',
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      ),
+      bg: C.accentYellow,
+      textColor: '#6b4f00',
+      colSpan: 'md:col-span-1',
+      imagePlaceholder: 'Live quiz score animation'
+    },
+    {
+      id: 'course',
+      title: 'Curriculum Generator',
+      desc: 'Instantly build fully structured, multi-module courses from a single prompt.',
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+      ),
+      bg: C.accentBlue,
+      textColor: '#1e3a6e',
+      colSpan: 'md:col-span-1',
+      imagePlaceholder: 'Course modules cascading into view'
+    },
+    {
+      id: 'interview',
+      title: 'Interview Simulator',
+      desc: 'Upload your resume and practice with our AI interviewer for real-world readiness.',
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      ),
+      bg: C.accentGreen,
+      textColor: '#15803d',
+      colSpan: 'md:col-span-2',
+      imagePlaceholder: 'Resume parsing layout'
+    },
+  ];
+
   return (
-    <section id="features" style={{ backgroundColor: C.cream }} className="py-24 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="capabilities" style={{ backgroundColor: C.cream }} className="py-24 relative overflow-hidden">
+      {/* Background glowing orbs */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[120px] opacity-40 pointer-events-none" style={{ backgroundColor: C.accentPurple }} />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[120px] opacity-40 pointer-events-none" style={{ backgroundColor: C.accentBlue }} />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-16">
           <motion.h2
-            className="text-3xl sm:text-4xl font-extrabold mb-4"
-            style={{ color: C.primary }}
+            className="text-4xl sm:text-5xl font-extrabold mb-4"
+            style={{ color: C.primary, fontFamily: 'var(--font-jakarta), sans-serif' }}
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            Dynamic Multi-Agent{' '}
-            <span style={{ color: '#5a6ba8' }}>Sangam</span>
+            A Unified Platform for <br />
+            <span style={{ color: C.accentPurple }}>Unstoppable Growth</span>
           </motion.h2>
           <motion.p
-            className="max-w-2xl mx-auto"
+            className="max-w-2xl mx-auto text-lg"
             style={{ color: C.onSurfaceVariant }}
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.15 }}
           >
-            Give us an educational challenge. We&apos;ll assemble the ultimate AI mandali (team).
+            Say goodbye to scattered tools. Focus brings all your learning, assessment, and career planning features into one beautifully integrated ecosystem.
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8" id="agents">
-          {[
-            {
-              icon: (
-                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                </svg>
-              ),
-              iconBg: C.accentYellow,
-              iconColor: '#6b4f00',
-              title: 'The AI Sutradhar',
-              desc: 'No fixed workflows. Focus dynamically identifies and deploys the exact AI specialists needed for your specific learning objective.',
-            },
-            {
-              icon: (
-                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                </svg>
-              ),
-              iconBg: C.accentBlue,
-              iconColor: '#1e3a6e',
-              title: 'Specialized Agent Mandali',
-              desc: "Instructional planners, researchers, and visual communicators seamlessly exchange information and review each other's outputs.",
-            },
-            {
-              icon: (
-                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                  <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                </svg>
-              ),
-              iconBg: C.accentPink,
-              iconColor: '#831843',
-              title: 'Personalized Margdarshan',
-              desc: 'Agents adapt the curriculum in real-time based on learner needs, ensuring an optimized and focused educational journey.',
-            },
-          ].map(({ icon, iconBg, iconColor, title, desc }, idx) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {capabilities.map((cap, idx) => (
             <motion.div
-              key={title}
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
-              transition={{ duration: 0.6, delay: idx * 0.15 }}
-              whileHover={{ y: -8, boxShadow: '0 16px 36px rgba(0,0,0,0.07)' }}
-              className="relative p-8 rounded-3xl border transition-all duration-300 overflow-hidden group"
-              style={{ backgroundColor: C.surfaceContainerLowest, borderColor: C.surfaceVariant }}
+              key={cap.id}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: idx * 0.1 }}
+              whileHover={{ y: -5, scale: 1.01 }}
+              className={`group relative rounded-[2rem] p-8 overflow-hidden border shadow-sm hover:shadow-xl transition-all duration-300 ${cap.colSpan}`}
+              style={{ backgroundColor: 'rgba(255,255,255,0.7)', borderColor: C.surfaceVariant, backdropFilter: 'blur(20px)' }}
             >
-              <div
-                aria-hidden
-                className="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-2xl"
-                style={{ backgroundColor: iconBg }}
+              {/* Animated hover gradient */}
+              <div 
+                className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none" 
+                style={{ background: `radial-gradient(circle at 100% 100%, ${cap.bg}, transparent 70%)` }}
               />
-              <div
-                className="relative w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3"
-                style={{ backgroundColor: `${iconBg}30`, color: iconColor }}
-              >
-                {icon}
+              
+              <div className="relative z-10 flex flex-col h-full justify-between gap-10">
+                <div>
+                  <div 
+                    className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-lg transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300"
+                    style={{ backgroundColor: cap.bg, color: cap.textColor }}
+                  >
+                    {cap.icon}
+                  </div>
+                  <h3 className="text-3xl font-extrabold tracking-tight mb-3" style={{ color: C.primary }}>
+                    {cap.title}
+                  </h3>
+                  <p className="text-base leading-relaxed max-w-md" style={{ color: C.onSurfaceVariant }}>
+                    {cap.desc}
+                  </p>
+                </div>
+                
+                {/* Abstract UI representation for the bento card */}
+                <div className="relative w-full h-32 rounded-xl overflow-hidden border mt-auto" style={{ backgroundColor: C.surfaceContainerLowest, borderColor: C.surfaceVariant }}>
+                  <div className="absolute inset-0 flex items-center justify-center opacity-30 text-sm font-bold tracking-widest uppercase">
+                    {cap.imagePlaceholder}
+                  </div>
+                  {/* Subtle decorative elements to imply UI */}
+                  <div className="absolute top-4 left-4 right-4 h-2 rounded-full opacity-20" style={{ backgroundColor: cap.bg }} />
+                  <div className="absolute top-8 left-4 w-2/3 h-2 rounded-full opacity-10" style={{ backgroundColor: cap.bg }} />
+                  <div className="absolute bottom-4 right-4 w-8 h-8 rounded-full opacity-20" style={{ backgroundColor: cap.bg }} />
+                </div>
               </div>
-              <h3 className="relative text-xl font-bold mb-3" style={{ color: C.primary }}>{title}</h3>
-              <p className="relative text-sm leading-relaxed" style={{ color: C.onSurfaceVariant }}>{desc}</p>
             </motion.div>
           ))}
         </div>
@@ -985,7 +1013,7 @@ export default function LandingClient() {
       <main>
         <HeroSection />
         <ProblemSection />
-        <FeaturesSection />
+        <CapabilitiesSection />
         <ProcessSection />
       </main>
       <Footer />

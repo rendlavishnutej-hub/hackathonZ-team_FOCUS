@@ -14,6 +14,7 @@ export interface BlackboardState {
   researcherOutput: any | null;
   coderOutput: any | null;
   criticOutput: any | null;
+  notetakerOutput: any | null;
   quizzerOutput: any | null;
   status: 'idle' | 'running' | 'completed' | 'failed';
 }
@@ -32,6 +33,7 @@ export class Blackboard {
       researcherOutput: null,
       coderOutput: null,
       criticOutput: null,
+      notetakerOutput: null,
       quizzerOutput: null,
       status: 'idle',
     };

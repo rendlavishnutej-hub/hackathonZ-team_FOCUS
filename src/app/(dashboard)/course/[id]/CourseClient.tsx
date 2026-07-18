@@ -54,7 +54,7 @@ export default function CourseClient({ courseId }: CourseClientProps) {
     }
   }, [courseId]);
 
-  const [activeTab, setActiveTab] = useState<'lesson-1' | 'lesson-2' | 'lesson-3' | 'quiz'>('lesson-1');
+  const [activeTab, setActiveTab] = useState<'lesson-1' | 'lesson-2' | 'lesson-3' | 'notes' | 'quiz'>('lesson-1');
   const [copied, setCopied] = useState<string | null>(null);
 
   // Quiz state
@@ -208,10 +208,11 @@ export default function CourseClient({ courseId }: CourseClientProps) {
         className="flex p-[2px] rounded-xl max-w-md"
         style={{ backgroundColor: C.surfaceContainerLow, border: `1px solid ${C.surfaceVariant}` }}
       >
-        {['lesson-1', 'lesson-2', 'lesson-3', 'quiz'].map((tab) => {
+        {['lesson-1', 'lesson-2', 'lesson-3', 'notes', 'quiz'].map((tab) => {
           const isActive = activeTab === tab;
           let label = `Lesson ${tab.split('-')[1]}`;
           if (tab === 'quiz') label = 'Final Quiz';
+          if (tab === 'notes') label = 'Study Notes';
 
           return (
             <button
@@ -232,7 +233,7 @@ export default function CourseClient({ courseId }: CourseClientProps) {
 
       {/* Active Tab View */}
       <div className="flex-1 space-y-6">
-        {activeTab !== 'quiz' && activeContent && (
+        {activeTab !== 'quiz' && activeTab !== 'notes' && activeContent && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Theory half */}
             <div className={activeContent.code ? "lg:col-span-7 space-y-4" : "lg:col-span-12 space-y-4"}>
@@ -294,6 +295,53 @@ export default function CourseClient({ courseId }: CourseClientProps) {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {activeTab === 'notes' && course.notes && (
+          <div className="space-y-8">
+            <div className="space-y-1.5">
+              <h2 className="font-display text-xl sm:text-2xl tracking-wide uppercase" style={{ color: C.primary }}>
+                Comprehensive Study Notes
+              </h2>
+              <p className="text-xs font-body" style={{ color: C.onSurfaceVariant }}>
+                High-yield summaries distilled from the deep research theory for rapid review.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {course.notes.notes.map((noteGroup: any, idx: number) => {
+                const lesson = course.syllabus.lessons.find((l: any) => l.id === noteGroup.lessonId) || { title: \`Lesson \${idx + 1}\` };
+                
+                return (
+                  <div 
+                    key={noteGroup.lessonId}
+                    className="p-6 rounded-2xl flex flex-col space-y-4 shadow-sm"
+                    style={{ backgroundColor: C.surfaceContainerLow, border: \`1px solid \${C.surfaceVariant}\` }}
+                  >
+                    <div className="space-y-1 pb-4 border-b" style={{ borderColor: C.surfaceVariant }}>
+                      <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-blue-600">
+                        Module 0{idx + 1}
+                      </span>
+                      <h3 className="text-sm font-bold" style={{ color: C.primary }}>
+                        {lesson.title}
+                      </h3>
+                    </div>
+                    
+                    <ul className="space-y-3 flex-1">
+                      {noteGroup.bullets.map((bullet: string, bIdx: number) => (
+                        <li key={bIdx} className="flex items-start gap-2.5">
+                          <span className="text-blue-500 mt-0.5 text-[10px]">●</span>
+                          <span className="text-xs leading-relaxed" style={{ color: C.onSurfaceVariant }}>
+                            {bullet}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 

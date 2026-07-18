@@ -21,6 +21,7 @@
     "@zxcvbn-ts/core": "^4.1.2",
     "@zxcvbn-ts/language-common": "^4.1.2",
     "framer-motion": "^12.42.2",
+    "jspdf": "^4.2.1",
     "lucide-react": "^1.24.0",
     "next": "16.2.10",
     "qrcode.react": "^4.2.0",

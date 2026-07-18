@@ -33,6 +33,7 @@ interface AgentGraphProps {
   researcherOutput: any | null;
   coderOutput: any | null;
   criticOutput: any | null;
+  notetakerOutput: any | null;
   quizzerOutput: any | null;
 }
 
@@ -43,16 +44,18 @@ export default function AgentGraph({
   researcherOutput,
   coderOutput,
   criticOutput,
+  notetakerOutput,
   quizzerOutput,
 }: AgentGraphProps) {
   // Generate nodes based on orchestrator state
   const nodes = useMemo<Node[]>(() => {
     const agentList = [
-      { id: 'planner', name: 'PLANNER', label: 'Curriculum Architect', x: 100, y: 150, hasOutput: !!plannerOutput },
-      { id: 'researcher', name: 'RESEARCHER', label: 'Deep Research Unit', x: 350, y: 50, hasOutput: !!researcherOutput },
-      { id: 'coder', name: 'CODER', label: 'Synthesis Coder', x: 600, y: 150, hasOutput: !!coderOutput },
-      { id: 'critic', name: 'CRITIC', label: 'Pedagogical Critic', x: 350, y: 250, hasOutput: !!criticOutput },
-      { id: 'quizzer', name: 'QUIZZER', label: 'Assessment Engine', x: 850, y: 150, hasOutput: !!quizzerOutput },
+      { id: 'planner', name: 'PLANNER', label: 'Curriculum Architect', x: 50, y: 150, hasOutput: !!plannerOutput },
+      { id: 'researcher', name: 'RESEARCHER', label: 'Deep Research Unit', x: 300, y: 50, hasOutput: !!researcherOutput },
+      { id: 'coder', name: 'CODER', label: 'Synthesis Coder', x: 550, y: 150, hasOutput: !!coderOutput },
+      { id: 'critic', name: 'CRITIC', label: 'Pedagogical Critic', x: 300, y: 250, hasOutput: !!criticOutput },
+      { id: 'notetaker', name: 'NOTETAKER', label: 'Study Scribe', x: 800, y: 150, hasOutput: !!notetakerOutput },
+      { id: 'quizzer', name: 'QUIZZER', label: 'Assessment Engine', x: 1050, y: 150, hasOutput: !!quizzerOutput },
     ];
 
     return agentList.map((agent) => {
@@ -123,7 +126,7 @@ export default function AgentGraph({
         style: { background: 'none', border: 'none', padding: 0 },
       };
     });
-  }, [activeAgentId, status, plannerOutput, researcherOutput, coderOutput, criticOutput, quizzerOutput]);
+  }, [activeAgentId, status, plannerOutput, researcherOutput, coderOutput, criticOutput, notetakerOutput, quizzerOutput]);
 
   // Define graph connections (edges)
   const edges = useMemo<Edge[]>(() => {
@@ -132,6 +135,7 @@ export default function AgentGraph({
       if (id === 'researcher') return !!researcherOutput;
       if (id === 'coder') return !!coderOutput;
       if (id === 'critic') return !!criticOutput;
+      if (id === 'notetaker') return !!notetakerOutput;
       if (id === 'quizzer') return !!quizzerOutput;
       return false;
     };
@@ -183,17 +187,26 @@ export default function AgentGraph({
         style: { stroke: getEdgeColor('critic', 'researcher'), strokeWidth: 2, strokeDasharray: '5,5' },
         markerEnd: { type: MarkerType.ArrowClosed, color: getEdgeColor('critic', 'researcher') }
       },
-      // Critic -> Quizzer
+      // Critic -> Notetaker
       { 
-        id: 'e-cr-q', 
+        id: 'e-cr-n', 
         source: 'critic', 
+        target: 'notetaker', 
+        animated: activeAgentId === 'notetaker',
+        style: { stroke: getEdgeColor('critic', 'notetaker'), strokeWidth: 2 },
+        markerEnd: { type: MarkerType.ArrowClosed, color: getEdgeColor('critic', 'notetaker') }
+      },
+      // Notetaker -> Quizzer
+      { 
+        id: 'e-n-q', 
+        source: 'notetaker', 
         target: 'quizzer', 
         animated: activeAgentId === 'quizzer',
-        style: { stroke: getEdgeColor('critic', 'quizzer'), strokeWidth: 2 },
-        markerEnd: { type: MarkerType.ArrowClosed, color: getEdgeColor('critic', 'quizzer') }
+        style: { stroke: getEdgeColor('notetaker', 'quizzer'), strokeWidth: 2 },
+        markerEnd: { type: MarkerType.ArrowClosed, color: getEdgeColor('notetaker', 'quizzer') }
       },
     ];
-  }, [activeAgentId, plannerOutput, researcherOutput, coderOutput, criticOutput, quizzerOutput]);
+  }, [activeAgentId, plannerOutput, researcherOutput, coderOutput, criticOutput, notetakerOutput, quizzerOutput]);
 
   return (
     <div

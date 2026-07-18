@@ -50,6 +50,7 @@ export default function SessionClient({ sessionId, prompt }: SessionClientProps)
   const [researcherOutput, setResearcherOutput] = useState<any | null>(null);
   const [coderOutput, setCoderOutput] = useState<any | null>(null);
   const [criticOutput, setCriticOutput] = useState<any | null>(null);
+  const [notetakerOutput, setNotetakerOutput] = useState<any | null>(null);
   const [quizzerOutput, setQuizzerOutput] = useState<any | null>(null);
 
   // Auto-scroll timeline to bottom
@@ -107,6 +108,7 @@ export default function SessionClient({ sessionId, prompt }: SessionClientProps)
               if (state.researcherOutput) setResearcherOutput(state.researcherOutput);
               if (state.coderOutput) setCoderOutput(state.coderOutput);
               if (state.criticOutput) setCriticOutput(state.criticOutput);
+              if (state.notetakerOutput) setNotetakerOutput(state.notetakerOutput);
               if (state.quizzerOutput) setQuizzerOutput(state.quizzerOutput);
 
               // If completed, save the course object
@@ -120,6 +122,7 @@ export default function SessionClient({ sessionId, prompt }: SessionClientProps)
                   syllabus: state.plannerOutput,
                   research: state.researcherOutput,
                   code: state.coderOutput,
+                  notes: state.notetakerOutput,
                   quiz: state.quizzerOutput,
                 };
 
@@ -316,7 +319,7 @@ export default function SessionClient({ sessionId, prompt }: SessionClientProps)
             >
               Multi-Agent Collaborative Insights
             </span>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
               {/* Planner Agent Card */}
               <div 
                 className="p-5 rounded-2xl border bg-white flex flex-col justify-between space-y-4 hover:shadow transition-all"
@@ -396,6 +399,26 @@ export default function SessionClient({ sessionId, prompt }: SessionClientProps)
                 </div>
                 <div className="text-[9px] font-mono font-bold text-green-700 bg-green-50 border border-green-200 px-1.5 py-0.5 rounded text-center w-fit">
                   {criticOutput?.verdict || 'APPROVED'}
+                </div>
+              </div>
+
+              {/* Notetaker Agent Card */}
+              <div 
+                className="p-5 rounded-2xl border bg-white flex flex-col justify-between space-y-4 hover:shadow transition-all"
+                style={{ borderColor: C.surfaceVariant }}
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono font-bold text-blue-600">NOTETAKER</span>
+                    <span className="text-xs">📝</span>
+                  </div>
+                  <h4 className="text-xs font-extrabold text-black uppercase">Study Scribe</h4>
+                  <p className="text-[11px] leading-relaxed text-zinc-600">
+                    Distilled deep theory into structured, high-yield bullet point study notes for rapid review.
+                  </p>
+                </div>
+                <div className="text-[9px] font-mono font-semibold text-zinc-400 border-t pt-2 max-w-full truncate">
+                  Output: {notetakerOutput?.notes?.length || 3} note sections
                 </div>
               </div>
 

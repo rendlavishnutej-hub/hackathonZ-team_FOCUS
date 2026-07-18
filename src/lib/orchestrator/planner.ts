@@ -45,6 +45,37 @@ function makeFallbackResearch(prompt: string) {
   };
 }
 
+function makeFallbackNotes(prompt: string) {
+  return {
+    notes: [
+      {
+        lessonId: 'lesson-1',
+        bullets: [
+          `Core paradigm: Declarative programming and component-based architecture for ${prompt}.`,
+          `Lifecycle hooks enable side-effects and resource management.`,
+          `Abstracts the DOM to improve developer ergonomics and productivity.`
+        ]
+      },
+      {
+        lessonId: 'lesson-2',
+        bullets: [
+          `Performance bottlenecks usually occur from unnecessary re-renders.`,
+          `Memoization (caching results) prevents expensive recalculations.`,
+          `Lazy loading delays the initialization of resources until they are needed.`
+        ]
+      },
+      {
+        lessonId: 'lesson-3',
+        bullets: [
+          `Production readiness requires automated CI/CD pipelines.`,
+          `Error boundaries catch unexpected runtime exceptions gracefully.`,
+          `Unit and integration testing validate edge cases and business logic.`
+        ]
+      }
+    ]
+  };
+}
+
 function isCodingTopic(prompt: string): boolean {
   const p = prompt.toLowerCase();
   const keywords = [
@@ -268,6 +299,44 @@ Be specific, concise, and constructive.`,
 
     this.blackboard.updateState({ criticOutput, researcherOutput: research });
     this.blackboard.addLog('critic', `Critique complete. Revision applied to Lesson 3 content.`, 'success');
+    onUpdate(this.blackboard.getState());
+
+    // ── 4.5. NOTETAKER AGENT ──────────────────────────────────────────────────
+    this.blackboard.updateState({ activeAgentId: 'notetaker' });
+    this.blackboard.addLog('notetaker', `Synthesizing study notes from deep research...`, 'info');
+    onUpdate(this.blackboard.getState());
+
+    const notesOutput = await generateJSON(
+      `You are an expert study guide creator called Notetaker Agent.
+Based on the syllabus and research theory for "${prompt}":
+${JSON.stringify(research.lessonContents, null, 2)}
+
+Create concise, high-yield bullet point study notes for each lesson. These should summarize the most important takeaways from the theory.
+
+Return a JSON object with EXACTLY this shape:
+{
+  "notes": [
+    {
+      "lessonId": "lesson-1",
+      "bullets": ["Point 1", "Point 2", "Point 3"]
+    },
+    {
+      "lessonId": "lesson-2",
+      "bullets": ["Point 1", "Point 2", "Point 3"]
+    },
+    {
+      "lessonId": "lesson-3",
+      "bullets": ["Point 1", "Point 2", "Point 3"]
+    }
+  ]
+}
+
+Keep each bullet point under 2 sentences. Focus on concepts, facts, and architectural principles.`,
+      makeFallbackNotes(prompt)
+    );
+
+    this.blackboard.updateState({ notetakerOutput: notesOutput });
+    this.blackboard.addLog('notetaker', `Study notes synthesized and structured.`, 'success');
     onUpdate(this.blackboard.getState());
 
     // ── 5. QUIZZER AGENT ──────────────────────────────────────────────────────

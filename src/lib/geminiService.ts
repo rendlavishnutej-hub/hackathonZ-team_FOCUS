@@ -78,17 +78,7 @@ ${courseContextPhrase}Here are some highly recommended career trajectories:
 - Partner with developers to understand software workflow patterns.
 - Read case study analyses on successful tech startups.`;
   } else {
-    response = `That is a very interesting question. Exploring career paths early is a great strategy to guide your studies!
-
-${courseContextPhrase}Here are some suggestions to help you explore and identify your ideal path:
-
-1. **Find Your Intersection**: Look for careers that sit at the intersection of your favorite hobbies and current study subjects.
-2. **Informational Interviews**: Talk to professionals currently working in roles that sound interesting to learn about their daily work.
-3. **Online Portfolios**: Try creating small projects in different areas (writing, coding, design) to see what you enjoy doing most.
-
-**Recommended Next Steps:**
-- Document your goals inside the FOCUS planner.
-- Take mock quizzes inside different subjects to identify your strengths.`;
+    response = `I'm sorry, but as a Career AI Advisor, I am programmed to only assist with questions related to career guidance, professional development, and education. Please ask me a career-related question!`;
   }
 
   return response;

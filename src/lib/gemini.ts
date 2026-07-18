@@ -29,9 +29,7 @@ async function retryWithBackoff<T>(fn: () => Promise<T>, retries = 3, delayMs = 
 }
 
 const MODELS_TO_TRY = [
-  'gemini-flash-latest',
-  'gemini-3.5-flash',
-  'gemini-2.5-flash'
+  'gemini-1.5-flash'
 ];
 
 export async function generateJSON<T>(prompt: string, fallback: T): Promise<T> {

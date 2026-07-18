@@ -222,7 +222,7 @@ function HeroSection() {
     { letter: 'R', label: 'Researcher Agent', desc: 'Sourcing academic references...', color: C.accentBlue, textColor: '#1d4ed8', strokeColor: '#3b82f6' },
     { letter: 'C', label: 'Coder Agent', desc: 'Generating interactive exercises...', color: C.accentYellow, textColor: '#a16207', strokeColor: '#eab308' },
     { letter: 'K', label: 'Critic Agent', desc: 'Auditing pedagogy and feedback flow...', color: C.accentPink, textColor: '#be185d', strokeColor: '#ec4899' },
-    { letter: 'Q', label: 'Quizzer Agent', desc: 'Compiling adaptive pariksha...', color: C.accentPurple, textColor: '#ffffff', strokeColor: '#d3579a' },
+    { letter: 'Q', label: 'Quizzer Agent', desc: 'Compiling adaptive assessments...', color: C.accentPurple, textColor: '#ffffff', strokeColor: '#d3579a' },
   ];
 
   return (
@@ -280,7 +280,7 @@ function HeroSection() {
             className="text-lg mb-8 leading-relaxed"
             style={{ color: C.onSurfaceVariant }}
           >
-            Stop the daily jhanjhat of disconnected tools. Focus dynamically coordinates specialist AI agents to research, design, and generate complete personalized learning experiences.
+            Stop the daily hassle of disconnected tools. Focus dynamically coordinates specialist AI agents to research, design, and generate complete personalized learning experiences.
           </motion.p>
 
           <motion.div
@@ -297,7 +297,7 @@ function HeroSection() {
               href="/signup"
               className="text-center px-8 py-4 rounded-full font-semibold transition-transform duration-150 ease-out hover:scale-[1.03] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
             >
-              Shuru Karein (Get Started)
+              Get Started
             </Link>
             <a
               href="#how-it-works"
@@ -683,7 +683,7 @@ function ProblemSection() {
           transition={{ duration: 0.6 }}
         >
           The Content Creation{' '}
-          <span style={{ color: C.accentPurple }}>Chakravyuh</span>
+          <span style={{ color: C.accentPurple }}>Challenge</span>
         </motion.h2>
         <motion.p
           className="max-w-2xl mx-auto mb-12 text-lg leading-relaxed"
@@ -693,7 +693,7 @@ function ProblemSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.15 }}
         >
-          Educational content creation requires curriculum design, research, assessment creation, and storytelling. Today, these tasks rely on disconnected tools and immense manual effort. Even specialized AI models operate in silos, failing to deliver unified educational lakshya (objectives).
+          Educational content creation requires curriculum design, research, assessment creation, and storytelling. Today, these tasks rely on disconnected tools and immense manual effort. Even specialized AI models operate in silos, failing to deliver unified educational goals.
         </motion.p>
 
         {/* Pain-point cards */}
@@ -739,7 +739,7 @@ function FeaturesSection() {
             transition={{ duration: 0.6 }}
           >
             Dynamic Multi-Agent{' '}
-            <span style={{ color: '#5a6ba8' }}>Sangam</span>
+            <span style={{ color: '#5a6ba8' }}>Collaboration</span>
           </motion.h2>
           <motion.p
             className="max-w-2xl mx-auto"
@@ -749,7 +749,7 @@ function FeaturesSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.15 }}
           >
-            Give us an educational challenge. We&apos;ll assemble the ultimate AI mandali (team).
+            Give us an educational challenge. We&apos;ll assemble the ultimate AI team.
           </motion.p>
         </div>
 
@@ -763,7 +763,7 @@ function FeaturesSection() {
               ),
               iconBg: C.accentYellow,
               iconColor: '#6b4f00',
-              title: 'The AI Sutradhar',
+              title: 'The AI Coordinator',
               desc: 'No fixed workflows. Focus dynamically identifies and deploys the exact AI specialists needed for your specific learning objective.',
             },
             {
@@ -774,7 +774,7 @@ function FeaturesSection() {
               ),
               iconBg: C.accentBlue,
               iconColor: '#1e3a6e',
-              title: 'Specialized Agent Mandali',
+              title: 'Specialized Agent Team',
               desc: "Instructional planners, researchers, and visual communicators seamlessly exchange information and review each other's outputs.",
             },
             {
@@ -786,7 +786,7 @@ function FeaturesSection() {
               ),
               iconBg: C.accentPink,
               iconColor: '#831843',
-              title: 'Personalized Margdarshan',
+              title: 'Personalized Guidance',
               desc: 'Agents adapt the curriculum in real-time based on learner needs, ensuring an optimized and focused educational journey.',
             },
           ].map(({ icon, iconBg, iconColor, title, desc }, idx) => (
@@ -825,10 +825,10 @@ function FeaturesSection() {
 function ProcessSection() {
   const magnetic = useMagnetic(10);
   const steps = [
-    { n: '1', title: 'Define the Lakshya (Objective)', desc: 'Enter a single prompt detailing your topic, audience, and educational challenge.' },
-    { n: '2', title: 'The AI Panchayat Assembles', desc: 'The Orchestrator Agent breaks down the task and spins up specialized agents for research, writing, and assessment.' },
+    { n: '1', title: 'Define the Goal', desc: 'Enter a single prompt detailing your topic, audience, and educational challenge.' },
+    { n: '2', title: 'The AI Team Assembles', desc: 'The Orchestrator Agent breaks down the task and spins up specialized agents for research, writing, and assessment.' },
     { n: '3', title: 'Collaborative Execution', desc: 'Agents share context and build the course collaboratively, ensuring pedagogical alignment.' },
-    { n: '4', title: 'Ready for Pariksha', desc: 'Export a complete, personalized learning module ready for your LMS or application.', accent: true },
+    { n: '4', title: 'Ready for Assessment', desc: 'Export a complete, personalized learning module ready for your LMS or application.', accent: true },
   ];
 
   return (
@@ -934,7 +934,7 @@ function Footer() {
         className="max-w-4xl mx-auto px-4 text-center mb-16"
       >
         <h2 className="text-3xl font-extrabold mb-4" style={{ color: C.primary }}>
-          Ready to build the ultimate digital Gurukul?
+          Ready to build the ultimate digital learning hub?
         </h2>
         <p className="mb-8 text-lg" style={{ color: C.onSurfaceVariant }}>
           Join the waitlist to access the Focus multi-agent content creation API.

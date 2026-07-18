@@ -45,6 +45,32 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [oauthLoading, setOauthLoading] = useState<string | null>(null);
+
+  const handleOAuthLogin = async (provider: 'google') => {
+    setError(null);
+    setOauthLoading(provider);
+    
+    try {
+      const { createClient } = await import('@/utils/supabase/client');
+      const supabase = createClient();
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${appUrl}/auth/callback?next=/dashboard`,
+        },
+      });
+
+      if (oauthError) {
+        throw oauthError;
+      }
+    } catch (err: any) {
+      console.error(`${provider} login error:`, err);
+      setError(`OAuth authentication failed: ${err.message}`);
+      setOauthLoading(null);
+    }
+  };
 
   // Live zxcvbn strength state
   const [strength, setStrength] = useState<PasswordStrengthResult | null>(null);
@@ -465,6 +491,39 @@ export default function SignupPage() {
               </button>
             </div>
           </form>
+
+          <div className="relative flex py-2 items-center">
+            <div className="flex-grow border-t" style={{ borderColor: C.surfaceVariant }} />
+            <span
+              className="flex-shrink mx-4 text-[10px] uppercase font-bold tracking-widest"
+              style={{ color: C.outline }}
+            >
+              or secure sign-up
+            </span>
+            <div className="flex-grow border-t" style={{ borderColor: C.surfaceVariant }} />
+          </div>
+
+          <div className="space-y-3">
+            {/* Google OAuth Login */}
+            <button
+              type="button"
+              onClick={() => handleOAuthLogin('google')}
+              disabled={oauthLoading !== null}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 border rounded-xl text-sm font-semibold transition-all hover:shadow-md"
+              style={{
+                borderColor: C.outlineVariant,
+                backgroundColor: C.surfaceContainerLow,
+                color: C.onSurface,
+              }}
+            >
+              {oauthLoading === 'google' ? (
+                <Loader2 className="h-4 w-4 animate-spin" style={{ color: C.primary }} />
+              ) : (
+                <Globe className="h-4 w-4" style={{ color: C.outline }} />
+              )}
+              Continue with Google
+            </button>
+          </div>
         </div>
       </div>
     </div>

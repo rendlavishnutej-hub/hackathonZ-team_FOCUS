@@ -20,20 +20,17 @@ const C = {
   onSurfaceVariant: '#45464d',
   outline: '#76777d',
   outlineVariant: '#c6c6cd',
-  inverseOnSurface: '#f5f0e9',
-  inverseSurface: '#32302c',
   accentYellow: '#ffe24c',
   accentBlue: '#bec6e0',
   accentPink: '#ffafd3',
   accentGreen: '#86efac',
   accentPurple: '#d3579a',
-  secondaryContainer: '#fcdf46',
 };
 
 const tabs = [
-  { id: 'start', label: 'Start Quiz', icon: Play },
-  { id: 'history', label: 'Quiz History', icon: History },
-  { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+  { id: 'start', label: 'START QUIZ', icon: Play, bg: 'bg-[#ffe24c]' },
+  { id: 'history', label: 'HISTORY', icon: History, bg: 'bg-[#bec6e0]' },
+  { id: 'analytics', label: 'ANALYTICS', icon: BarChart3, bg: 'bg-[#ffafd3]' },
 ] as const;
 
 type TabId = typeof tabs[number]['id'];
@@ -52,24 +49,24 @@ export default function QuizHubClient({ userEmail, userId }: QuizHubClientProps)
       whileInView="show"
       viewport={{ once: true, margin: "-50px" }}
       variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
-      className="max-w-6xl mx-auto space-y-8"
+      className="max-w-6xl mx-auto space-y-12 py-8 lg:py-4 px-2 sm:px-0"
     >
       {/* Header */}
-      <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="space-y-2">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[#7C5CFF] text-[10px] font-semibold uppercase tracking-wider">
-          <Sparkles className="h-3 w-3 animate-spin-slow" />
-          Assessment Module
+      <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="space-y-4">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border-4 border-black text-black text-sm font-bold uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <Sparkles className="h-4 w-4 animate-spin-slow text-[#d3579a]" strokeWidth={3} />
+          ASSESSMENT MODULE
         </div>
-        <h1 className="font-display text-4xl sm:text-5xl tracking-wide uppercase font-extrabold text-black leading-none">
-          QUIZ <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#d3579a] to-[#5a6ba8]">ARENA</span>
+        <h1 className="font-display text-6xl sm:text-7xl md:text-8xl tracking-wide uppercase text-black leading-none pt-2">
+          QUIZ <span className="text-white bg-black px-4 inline-block mt-2 sm:mt-0 shadow-[6px_6px_0px_0px_rgba(211,87,154,1)]">ARENA</span>
         </h1>
-        <p className="text-sm font-medium" style={{ color: C.onSurfaceVariant }}>
+        <p className="text-xl sm:text-2xl font-bold max-w-3xl text-black border-l-8 border-[#ffe24c] pl-4 pt-2 uppercase tracking-wide">
           Upload your study materials and let AI generate a personalised quiz. Track progress and discover weak areas with intelligent analytics.
         </p>
       </motion.div>
 
       {/* Tab Navigation */}
-      <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="flex gap-1 p-1 bg-zinc-950/60 border border-zinc-800 rounded-2xl w-fit">
+      <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }} className="flex flex-wrap gap-4 pt-4">
         {tabs.map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -77,21 +74,14 @@ export default function QuizHubClient({ userEmail, userId }: QuizHubClientProps)
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className="relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors duration-200"
-              style={{ color: isActive ? '#000000' : '#71717a' }}
+              className={`flex items-center gap-3 px-6 py-4 text-xl font-display uppercase tracking-widest transition-all border-4 border-black hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] ${
+                isActive
+                  ? `${tab.bg} text-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] -translate-y-1 -translate-x-1`
+                  : 'bg-white text-black'
+              }`}
             >
-              {isActive && (
-                <motion.div
-                  layoutId="quiz-tab-bg"
-                  className="absolute inset-0 border rounded-xl"
-                  style={{ backgroundColor: C.surfaceContainerLow, borderColor: C.surfaceVariant }}
-                  transition={{ type: 'spring', duration: 0.4, bounce: 0.15 }}
-                />
-              )}
-              <span className="relative z-10 flex items-center gap-2 font-bold">
-                <Icon className={`h-4 w-4 ${isActive ? 'text-[#d3579a]' : ''}`} />
-                {tab.label}
-              </span>
+              <Icon className="h-6 w-6 shrink-0" strokeWidth={3} />
+              {tab.label}
             </button>
           );
         })}
@@ -101,10 +91,11 @@ export default function QuizHubClient({ userEmail, userId }: QuizHubClientProps)
       <AnimatePresence mode="wait">
         <motion.div
           key={activeTab}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.2 }}
+          className="pt-2"
         >
           {activeTab === 'start' && <QuizConfigForm userId={userId} />}
           {activeTab === 'history' && <QuizHistory userId={userId} />}

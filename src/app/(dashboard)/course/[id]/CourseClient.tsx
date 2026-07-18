@@ -311,13 +311,13 @@ export default function CourseClient({ courseId }: CourseClientProps) {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {course.notes.notes.map((noteGroup: any, idx: number) => {
-                const lesson = course.syllabus.lessons.find((l: any) => l.id === noteGroup.lessonId) || { title: \`Lesson \${idx + 1}\` };
+                const lesson = course.syllabus.lessons.find((l: any) => l.id === noteGroup.lessonId) || { title: `Lesson ${idx + 1}` };
                 
                 return (
                   <div 
                     key={noteGroup.lessonId}
                     className="p-6 rounded-2xl flex flex-col space-y-4 shadow-sm"
-                    style={{ backgroundColor: C.surfaceContainerLow, border: \`1px solid \${C.surfaceVariant}\` }}
+                    style={{ backgroundColor: C.surfaceContainerLow, border: `1px solid ${C.surfaceVariant}` }}
                   >
                     <div className="space-y-1 pb-4 border-b" style={{ borderColor: C.surfaceVariant }}>
                       <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-blue-600">

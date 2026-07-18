@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { signOutAction } from '@/app/auth/actions';
 
-// ─── Colour constants matching the brutalist design system ──────────────
+// ─── Colour constants matching the landing page design system ──────────────
 const C = {
   cream: '#fef9f2',
   primary: '#000000',
@@ -26,8 +26,8 @@ const C = {
   outlineVariant: '#c6c6cd',
   accentBlue: '#bec6e0',
   accentPurple: '#d3579a',
-  accentYellow: '#ffe24c',
 };
+
 
 interface SidebarProps {
   userEmail: string;
@@ -66,26 +66,28 @@ export default function Sidebar({ userEmail }: SidebarProps) {
   const displayName = userEmail.split('@')[0].toUpperCase();
 
   const sidebarContent = (
-    <div className="flex flex-col justify-between h-full w-full bg-white border-r-4 border-black text-black">
+    <div
+      className="w-full flex flex-col justify-between shrink-0 h-full bg-white md:bg-transparent"
+      style={{ backgroundColor: C.surfaceContainerLow }}
+    >
       {/* Top Header */}
-      <div className="p-6 border-b-4 border-black bg-[#ffe24c]">
+      <div className="p-6">
         <Link href="/dashboard" className="flex items-center group">
           <div>
-            <span className="text-4xl font-display tracking-widest block uppercase text-black">
+            <span className="text-3xl font-bold tracking-tight block" style={{ color: C.primary, fontFamily: 'var(--font-fredoka), sans-serif' }}>
               Focus
             </span>
             <span
-              className="text-[10px] uppercase tracking-widest font-bold block mt-1 text-black bg-white px-2 py-0.5 border-2 border-black inline-block shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+              className="text-[10px] uppercase tracking-widest font-semibold block mt-0.5"
+              style={{ color: C.outline }}
             >
               Agent Syllabus
             </span>
           </div>
         </Link>
-      </div>
 
-      {/* Navigation */}
-      <div className="flex-1 overflow-y-auto p-6">
-        <nav className="space-y-4">
+        {/* Navigation */}
+        <nav className="mt-8 space-y-1.5 overflow-y-auto">
           {navItems.map(item => {
             const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
             const Icon = item.icon;
@@ -94,16 +96,24 @@ export default function Sidebar({ userEmail }: SidebarProps) {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 text-sm font-bold uppercase tracking-wider transition-transform border-4 border-black hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${
+                className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150"
+                style={
                   isActive
-                    ? 'bg-black text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-y-1 -translate-x-1'
-                    : 'bg-white text-black'
-                }`}
+                    ? {
+                        backgroundColor: C.surfaceContainerLowest,
+                        color: C.primary,
+                        border: `1px solid ${C.surfaceVariant}`,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                      }
+                    : {
+                        color: C.onSurfaceVariant,
+                        border: '1px solid transparent',
+                      }
+                }
               >
                 <Icon
-                  className="h-5 w-5 shrink-0"
-                  strokeWidth={isActive ? 3 : 2}
-                  style={{ color: isActive ? C.accentYellow : C.primary }}
+                  className="h-4 w-4"
+                  style={{ color: isActive ? C.primary : C.outline }}
                 />
                 {item.name}
               </Link>
@@ -113,16 +123,22 @@ export default function Sidebar({ userEmail }: SidebarProps) {
       </div>
 
       {/* User Session profile / Logout */}
-      <div className="p-6 border-t-4 border-black bg-[#bec6e0] space-y-4">
-        <div className="flex items-center gap-3 p-3 border-4 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <div className="h-10 w-10 border-4 border-black bg-[#d3579a] flex items-center justify-center font-display text-xl text-white shrink-0">
+      <div className="p-6 border-t space-y-4 shrink-0" style={{ borderColor: C.surfaceVariant }}>
+        <div
+          className="flex items-center gap-3 p-3 rounded-xl border"
+          style={{ backgroundColor: C.surfaceContainerLowest, borderColor: C.surfaceVariant }}
+        >
+          <div
+            className="h-8 w-8 rounded-lg flex items-center justify-center font-bold text-sm"
+            style={{ backgroundColor: `${C.accentBlue}40`, color: '#5a6ba8' }}
+          >
             {displayName[0] || 'U'}
           </div>
           <div className="overflow-hidden">
-            <span className="text-sm font-bold uppercase tracking-wider block truncate text-black">
+            <span className="text-xs font-semibold block truncate" style={{ color: C.onSurface }}>
               {displayName}
             </span>
-            <span className="text-[10px] font-bold block truncate text-zinc-600">
+            <span className="text-[10px] block truncate" style={{ color: C.outline }}>
               {userEmail}
             </span>
           </div>
@@ -130,10 +146,15 @@ export default function Sidebar({ userEmail }: SidebarProps) {
 
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 border-4 border-black bg-white text-black font-bold uppercase tracking-wider hover:bg-[#ffafd3] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border text-sm font-medium rounded-xl transition-all hover:shadow-md"
+          style={{
+            borderColor: C.outlineVariant,
+            color: C.onSurfaceVariant,
+            backgroundColor: 'transparent',
+          }}
         >
-          <LogOut className="h-5 w-5" strokeWidth={3} />
-          LOGOUT
+          <LogOut className="h-4 w-4" />
+          Logout
         </button>
       </div>
     </div>
@@ -144,9 +165,10 @@ export default function Sidebar({ userEmail }: SidebarProps) {
       {/* Mobile Hamburger Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-40 p-2 border-4 border-black bg-[#ffe24c] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+        className="lg:hidden fixed top-4 left-4 z-40 p-2.5 rounded-xl shadow-sm border flex items-center justify-center bg-white hover:bg-zinc-50 transition-colors"
+        style={{ borderColor: C.surfaceVariant, color: C.onSurface }}
       >
-        <Menu className="h-6 w-6 text-black" strokeWidth={3} />
+        <Menu className="h-5 w-5" />
       </button>
 
       {/* Mobile Drawer Overlay */}
@@ -154,17 +176,21 @@ export default function Sidebar({ userEmail }: SidebarProps) {
         <div className="lg:hidden fixed inset-0 z-50 flex">
           {/* Backdrop */}
           <div 
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm" 
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" 
             onClick={() => setIsOpen(false)}
           />
           
           {/* Drawer */}
-          <div className="relative w-72 max-w-[80vw] h-full flex flex-col transform transition-transform animate-in slide-in-from-left">
+          <div 
+            className="relative w-64 max-w-[80vw] h-full flex flex-col transform transition-transform animate-in slide-in-from-left border-r shadow-xl"
+            style={{ borderColor: C.surfaceVariant }}
+          >
             <button
               onClick={() => setIsOpen(false)}
-              className="absolute top-4 -right-12 p-2 border-4 border-black bg-[#ffafd3] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+              className="absolute top-4 -right-12 p-2.5 rounded-xl bg-white shadow-sm border flex items-center justify-center text-zinc-500 hover:text-black transition-colors"
+              style={{ borderColor: C.surfaceVariant }}
             >
-              <X className="h-6 w-6 text-black" strokeWidth={3} />
+              <X className="h-5 w-5" />
             </button>
             {sidebarContent}
           </div>
@@ -172,7 +198,10 @@ export default function Sidebar({ userEmail }: SidebarProps) {
       )}
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col justify-between shrink-0 h-screen sticky top-0 w-72">
+      <aside 
+        className="hidden lg:flex w-64 flex-col justify-between shrink-0 h-screen sticky top-0 border-r"
+        style={{ borderColor: C.surfaceVariant }}
+      >
         {sidebarContent}
       </aside>
     </>

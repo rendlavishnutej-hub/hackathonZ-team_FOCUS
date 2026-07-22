@@ -243,8 +243,8 @@ export default function SignupPage() {
           <div className="absolute w-[120px] h-[120px] rounded-full border-2 border-[#22D3D0]/50 animate-pulse" style={{ animationDuration: '2s' }} />
 
           {/* Central Orchestrator Core */}
-          <div className="absolute w-[72px] h-[72px] rounded-2xl bg-gradient-to-tr from-[#7C5CFF] via-[#d3579a] to-[#22D3D0] flex items-center justify-center shadow-[0_0_40px_rgba(124,92,255,0.4)] z-20">
-            <Brain className="h-10 w-10 text-white drop-shadow-md" />
+          <div className="absolute w-[80px] h-[80px] flex items-center justify-center z-20">
+            <Brain className="h-16 w-16 text-[#7C5CFF] drop-shadow-[0_0_20px_rgba(124,92,255,0.6)]" />
           </div>
         </div>
 
